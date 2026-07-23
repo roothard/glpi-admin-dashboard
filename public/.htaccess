@@ -1,24 +1,20 @@
-# --- GLPI Projects Dashboard — basic hardening (Apache 2.4+) ---------------
+# --- GLPI Projects Dashboard — docroot hardening (Apache 2.4+) -------------
+Options -Indexes
 
-# Never serve dotfiles (.env, .git, …) from the docroot.
-<FilesMatch "^\.">
-  Require all denied
-</FilesMatch>
-
-# Security headers
 <IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+  # Self-contained page; map tiles come from CARTO. Adjust img-src if you change tile provider.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.basemaps.cartocdn.com; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+  Header always set X-Frame-Options "DENY"
   Header always set X-Content-Type-Options "nosniff"
-  Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Referrer-Policy "no-referrer"
-  # Self-contained page: allow only same-origin assets and inline styles/scripts.
-  Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'self'; frame-ancestors 'self'"
-</IfModule>
-
-# Don't cache the data feed.
-<IfModule mod_headers.c>
-  <FilesMatch "data\.json$">
-    Header set Cache-Control "no-store"
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=()"
+  <FilesMatch "\.json$">
+    Header always set Cache-Control "no-store"
   </FilesMatch>
 </IfModule>
 
-Options -Indexes
+# Never serve dotfiles (.env lives above docroot anyway).
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
