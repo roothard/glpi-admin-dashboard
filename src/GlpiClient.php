@@ -25,6 +25,7 @@ class GlpiClient
     private string $userToken;
     private bool   $tokensInQuery;
     private int    $timeout;
+    private bool   $insecure;        // allow self-signed TLS
     private int    $profileId;       // 0 = keep token's default profile
     private int    $entityId;        // -1 = keep default entity
     private bool   $entityRecursive;
@@ -42,6 +43,7 @@ class GlpiClient
         $this->userToken       = (string)($cfg['user_token'] ?? '');
         $this->tokensInQuery   = (bool)($cfg['tokens_in_query'] ?? false);
         $this->timeout         = (int)($cfg['timeout'] ?? 30);
+        $this->insecure        = (bool)($cfg['insecure'] ?? false);
         $this->profileId       = (int)($cfg['profile_id'] ?? 0);
         $this->entityId        = array_key_exists('entity_id', $cfg) && $cfg['entity_id'] !== '' ? (int)$cfg['entity_id'] : -1;
         $this->entityRecursive = (bool)($cfg['entity_recursive'] ?? true);
@@ -181,6 +183,10 @@ class GlpiClient
             CURLOPT_CONNECTTIMEOUT => min(15, $this->timeout),
             CURLOPT_FOLLOWLOCATION => true,
         ];
+        if ($this->insecure) {
+            $opts[CURLOPT_SSL_VERIFYPEER] = false;
+            $opts[CURLOPT_SSL_VERIFYHOST] = 0;
+        }
         if ($body !== null) {
             $opts[CURLOPT_POSTFIELDS] = json_encode($body);
         }

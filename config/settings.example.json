@@ -1,0 +1,38 @@
+{
+  "glpi": {
+    "url": "https://glpi.example.com",
+    "app_token": "",
+    "user_token": "",
+    "tokens_in_query": false,
+    "profile_id": 0,
+    "insecure": false,
+    "resolve_host": "",
+    "resolve_ip": ""
+  },
+  "projects": {
+    "project_type": "",
+    "group_by": "parent",
+    "include_only_leaf": false,
+    "area_strip_prefix": "",
+    "state_inprogress": ["proceso", "progress", "curso", "doing", "en cours"],
+    "state_done": ["cerrado", "closed", "done", "finished", "terminé"],
+    "state_planned": ["espera", "nuevo", "new", "planned", "hold", "waiting", "à faire"]
+  },
+  "branding": {
+    "app_name": "",
+    "subtitle": "Projects Center",
+    "accent": "#405cde",
+    "logo_url": "",
+    "default_lang": "es"
+  },
+  "modules": {
+    "gps": {
+      "enabled": false,
+      "label": "GPS Check-ins",
+      "app_url": "",
+      "db": { "host": "", "name": "", "user": "", "pass": "" }
+    }
+  },
+  "output": "",
+  "timezone": "UTC"
+}

@@ -8,8 +8,8 @@ public/data.json
 data-cache.json
 *.log
 
-# Dependencies / build
-vendor/
+# Dependencies / build (root composer vendor only; public/vendor/leaflet IS bundled)
+/vendor/
 node_modules/
 
 # OS / editor
@@ -18,3 +18,4 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+config/settings.json

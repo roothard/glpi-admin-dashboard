@@ -1,33 +1,27 @@
 <?php
 /**
- * generate.php — CLI entry point. Reads config, pulls GLPI over REST, writes data.json.
+ * generate.php — CLI entry point. Reads config (config/settings.json, with env
+ * overrides), pulls GLPI over REST, writes data-cache.json.
  *
- * Usage:
- *   php bin/generate.php [--env=/path/to/.env] [--out=/path/to/data.json]
- *
- * Intended to run from cron (or the Docker scheduler). Exit code 0 on success.
- *
+ * Usage: php bin/generate.php [--out=/path/to/data-cache.json]
+ * Intended to run from cron. Exit 0 on success.
  * @license MIT
  */
 
-if (PHP_SAPI !== 'cli') {
-    http_response_code(403);
-    exit("This script is CLI-only.\n");
-}
+if (PHP_SAPI !== 'cli') { http_response_code(403); exit("CLI only.\n"); }
 
-require __DIR__ . '/../src/Config.php';
+require __DIR__ . '/../src/Settings.php';
 require __DIR__ . '/../src/GlpiClient.php';
 require __DIR__ . '/../src/DashboardGenerator.php';
 
-// --- args ---
-$opts = getopt('', ['env::', 'out::']);
-$envFile = $opts['env'] ?? (getenv('DASHBOARD_ENV') ?: __DIR__ . '/../.env');
+$opts = getopt('', ['out::', 'config::']);
 
 try {
-    $cfg = Config::load(is_file($envFile) ? $envFile : null);
-    if (!empty($cfg['timezone'])) {
-        @date_default_timezone_set($cfg['timezone']);
+    $cfg = Settings::flat(Settings::load($opts['config'] ?? null));
+    if (($cfg['url'] ?? '') === '' || ($cfg['app_token'] ?? '') === '') {
+        throw new RuntimeException('Not configured yet. Open /setup.php (or set GLPI_URL/GLPI_APP_TOKEN).');
     }
+    if (!empty($cfg['timezone'])) { @date_default_timezone_set($cfg['timezone']); }
     $out = $opts['out'] ?? $cfg['output'];
 
     $client = new GlpiClient($cfg);
@@ -37,10 +31,7 @@ try {
     [$projects, $kb] = $gen->run($out);
     $ms = round((microtime(true) - $t0) * 1000);
 
-    fwrite(STDOUT, sprintf(
-        "OK — %d projects, %d KB linked → %s (%d ms)\n",
-        $projects, $kb, $out, $ms
-    ));
+    fwrite(STDOUT, sprintf("OK — %d projects, %d KB linked → %s (%d ms)\n", $projects, $kb, $out, $ms));
     exit(0);
 } catch (\Throwable $e) {
     fwrite(STDERR, 'ERROR: ' . $e->getMessage() . "\n");

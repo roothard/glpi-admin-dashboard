@@ -25,10 +25,9 @@ $u = trim($in['usuario'] ?? '');
 $p = (string)($in['password'] ?? '');
 if ($u === '' || $p === '') { http_response_code(400); echo json_encode(['ok' => false]); exit; }
 
-$e = env();
-if (empty($e['GLPI_APP_TOKEN'])) {
+if (glpi_app_token() === '') {
     http_response_code(503);
-    echo json_encode(['ok' => false, 'error' => 'App-Token not configured on the server']);
+    echo json_encode(['ok' => false, 'error' => 'App-Token not configured — open /setup.php']);
     exit;
 }
 
