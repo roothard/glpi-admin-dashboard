@@ -51,8 +51,8 @@ class Config
                 'done'       => $list($get('STATE_DONE', 'cerrado,closed,done,finished,prod')),
                 'planned'    => $list($get('STATE_PLANNED', 'espera,nuevo,new,planned,hold,waiting')),
             ],
-            // output
-            'output'   => (string)$get('OUTPUT', __DIR__ . '/../public/data.json'),
+            // output (defaults above docroot for login mode; data.php reads it)
+            'output'   => (string)$get('OUTPUT', __DIR__ . '/../data-cache.json'),
             'timezone' => (string)$get('TIMEZONE', 'UTC'),
         ];
     }
