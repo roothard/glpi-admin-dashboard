@@ -15,8 +15,8 @@ header('Content-Type: application/json; charset=utf-8');
 
 if (empty($_SESSION['glpi_token'])) { http_response_code(401); echo json_encode(['auth' => false]); exit; }
 
-$e = env();
-$db = @new mysqli($e['DB_HOST'] ?? '', $e['DB_USER'] ?? '', $e['DB_PASS'] ?? '', $e['DB_NAME'] ?? '');
+$dbc = cfg()['modules']['gps']['db'];
+$db = @new mysqli($dbc['host'] ?? '', $dbc['user'] ?? '', $dbc['pass'] ?? '', $dbc['name'] ?? '');
 if ($db->connect_errno) { http_response_code(500); echo json_encode(['error' => 'db']); exit; }
 $db->set_charset('utf8mb4');
 

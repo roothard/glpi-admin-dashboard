@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RootHard · Centro de Proyectos</title>
+<title>Dashboard</title>
 <script>(function(){var s=localStorage.getItem('rh-theme');if(s)document.documentElement.setAttribute('data-theme',s);})();</script>
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <script src="vendor/leaflet/leaflet.js"></script>
@@ -162,13 +162,15 @@ main{padding-top:20px;padding-bottom:60px}
 #fi-map{height:340px;border-radius:12px;overflow:hidden;border:1px solid var(--border);z-index:0}
 .leaflet-container{font-family:var(--sans);background:var(--surface2)}
 .leaflet-popup-content{font:500 12.5px var(--sans)}
+.applink{margin-left:auto;font:600 11px var(--mono);color:var(--accent);text-decoration:none;border:1px solid var(--border2);border-radius:7px;padding:5px 10px;white-space:nowrap}
+.applink:hover{border-color:var(--accent);background:var(--accent-soft)}
 </style>
 </head>
 <body>
 <header class="top"><div class="wrap">
   <div class="hrow">
     <svg class="mark" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#405cde"/><stop offset="1" stop-color="#6a83f2"/></linearGradient></defs><path d="M4 20c5-9 11-13.5 16-13.5S31 11 36 20c-5 9-11 13.5-16 13.5S9 29 4 20Z" stroke="url(#g)" stroke-width="2.4"/><circle cx="20" cy="20" r="5" fill="url(#g)"/></svg>
-    <h1>RootHard · <span id="tit">Centro de Proyectos</span></h1>
+    <h1><span id="brand"></span><span id="tit">Centro de Proyectos</span></h1>
     <div class="ctrls">
       <span class="gen" id="gen"></span>
       <span id="who"></span>
@@ -229,6 +231,7 @@ main{padding-top:20px;padding-bottom:60px}
       <button class="clr" id="fi-go">Filtrar</button>
       <button class="clr" id="fi-csv">Exportar CSV</button>
       <span class="chip" id="fi-scope"></span>
+      <a class="applink" id="fi-applink" href="https://gps.roothard.com.ar" target="_blank" rel="noopener">🌐 <span id="fi-appt">Ver app</span> ↗</a>
     </div>
     <div class="panel" id="fi-lic" style="display:none">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -280,7 +283,7 @@ const I18N={
   close:'Cerrar',noDesc:'Sin descripción',noKb:'Sin artículos vinculados a este proyecto en GLPI.',noDates:'Sin fechas.',noTaskDates:'Sin fechas de tareas.',today:'hoy',noData:'No se pudieron cargar los datos',
   l_sub:'Ingresá con tu cuenta de GLPI',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Acceder',l_err:'Usuario o contraseña incorrectos',l_503:'Login no configurado (falta App-Token)',logout:'Salir',
   apps:'Apps',hub_h:'Bienvenido',hub_sub:'Elegí una aplicación',app_proj:'Panel de Proyectos',app_proj_d:'Portfolio, avances y cronograma',app_fich:'Fichadas GPS',app_fich_d:'Presencia de técnicos en campo',
-  filtrar:'Filtrar',allTec:'Todos los técnicos',f_total:'Fichadas',f_tec:'Técnicos',f_hours:'Horas',f_tecnico:'Técnico',f_cliente:'Cliente',f_entrada:'Entrada',f_salida:'Salida',f_dur:'Duración',scope_admin:'Todos los técnicos',scope_supervisor:'Mi equipo',scope_tecnico:'Mis fichadas',f_csv:'Exportar CSV',f_map:'Ubicaciones',f_nogps:'Sin coordenadas GPS',f_mapnote:'Distribución por ubicación GPS (clic en un punto = Google Maps).',lic_h:'Licencia GPS',lic_note:'La app leerá esta clave desde GLPI — los usuarios no la cargan a mano.',lic_key:'Clave de licencia',lic_save:'Guardar en GLPI',lic_active:'Activado',lic_inactive:'Sin licencia',lic_activate:'Activar',lic_change:'Cambiar',lic_saving:'guardando…',lic_saved:'guardada en GLPI',lic_error:'error al guardar'},
+  filtrar:'Filtrar',allTec:'Todos los técnicos',f_total:'Fichadas',f_tec:'Técnicos',f_hours:'Horas',f_tecnico:'Técnico',f_cliente:'Cliente',f_entrada:'Entrada',f_salida:'Salida',f_dur:'Duración',scope_admin:'Todos los técnicos',scope_supervisor:'Mi equipo',scope_tecnico:'Mis fichadas',f_csv:'Exportar CSV',f_map:'Ubicaciones',f_nogps:'Sin coordenadas GPS',f_mapnote:'Distribución por ubicación GPS (clic en un punto = Google Maps).',lic_h:'Licencia GPS',lic_note:'La app leerá esta clave desde GLPI — los usuarios no la cargan a mano.',lic_key:'Clave de licencia',lic_save:'Guardar en GLPI',lic_active:'Activado',lic_inactive:'Sin licencia',lic_activate:'Activar',lic_change:'Cambiar',lic_saving:'guardando…',lic_saved:'guardada en GLPI',lic_error:'error al guardar',app_link:'Ver app'},
  en:{tit:'Projects Center',upd:'Updated',t_res:'Summary',t_exp:'Explorer',t_map:'Map',
   search:'Search project…',allAreas:'All areas',allStates:'All states',allEnts:'All entities',allResp:'All owners',clear:'Clear',
   proj:'project',projs:'projects',k_proj:'Projects',k_act:'Active',k_avg:'Avg. progress',k_prog:'In progress',
@@ -309,7 +312,10 @@ function applyStatic(){
   document.querySelector('.tab[data-v="resumen"]').textContent='▦ '+T('t_res');
   document.querySelector('.tab[data-v="explorador"]').textContent='🔍 '+T('t_exp');
   document.querySelector('.tab[data-v="mapa"]').textContent='🗺 '+T('t_map');
+  const _bn=(CONFIG.branding&&CONFIG.branding.app_name)||'';
+  $('#brand').textContent=_bn?_bn+' · ':'';
   $('#tit').textContent=T('tit');
+  document.title=(_bn?_bn+' · ':'')+T('tit');
   $('#q').placeholder=T('search');
   $('#f-area').options[0].text=T('allAreas'); $('#f-estado').options[0].text=T('allStates');
   $('#f-entidad').options[0].text=T('allEnts'); $('#f-resp').options[0].text=T('allResp');
@@ -345,7 +351,8 @@ function renderHub(){
   $('#hub-h').textContent=T('hub_h')+(DATA.user?', '+String(DATA.user).split(' ')[0]:'');
   $('#hub-sub').textContent=T('hub_sub');
   const tiles=[{k:'proyectos',ic:'📊',t:T('app_proj'),d:T('app_proj_d')}];
-  if(DATA.isAdmin||DATA.isSuper) tiles.push({k:'fichadas',ic:'📍',t:T('app_fich'),d:T('app_fich_d')});
+  const _gps=(CONFIG.modules&&CONFIG.modules.gps)||{};
+  if((DATA.isAdmin||DATA.isSuper)&&_gps.enabled) tiles.push({k:'fichadas',ic:'📍',t:_gps.label||T('app_fich'),d:T('app_fich_d')});
   const w=$('#hubtiles'); w.innerHTML='';
   tiles.forEach(x=>{const c=el('div','apptile');c.innerHTML=`<div class="ai">${x.ic}</div><h3>${esc(x.t)}</h3><p>${esc(x.d)}</p>`;c.addEventListener('click',()=>showApp(x.k));w.appendChild(c);});
 }
@@ -441,7 +448,22 @@ $('#loginform').addEventListener('submit',e=>{
     }).catch(()=>{ btn.disabled=false; $('#l-err').textContent=T('l_err'); });
 });
 $('#logout').addEventListener('click',()=>{fetch('logout.php',{method:'POST',credentials:'same-origin'}).then(()=>{DATA={projects:[],states:[]};showLogin();});});
-loadData();
+
+// ---- config del server: branding + módulos (NADA hardcodeado) ----
+let CONFIG={branding:{},modules:{gps:{}}};
+function applyBranding(){
+  const b=CONFIG.branding||{}, gps=(CONFIG.modules||{}).gps||{};
+  if(b.accent) document.documentElement.style.setProperty('--accent',b.accent);
+  if(b.logo_url) document.querySelectorAll('.mark,.lmark').forEach(m=>{const img=el('img');img.src=b.logo_url;img.className=m.className;img.style.width=m.classList.contains('lmark')?'44px':'30px';img.style.height='auto';m.replaceWith(img);});
+  const al=$('#fi-applink'); if(al){ if(gps.app_url){al.href=gps.app_url;al.style.display='';}else{al.style.display='none';} }
+}
+function loadConfig(){
+  return fetch('config.php?_='+Date.now()).then(r=>r.ok?r.json():null).then(c=>{
+    if(c){CONFIG=c; if(!localStorage.getItem('rh-lang')&&c.branding&&c.branding.default_lang){LANG=c.branding.default_lang;$lang.value=LANG;}}
+    applyBranding();
+  }).catch(()=>{applyBranding();});
+}
+loadConfig().then(loadData);
 
 // ---- navegación: apps (hub/proyectos/fichadas) + tabs de proyectos ----
 let APP='hub', curTab='resumen';

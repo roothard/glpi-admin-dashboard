@@ -15,7 +15,7 @@ $tok = $_SESSION['glpi_token'];
 list($c, $list) = glpi_fetch('/Project', ['range' => '0-500', 'expand_dropdowns' => 'true'], $tok);
 if ($c === 401 || $c === 403) { $_SESSION = []; http_response_code(401); echo json_encode(['auth' => false]); exit; }
 
-$type = trim((string)(env()['PROJECT_TYPE'] ?? '')); // empty = all types
+$type = trim((string)(cfg()['projects']['project_type'] ?? '')); // empty = all types
 $vis = [];
 if (is_array($list)) {
     foreach ($list as $p) {
