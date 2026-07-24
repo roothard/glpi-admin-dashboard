@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cfg['branding']['subtitle']     = trim($in['subtitle'] ?? '');
     $cfg['branding']['accent']       = preg_match('/^#[0-9a-fA-F]{6}$/', $in['accent'] ?? '') ? $in['accent'] : '#405cde';
     $cfg['branding']['logo_url']     = trim($in['logo_url'] ?? '');
-    $cfg['branding']['default_lang'] = in_array(($in['default_lang'] ?? 'es'), ['es', 'en', 'fr', 'de', 'pt'], true) ? $in['default_lang'] : 'es';
+    $cfg['branding']['default_lang'] = in_array(($in['default_lang'] ?? 'es'), ['es', 'en'], true) ? $in['default_lang'] : 'es';
 
     $cfg['modules']['gps']['enabled']    = !empty($in['gps_enabled']);
     $cfg['modules']['gps']['label']      = trim($in['gps_label'] ?? '') ?: 'GPS Check-ins';
@@ -159,7 +159,7 @@ button{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18px;cu
   <div class="row"><label>Subtitle</label><input type="text" name="subtitle" value="<?= $h($b['subtitle']) ?>"></div>
   <div class="row"><label>Accent color</label><input type="color" name="accent" value="<?= $h($b['accent']) ?>"></div>
   <div class="row"><label>Logo URL</label><input type="url" name="logo_url" value="<?= $h($b['logo_url']) ?>" placeholder="optional"></div>
-  <div class="row"><label>Default language</label><select name="default_lang"><?php foreach (['es'=>'Español','en'=>'English','fr'=>'Français','de'=>'Deutsch','pt'=>'Português'] as $k=>$v) echo '<option value="'.$k.'" '.($b['default_lang']===$k?'selected':'').">$v</option>"; ?></select></div>
+  <div class="row"><label>Default language</label><select name="default_lang"><?php foreach (['es'=>'Español','en'=>'English'] as $k=>$v) echo '<option value="'.$k.'" '.($b['default_lang']===$k?'selected':'').">$v</option>"; ?></select></div>
 </fieldset>
 <fieldset><legend>Module · GPS Check-ins</legend>
   <div class="row"><label class="chk"><input type="checkbox" name="gps_enabled" <?= $gps['enabled'] ? 'checked' : '' ?>> Enable module</label><span></span></div>
