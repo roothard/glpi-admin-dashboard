@@ -54,6 +54,20 @@ main{padding-top:20px;padding-bottom:60px}
 .arow .an{font-size:14px;font-weight:600}
 .arow .as{font:600 10px var(--mono);color:var(--muted)}
 .arow .ab{grid-column:1/3;margin-top:7px}
+.acthead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.acthead>h4{margin:0}
+.acttools{display:flex;gap:8px;margin-left:auto}
+.acttools input,.acttools select{font:500 13px var(--sans);color:var(--text);background:var(--bg);border:1px solid var(--border2);border-radius:9px;padding:7px 10px;outline:none}
+.acttools input:focus,.acttools select:focus{border-color:var(--accent)}
+.statelegend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px}
+.statelegend span{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--mono);color:var(--muted)}
+.statelegend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.arow .rsn{display:flex;gap:5px;flex-wrap:wrap;grid-column:1/3;margin-top:4px}
+.rchip{font:600 9.5px var(--mono);padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.03em}
+.rchip.late{background:rgba(226,80,110,.15);color:#e2506e}
+.rchip.stuck{background:rgba(200,140,0,.16);color:#c88c00}
+.rchip.nodate{background:var(--surface2);color:var(--muted)}
+#att-panel>h4{color:#e2506e}
 /* timeline (gantt de proyectos) */
 .grow{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:10px;margin:5px 0;position:relative;z-index:1}
 .gname{font-size:12px;color:var(--text);overflow:hidden}
@@ -164,18 +178,62 @@ main{padding-top:20px;padding-bottom:60px}
 .leaflet-popup-content{font:500 12.5px var(--sans)}
 .applink{margin-left:auto;font:600 11px var(--mono);color:var(--accent);text-decoration:none;border:1px solid var(--border2);border-radius:7px;padding:5px 10px;white-space:nowrap}
 .applink:hover{border-color:var(--accent);background:var(--accent-soft)}
+/* ---- sidebar ---- */
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--surface);border-right:1px solid var(--border);z-index:40;display:flex;flex-direction:column;transition:width .16s;overflow:hidden}
+body{padding-left:64px;transition:padding-left .16s}
+body.sb-pinned{padding-left:220px}
+body.sb-pinned #sidebar{width:220px}
+body.sb-auto #sidebar:hover{width:220px;box-shadow:8px 0 30px rgba(10,15,30,.16)}
+.sb-top{display:flex;align-items:center;gap:11px;padding:0 18px;min-height:53px;border-bottom:1px solid var(--border)}
+.sb-top .mark{width:26px;height:26px;flex:none}
+.sb-brand{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;opacity:0;transition:opacity .12s}
+body.sb-pinned .sb-brand,body.sb-auto #sidebar:hover .sb-brand{opacity:1}
+#sb-apps{padding:8px 0}
+.sb-item{display:flex;align-items:center;gap:13px;padding:11px 20px;cursor:pointer;color:var(--muted);white-space:nowrap;font-size:14px;font-weight:600}
+.sb-item:hover{color:var(--text);background:var(--surface2)}
+.sb-item.on{color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.sb-item .ic{font-size:18px;min-width:24px;text-align:center}
+.sb-item span:not(.ic){opacity:0;transition:opacity .12s}
+body.sb-pinned .sb-item span:not(.ic),body.sb-auto #sidebar:hover .sb-item span:not(.ic){opacity:1}
+.sb-spacer{flex:1}
+.sb-toggle{border-top:1px solid var(--border);color:var(--dim)}
+@media(max-width:720px){body,body.sb-pinned{padding-left:56px}#sidebar,body.sb-pinned #sidebar{width:56px}}
+/* ---- reportes fichadas ---- */
+.perbar{display:flex;gap:6px;margin:0 0 14px;flex-wrap:wrap}
+.perbar button{font:600 12px var(--sans);color:var(--muted);background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:6px 13px;cursor:pointer}
+.perbar button.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.freports{display:flex;gap:4px;margin:0 0 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.freports button{font:600 13px var(--sans);color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;padding:8px 13px 10px;cursor:pointer}
+.freports button:hover{color:var(--text)}
+.freports button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.hrow{display:grid;grid-template-columns:190px 1fr auto;gap:12px;align-items:center;padding:7px 2px}
+.hrow .hn{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hrow .hbar{height:16px;background:var(--surface2);border-radius:5px;overflow:hidden}
+.hrow .hbar>i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.hrow .hv{font:700 12px var(--mono);color:var(--muted);white-space:nowrap}
+.anomrow{display:flex;gap:10px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--border);font-size:13px}
+.anomrow .aw{color:var(--dim);font:600 11px var(--mono)}
+.anomrow .at{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap}
 </style>
 </head>
 <body>
+<aside id="sidebar">
+  <div class="sb-top">
+    <svg class="mark" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="gs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#405cde"/><stop offset="1" stop-color="#6a83f2"/></linearGradient></defs><path d="M4 20c5-9 11-13.5 16-13.5S31 11 36 20c-5 9-11 13.5-16 13.5S9 29 4 20Z" stroke="url(#gs)" stroke-width="2.4"/><circle cx="20" cy="20" r="5" fill="url(#gs)"/></svg>
+    <span class="sb-brand" id="sb-brand"></span>
+  </div>
+  <nav id="sb-apps"></nav>
+</aside>
 <header class="top"><div class="wrap">
   <div class="hrow">
+    <button class="iconbtn" id="sb-pin" title="">☰</button>
     <svg class="mark" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#405cde"/><stop offset="1" stop-color="#6a83f2"/></linearGradient></defs><path d="M4 20c5-9 11-13.5 16-13.5S31 11 36 20c-5 9-11 13.5-16 13.5S9 29 4 20Z" stroke="url(#g)" stroke-width="2.4"/><circle cx="20" cy="20" r="5" fill="url(#g)"/></svg>
     <h1><span id="brand"></span><span id="tit">Centro de Proyectos</span></h1>
     <div class="ctrls">
       <span class="gen" id="gen"></span>
       <span id="who"></span>
       <button class="iconbtn" id="theme" title="Tema">🌙</button>
-      <select id="lang"><option value="es">ES</option><option value="en">EN</option></select>
+      <select id="lang"><option value="es">ES</option><option value="en">EN</option><option value="fr">FR</option><option value="de">DE</option><option value="pt">PT</option></select>
       <button class="iconbtn" id="logout" title="Salir" style="display:none">⎋</button>
     </div>
   </div>
@@ -199,8 +257,20 @@ main{padding-top:20px;padding-bottom:60px}
   <!-- RESUMEN -->
   <section class="view on" id="v-resumen">
     <div class="kpis" id="kpis"></div>
-    <div class="panel"><h4 id="h-act">Proyectos activos · avance</h4><div class="actlist" id="actlist"></div></div>
-    <div class="panel"><h4 id="h-tl">Línea de tiempo · todos los proyectos</h4><div id="timeline"></div></div>
+    <div class="panel" id="att-panel"><h4 id="h-att">Requieren atención</h4><div class="actlist" id="attlist"></div></div>
+    <div class="panel">
+      <div class="acthead"><h4 id="h-act">Proyectos activos · avance</h4>
+        <div class="acttools">
+          <input id="act-q" type="search" autocomplete="off">
+          <select id="act-sort"></select>
+        </div>
+      </div>
+      <div class="actlist" id="actlist"></div>
+    </div>
+    <div class="panel"><h4 id="h-tl">Línea de tiempo · todos los proyectos</h4>
+      <div class="statelegend" id="tl-legend"></div>
+      <div id="timeline"></div>
+    </div>
   </section>
 
   <!-- EXPLORADOR -->
@@ -233,6 +303,7 @@ main{padding-top:20px;padding-bottom:60px}
       <span class="chip" id="fi-scope"></span>
       <a class="applink" id="fi-applink" href="https://gps.roothard.com.ar" target="_blank" rel="noopener">🌐 <span id="fi-appt">Ver app</span> ↗</a>
     </div>
+    <div class="perbar" id="fi-per"></div>
     <div class="panel" id="fi-lic" style="display:none">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <span id="lic-h" style="font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--dim)">Licencia GPS</span>
@@ -249,9 +320,19 @@ main{padding-top:20px;padding-bottom:60px}
         </div>
       </div>
     </div>
-    <div class="kpis" id="fi-kpis"></div>
-    <div class="panel"><h4 id="fi-mh">Ubicaciones</h4><div id="fi-map"></div></div>
-    <div class="panel"><h4 id="fi-h">Fichadas</h4><div id="fi-table"></div></div>
+    <nav class="freports" id="fi-reports"></nav>
+    <div class="frep" id="fi-rep-over">
+      <div class="kpis" id="fi-kpis"></div>
+      <div class="panel"><h4 id="fi-mh">Ubicaciones</h4><div id="fi-map"></div></div>
+      <div class="panel"><h4 id="fi-h">Fichadas</h4><div id="fi-table"></div></div>
+    </div>
+    <div class="frep" id="fi-rep-hours" style="display:none">
+      <div class="panel"><h4 id="fi-hh"></h4><div id="fi-hours"></div></div>
+    </div>
+    <div class="frep" id="fi-rep-anom" style="display:none">
+      <div class="kpis" id="fi-akpis"></div>
+      <div class="panel"><h4 id="fi-ah"></h4><div id="fi-anom"></div></div>
+    </div>
   </section>
 </main>
 
@@ -293,8 +374,43 @@ const I18N={
   close:'Close',noDesc:'No description',noKb:'No articles linked to this project in GLPI.',noDates:'No dates.',noTaskDates:'No task dates.',today:'today',noData:'Could not load data',
   l_sub:'Sign in with your GLPI account',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err:'Wrong username or password',l_503:'Login not configured (App-Token missing)',logout:'Sign out',
   apps:'Apps',hub_h:'Welcome',hub_sub:'Choose an app',app_proj:'Projects Panel',app_proj_d:'Portfolio, progress and schedule',app_fich:'GPS Check-ins',app_fich_d:'Field technician presence',
-  filtrar:'Filter',allTec:'All technicians',f_total:'Check-ins',f_tec:'Technicians',f_hours:'Hours',f_tecnico:'Technician',f_cliente:'Client',f_entrada:'In',f_salida:'Out',f_dur:'Duration',scope_admin:'All technicians',scope_supervisor:'My team',scope_tecnico:'My check-ins',f_csv:'Export CSV',f_map:'Locations',f_nogps:'No GPS coordinates',f_mapnote:'Distribution by GPS location (click a point = Google Maps).',lic_h:'GPS License',lic_note:'The app reads this key from GLPI — users no longer enter it manually.',lic_key:'License key',lic_save:'Save to GLPI',lic_active:'Activated',lic_inactive:'No license',lic_activate:'Activate',lic_change:'Change',lic_saving:'saving…',lic_saved:'saved to GLPI',lic_error:'save error'}
+  filtrar:'Filter',allTec:'All technicians',f_total:'Check-ins',f_tec:'Technicians',f_hours:'Hours',f_tecnico:'Technician',f_cliente:'Client',f_entrada:'In',f_salida:'Out',f_dur:'Duration',scope_admin:'All technicians',scope_supervisor:'My team',scope_tecnico:'My check-ins',f_csv:'Export CSV',f_map:'Locations',f_nogps:'No GPS coordinates',f_mapnote:'Distribution by GPS location (click a point = Google Maps).',lic_h:'GPS License',lic_note:'The app reads this key from GLPI — users no longer enter it manually.',lic_key:'License key',lic_save:'Save to GLPI',lic_active:'Activated',lic_inactive:'No license',lic_activate:'Activate',lic_change:'Change',lic_saving:'saving…',lic_saved:'saved to GLPI',lic_error:'save error',app_link:'Open app'},
+ fr:{tit:'Centre de projets',upd:'Mis à jour',t_res:'Résumé',t_exp:'Explorateur',t_map:'Carte',
+  search:'Rechercher un projet…',allAreas:'Toutes les zones',allStates:'Tous les états',allEnts:'Toutes les entités',allResp:'Tous les responsables',clear:'Effacer',
+  proj:'projet',projs:'projets',k_proj:'Projets',k_act:'Actifs',k_avg:'Avancement moy.',k_prog:'En cours',
+  h_act:'Projets actifs · avancement',h_tl:'Chronologie · tous les projets',
+  p_gantt:'Gantt · Calendrier des tâches',p_kanban:'Kanban · Tâches par état',p_det:'Détails',p_kb:'Base de connaissances',
+  d_area:'Zone',d_ent:'Entité',d_resp:'Responsable',d_prog:'Avancement',d_plan:'Planifié',d_done:'terminées',d_pend:'en attente',
+  close:'Fermer',noDesc:'Sans description',noKb:'Aucun article lié à ce projet dans GLPI.',noDates:'Aucune date.',noTaskDates:'Aucune date de tâche.',today:"aujourd'hui",noData:'Impossible de charger les données',
+  l_sub:'Connectez-vous avec votre compte GLPI',l_user:'Utilisateur',l_pass:'Mot de passe',l_btn:'Se connecter',l_err:'Utilisateur ou mot de passe incorrect',l_503:'Connexion non configurée (App-Token manquant)',logout:'Déconnexion',
+  apps:'Apps',hub_h:'Bienvenue',hub_sub:'Choisissez une application',app_proj:'Panneau de projets',app_proj_d:'Portfolio, avancement et calendrier',app_fich:'Pointages GPS',app_fich_d:'Présence des techniciens sur le terrain',
+  filtrar:'Filtrer',allTec:'Tous les techniciens',f_total:'Pointages',f_tec:'Techniciens',f_hours:'Heures',f_tecnico:'Technicien',f_cliente:'Client',f_entrada:'Entrée',f_salida:'Sortie',f_dur:'Durée',scope_admin:'Tous les techniciens',scope_supervisor:'Mon équipe',scope_tecnico:'Mes pointages',f_csv:'Exporter CSV',f_map:'Emplacements',f_nogps:'Pas de coordonnées GPS',f_mapnote:'Répartition par emplacement GPS (clic sur un point = Google Maps).',lic_h:'Licence GPS',lic_note:"L'app lit cette clé depuis GLPI — les utilisateurs ne la saisissent plus.",lic_key:'Clé de licence',lic_save:'Enregistrer dans GLPI',lic_active:'Activé',lic_inactive:'Sans licence',lic_activate:'Activer',lic_change:'Changer',lic_saving:'enregistrement…',lic_saved:'enregistrée dans GLPI',lic_error:'erreur',app_link:"Voir l'app"},
+ de:{tit:'Projektzentrum',upd:'Aktualisiert',t_res:'Übersicht',t_exp:'Explorer',t_map:'Karte',
+  search:'Projekt suchen…',allAreas:'Alle Bereiche',allStates:'Alle Status',allEnts:'Alle Entitäten',allResp:'Alle Verantwortlichen',clear:'Löschen',
+  proj:'Projekt',projs:'Projekte',k_proj:'Projekte',k_act:'Aktiv',k_avg:'Ø Fortschritt',k_prog:'In Arbeit',
+  h_act:'Aktive Projekte · Fortschritt',h_tl:'Zeitleiste · alle Projekte',
+  p_gantt:'Gantt · Aufgabenplan',p_kanban:'Kanban · Aufgaben nach Status',p_det:'Details',p_kb:'Wissensdatenbank',
+  d_area:'Bereich',d_ent:'Entität',d_resp:'Verantwortlich',d_prog:'Fortschritt',d_plan:'Geplant',d_done:'erledigt',d_pend:'offen',
+  close:'Schließen',noDesc:'Keine Beschreibung',noKb:'Keine Artikel mit diesem Projekt in GLPI verknüpft.',noDates:'Keine Daten.',noTaskDates:'Keine Aufgaben-Daten.',today:'heute',noData:'Daten konnten nicht geladen werden',
+  l_sub:'Mit Ihrem GLPI-Konto anmelden',l_user:'Benutzer',l_pass:'Passwort',l_btn:'Anmelden',l_err:'Falscher Benutzer oder Passwort',l_503:'Login nicht konfiguriert (App-Token fehlt)',logout:'Abmelden',
+  apps:'Apps',hub_h:'Willkommen',hub_sub:'Wählen Sie eine App',app_proj:'Projekt-Panel',app_proj_d:'Portfolio, Fortschritt und Zeitplan',app_fich:'GPS-Check-ins',app_fich_d:'Anwesenheit der Außendiensttechniker',
+  filtrar:'Filtern',allTec:'Alle Techniker',f_total:'Check-ins',f_tec:'Techniker',f_hours:'Stunden',f_tecnico:'Techniker',f_cliente:'Kunde',f_entrada:'Eingang',f_salida:'Ausgang',f_dur:'Dauer',scope_admin:'Alle Techniker',scope_supervisor:'Mein Team',scope_tecnico:'Meine Check-ins',f_csv:'CSV exportieren',f_map:'Standorte',f_nogps:'Keine GPS-Koordinaten',f_mapnote:'Verteilung nach GPS-Standort (Klick auf einen Punkt = Google Maps).',lic_h:'GPS-Lizenz',lic_note:'Die App liest diesen Schlüssel aus GLPI — Benutzer geben ihn nicht mehr ein.',lic_key:'Lizenzschlüssel',lic_save:'In GLPI speichern',lic_active:'Aktiviert',lic_inactive:'Keine Lizenz',lic_activate:'Aktivieren',lic_change:'Ändern',lic_saving:'speichern…',lic_saved:'in GLPI gespeichert',lic_error:'Fehler',app_link:'App öffnen'},
+ pt:{tit:'Centro de Projetos',upd:'Atualizado',t_res:'Resumo',t_exp:'Explorador',t_map:'Mapa',
+  search:'Buscar projeto…',allAreas:'Todas as áreas',allStates:'Todos os estados',allEnts:'Todas as entidades',allResp:'Todos os responsáveis',clear:'Limpar',
+  proj:'projeto',projs:'projetos',k_proj:'Projetos',k_act:'Ativos',k_avg:'Progresso méd.',k_prog:'Em andamento',
+  h_act:'Projetos ativos · progresso',h_tl:'Linha do tempo · todos os projetos',
+  p_gantt:'Gantt · Cronograma de tarefas',p_kanban:'Kanban · Tarefas por estado',p_det:'Detalhes',p_kb:'Base de conhecimento',
+  d_area:'Área',d_ent:'Entidade',d_resp:'Responsável',d_prog:'Progresso',d_plan:'Planejado',d_done:'concluídas',d_pend:'pendentes',
+  close:'Fechar',noDesc:'Sem descrição',noKb:'Nenhum artigo vinculado a este projeto no GLPI.',noDates:'Sem datas.',noTaskDates:'Sem datas de tarefas.',today:'hoje',noData:'Não foi possível carregar os dados',
+  l_sub:'Entre com sua conta GLPI',l_user:'Usuário',l_pass:'Senha',l_btn:'Entrar',l_err:'Usuário ou senha incorretos',l_503:'Login não configurado (App-Token ausente)',logout:'Sair',
+  apps:'Apps',hub_h:'Bem-vindo',hub_sub:'Escolha um aplicativo',app_proj:'Painel de Projetos',app_proj_d:'Portfólio, progresso e cronograma',app_fich:'Registros GPS',app_fich_d:'Presença de técnicos em campo',
+  filtrar:'Filtrar',allTec:'Todos os técnicos',f_total:'Registros',f_tec:'Técnicos',f_hours:'Horas',f_tecnico:'Técnico',f_cliente:'Cliente',f_entrada:'Entrada',f_salida:'Saída',f_dur:'Duração',scope_admin:'Todos os técnicos',scope_supervisor:'Minha equipe',scope_tecnico:'Meus registros',f_csv:'Exportar CSV',f_map:'Localizações',f_nogps:'Sem coordenadas GPS',f_mapnote:'Distribuição por localização GPS (clique num ponto = Google Maps).',lic_h:'Licença GPS',lic_note:'O app lê esta chave do GLPI — os usuários não a inserem manualmente.',lic_key:'Chave de licença',lic_save:'Salvar no GLPI',lic_active:'Ativado',lic_inactive:'Sem licença',lic_activate:'Ativar',lic_change:'Alterar',lic_saving:'salvando…',lic_saved:'salva no GLPI',lic_error:'erro',app_link:'Ver app'}
 };
+Object.assign(I18N.es,{legend:'Referencia',att_h:'Requieren atención',att_late:'atrasado',att_stuck:'sin avance',att_nodate:'sin fechas',att_ok:'Todo en orden 👍',sort:'Ordenar',s_pct:'Avance',s_name:'Nombre',s_area:'Área',s_state:'Estado',rep_over:'Resumen',rep_hours:'Horas por técnico',rep_anom:'Anomalías',rep_visits:'Visitas',rep_avg:'Prom.',per_today:'Hoy',per_week:'Semana',per_month:'Mes',per_all:'Todo',anom_nogps:'Sin GPS',anom_short:'Muy corta',anom_noout:'Sin salida',anom_none:'Sin anomalías 👍',pin:'Fijar',unpin:'Autocolapsar'});
+Object.assign(I18N.en,{legend:'Legend',att_h:'Needs attention',att_late:'overdue',att_stuck:'no progress',att_nodate:'no dates',att_ok:'All on track 👍',sort:'Sort',s_pct:'Progress',s_name:'Name',s_area:'Area',s_state:'State',rep_over:'Overview',rep_hours:'Hours per technician',rep_anom:'Anomalies',rep_visits:'Visits',rep_avg:'Avg',per_today:'Today',per_week:'Week',per_month:'Month',per_all:'All',anom_nogps:'No GPS',anom_short:'Too short',anom_noout:'No checkout',anom_none:'No anomalies 👍',pin:'Pin',unpin:'Auto-collapse'});
+Object.assign(I18N.fr,{legend:'Légende',att_h:'À surveiller',att_late:'en retard',att_stuck:'sans avancement',att_nodate:'sans dates',att_ok:'Tout va bien 👍',sort:'Trier',s_pct:'Avancement',s_name:'Nom',s_area:'Zone',s_state:'État',rep_over:'Aperçu',rep_hours:'Heures par technicien',rep_anom:'Anomalies',rep_visits:'Visites',rep_avg:'Moy.',per_today:"Aujourd'hui",per_week:'Semaine',per_month:'Mois',per_all:'Tout',anom_nogps:'Sans GPS',anom_short:'Trop courte',anom_noout:'Sans sortie',anom_none:'Aucune anomalie 👍',pin:'Épingler',unpin:'Réduire auto'});
+Object.assign(I18N.de,{legend:'Legende',att_h:'Zu beachten',att_late:'überfällig',att_stuck:'kein Fortschritt',att_nodate:'keine Daten',att_ok:'Alles im Plan 👍',sort:'Sortieren',s_pct:'Fortschritt',s_name:'Name',s_area:'Bereich',s_state:'Status',rep_over:'Übersicht',rep_hours:'Stunden pro Techniker',rep_anom:'Anomalien',rep_visits:'Besuche',rep_avg:'Ø',per_today:'Heute',per_week:'Woche',per_month:'Monat',per_all:'Alle',anom_nogps:'Kein GPS',anom_short:'Zu kurz',anom_noout:'Kein Ausgang',anom_none:'Keine Anomalien 👍',pin:'Anheften',unpin:'Auto-einklappen'});
+Object.assign(I18N.pt,{legend:'Legenda',att_h:'Requerem atenção',att_late:'atrasado',att_stuck:'sem progresso',att_nodate:'sem datas',att_ok:'Tudo em ordem 👍',sort:'Ordenar',s_pct:'Progresso',s_name:'Nome',s_area:'Área',s_state:'Estado',rep_over:'Visão geral',rep_hours:'Horas por técnico',rep_anom:'Anomalias',rep_visits:'Visitas',rep_avg:'Méd.',per_today:'Hoje',per_week:'Semana',per_month:'Mês',per_all:'Tudo',anom_nogps:'Sem GPS',anom_short:'Muito curta',anom_noout:'Sem saída',anom_none:'Sem anomalias 👍',pin:'Fixar',unpin:'Auto-recolher'});
 let LANG=localStorage.getItem('rh-lang')||'es';
 const T=k=>(I18N[LANG]&&I18N[LANG][k])||k;
 
@@ -307,7 +423,7 @@ updThemeIcon();
 
 // ---- idioma ----
 const $lang=$('#lang'); $lang.value=LANG;
-$lang.addEventListener('change',()=>{LANG=$lang.value;localStorage.setItem('rh-lang',LANG);applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();});
+$lang.addEventListener('change',()=>{LANG=$lang.value;localStorage.setItem('rh-lang',LANG);applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();renderSidebar();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();});
 function applyStatic(){
   document.querySelector('.tab[data-v="resumen"]').textContent='▦ '+T('t_res');
   document.querySelector('.tab[data-v="explorador"]').textContent='🔍 '+T('t_exp');
@@ -321,7 +437,7 @@ function applyStatic(){
   $('#f-entidad').options[0].text=T('allEnts'); $('#f-resp').options[0].text=T('allResp');
   $('#clr').textContent=T('clear'); $('#h-act').textContent=T('h_act'); $('#h-tl').textContent=T('h_tl');
   $('#gen').textContent=DATA.generated?T('upd')+' '+DATA.generated:'';
-  $('#l-tit').textContent=T('tit'); $('#l-sub').textContent=T('l_sub');
+  $('#l-tit').textContent=((CONFIG.branding&&CONFIG.branding.app_name)||T('tit')); $('#l-sub').textContent=T('l_sub');
   $('#l-user').placeholder=T('l_user'); $('#l-pass').placeholder=T('l_pass');
   $('#l-btn').textContent=T('l_btn'); $('#logout').title=T('logout');
   $('#btnhome').textContent='⌂ '+T('apps');
@@ -344,7 +460,7 @@ function loadData(){
     fillSel('#f-estado',uniq(d.projects.map(p=>p.estado)));
     fillSel('#f-entidad',uniq(d.projects.map(p=>p.entidad)));
     fillSel('#f-resp',uniq(d.projects.map(p=>p.responsable)));
-    applyStatic(); renderResumen(); renderExpl(); renderMapa(); renderHub(); showApp('hub');
+    applyStatic(); renderResumen(); renderExpl(); renderMapa(); renderHub(); showApp('proyectos');
   }).catch(()=>{$('#kpis').innerHTML='<div class="empty">'+T('noData')+'</div>';});
 }
 function renderHub(){
@@ -421,17 +537,66 @@ function fetchFichadas(){
 function fillFichTec(){const s=$('#fi-tec'),cur=s.value;while(s.options.length>1)s.remove(1);uniq((FICH.fichadas||[]).map(f=>f.tecnico)).forEach(t=>{const o=el('option');o.value=t;o.textContent=t;s.appendChild(o);});s.value=cur;}
 function fmtDur(sec){if(sec==null)return '—';const h=Math.floor(sec/3600),m=Math.round(sec%3600/60);return h?h+'h '+m+'m':m+'m';}
 function fmtDT(s){return s?String(s).substring(0,16).replace('T',' '):'—';}
+let FREP='over', PER='';
+function renderFReports(){
+  const nav=$('#fi-reports'); nav.innerHTML='';
+  [['over',T('rep_over')],['hours',T('rep_hours')],['anom',T('rep_anom')]].forEach(([k,t])=>{
+    const b=el('button',FREP===k?'on':'',esc(t)); b.addEventListener('click',()=>{FREP=k;renderFich();}); nav.appendChild(b);});
+}
+function renderPerBar(){
+  const bar=$('#fi-per'); bar.innerHTML='';
+  [['',T('per_all')],['month',T('per_month')],['week',T('per_week')],['today',T('per_today')]].forEach(([k,t])=>{
+    const b=el('button',PER===k?'on':'',esc(t)); b.addEventListener('click',()=>setPeriod(k)); bar.appendChild(b);});
+}
+function setPeriod(k){
+  PER=k; const to=new Date(); let from=null;
+  if(k==='today') from=new Date(to);
+  else if(k==='week'){from=new Date(to);from.setDate(from.getDate()-6);}
+  else if(k==='month'){from=new Date(to);from.setDate(from.getDate()-29);}
+  const iso=d=>d?new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().substring(0,10):'';
+  $('#fi-from').value=iso(from); $('#fi-to').value=k?iso(to):'';
+  fetchFichadas();
+}
+function fList(){const tec=$('#fi-tec').value;let l=FICH.fichadas||[];if(tec)l=l.filter(f=>f.tecnico===tec);return l;}
 function renderFich(){
   if(!FICH)return;
-  const tec=$('#fi-tec').value; let list=FICH.fichadas||[]; if(tec)list=list.filter(f=>f.tecnico===tec);
   $('#fi-scope').textContent=T('scope_'+FICH.scope)||'';
+  renderFReports(); renderPerBar();
+  const list=fList();
+  ['over','hours','anom'].forEach(r=>$('#fi-rep-'+r).style.display=FREP===r?'':'none');
+  if(FREP==='over') renderFOver(list); else if(FREP==='hours') renderFHours(list); else renderFAnom(list);
+}
+function renderFOver(list){
   const totSec=list.reduce((a,f)=>a+(f.dur||0),0), tecs=uniq(list.map(f=>f.tecnico)).length;
   const kp=[[T('f_total'),list.length],[T('f_tec'),tecs],[T('f_hours'),fmtDur(totSec)]];
   $('#fi-kpis').innerHTML=kp.map(k=>`<div class="kpi"><b>${k[1]}</b><span>${k[0]}</span></div>`).join('');
   renderMap(list);
   const rows=list.map(f=>`<tr><td>${esc(f.tecnico||'—')}</td><td>${esc(f.cliente||'—')}</td><td>${fmtDT(f.entrada)}</td><td>${fmtDT(f.salida)}</td><td>${fmtDur(f.dur)}</td><td>${f.lat?'<a class="map" target="_blank" rel="noopener" href="https://maps.google.com/?q='+esc(f.lat)+','+esc(f.lon)+'">ver</a>':'—'}</td></tr>`).join('');
-  $('#fi-h').textContent=T('app_fich');
+  $('#fi-mh').textContent=T('f_map'); $('#fi-h').textContent=T('app_fich');
   $('#fi-table').innerHTML='<table class="ftable"><thead><tr><th>'+T('f_tecnico')+'</th><th>'+T('f_cliente')+'</th><th>'+T('f_entrada')+'</th><th>'+T('f_salida')+'</th><th>'+T('f_dur')+'</th><th>GPS</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">—</td></tr>')+'</tbody></table>';
+}
+function renderFHours(list){
+  $('#fi-hh').textContent=T('rep_hours');
+  const by={}; list.forEach(f=>{const k=f.tecnico||'—';(by[k]=by[k]||{sec:0,n:0});by[k].sec+=f.dur||0;by[k].n++;});
+  const arr=Object.entries(by).map(([k,v])=>({t:k,sec:v.sec,n:v.n})).sort((a,b)=>b.sec-a.sec);
+  const max=arr.length?(arr[0].sec||1):1, box=$('#fi-hours'); box.innerHTML='';
+  if(!arr.length){box.appendChild(el('div','empty','—'));return;}
+  arr.forEach(r=>{const row=el('div','hrow');
+    row.innerHTML=`<div class="hn">${esc(r.t)}</div><div class="hbar"><i style="width:${Math.round(r.sec/max*100)}%"></i></div><div class="hv">${fmtDur(r.sec)} · ${r.n} ${T('rep_visits')}</div>`;
+    box.appendChild(row);});
+}
+function anomOf(f){const a=[];if(!f.lat||!f.lon)a.push('nogps');if(!f.salida)a.push('noout');else if(f.dur!=null&&f.dur<300)a.push('short');return a;}
+function renderFAnom(list){
+  $('#fi-ah').textContent=T('rep_anom');
+  const flagged=list.map(f=>({f,a:anomOf(f)})).filter(x=>x.a.length);
+  const cnt={nogps:0,noout:0,short:0}; flagged.forEach(x=>x.a.forEach(k=>cnt[k]++));
+  const kp=[[T('anom_nogps'),cnt.nogps],[T('anom_noout'),cnt.noout],[T('anom_short'),cnt.short]];
+  $('#fi-akpis').innerHTML=kp.map(k=>`<div class="kpi"><b>${k[1]}</b><span>${k[0]}</span></div>`).join('');
+  const box=$('#fi-anom'); box.innerHTML='';
+  if(!flagged.length){box.appendChild(el('div','empty',T('anom_none')));return;}
+  flagged.forEach(({f,a})=>{const row=el('div','anomrow');
+    row.innerHTML=`<span>${esc(f.tecnico||'—')}</span><span class="aw">${esc(f.cliente||'')} · ${fmtDT(f.entrada)}</span><span class="at">${a.map(k=>`<span class="rchip late">${T('anom_'+k)}</span>`).join('')}</span>`;
+    box.appendChild(row);});
 }
 function showLogin(){$('#loginwrap').classList.add('on');$('#logout').style.display='none';$('#who').textContent='';applyStatic();}
 function hideLogin(){$('#loginwrap').classList.remove('on');}
@@ -478,37 +643,93 @@ function setTab(v){
 function showApp(app){
   APP=app;
   ['hub','proyectos','fichadas'].forEach(a=>$('#v-'+a).classList.toggle('appon',a===app));
-  $('#btnhome').style.display=app==='hub'?'none':'flex';
+  $('#btnhome').style.display='none';
   document.querySelectorAll('.tab.pt').forEach(t=>t.style.display=app==='proyectos'?'flex':'none');
   if(app==='proyectos')setTab(curTab);
   if(app==='fichadas')fetchFichadas();
+  renderSidebar();
   window.scrollTo({top:0});
 }
 function goToProject(id){ showApp('proyectos'); setTab('explorador'); SEL=id; renderExpl(); const p=DATA.projects.find(x=>x.id===id); if(p)detail(p); }
+
+// ---- sidebar de navegación entre apps ----
+function sbApps(){
+  const a=[{k:'proyectos',ic:'📊',t:T('app_proj')}];
+  const g=(CONFIG.modules&&CONFIG.modules.gps)||{};
+  if((DATA.isAdmin||DATA.isSuper)&&g.enabled) a.push({k:'fichadas',ic:'📍',t:g.label||T('app_fich')});
+  return a;
+}
+function renderSidebar(){
+  $('#sb-brand').textContent=(CONFIG.branding&&CONFIG.branding.app_name)||'';
+  const nav=$('#sb-apps'); nav.innerHTML='';
+  sbApps().forEach(x=>{const it=el('div','sb-item'+(APP===x.k?' on':''));it.innerHTML=`<span class="ic">${x.ic}</span><span>${esc(x.t)}</span>`;it.addEventListener('click',()=>showApp(x.k));nav.appendChild(it);});
+  $('#sb-pin').title=document.body.classList.contains('sb-pinned')?T('unpin'):T('pin');
+}
+function applySb(){const pinned=localStorage.getItem('rh-sb')!=='auto';document.body.classList.toggle('sb-pinned',pinned);document.body.classList.toggle('sb-auto',!pinned);}
+$('#sb-pin').addEventListener('click',()=>{const nowAuto=localStorage.getItem('rh-sb')!=='auto';localStorage.setItem('rh-sb',nowAuto?'auto':'pinned');applySb();renderSidebar();});
+applySb();
 
 function uniq(a){return [...new Set(a.filter(Boolean))].sort((x,y)=>x.localeCompare(y));}
 function fillSel(sel,vals){const s=$(sel);while(s.options.length>1)s.remove(1);vals.forEach(v=>{const o=el('option');o.value=v;o.textContent=v;s.appendChild(o);});}
 
 // ================= RESUMEN =================
+let ACT={q:'',sort:'pct'};
+const isActive=p=>p.s!=='prod';
+function attnReasons(p){
+  const r=[]; if(!isActive(p))return r;
+  const today=new Date(); today.setHours(0,0,0,0);
+  if(p.end&&toD(p.end)<today) r.push('late');
+  if(p.pct===0&&p.s==='curso') r.push('stuck');
+  if(!p.start||!p.end) r.push('nodate');
+  return r;
+}
+function arow(p,reasons){
+  const r=el('div','arow');
+  const rsn=(reasons&&reasons.length)?`<div class="rsn">${reasons.map(x=>`<span class="rchip ${x}">${T('att_'+x)}</span>`).join('')}</div>`:'';
+  r.innerHTML=`<div class="an">${esc(p.n)}</div><div class="pctn">${p.pct}%</div>
+    <div class="as">${esc(p.area)} · ${esc(p.estado)}</div>
+    <div class="ab bar"><i style="width:${p.pct}%;background:${p.color}"></i></div>${rsn}`;
+  r.addEventListener('click',()=>goToProject(p.id));
+  return r;
+}
+function stateLegend(box){
+  box.innerHTML=''; const seen={};
+  (DATA.states||[]).forEach(s=>{ if(seen[s.name])return; seen[s.name]=1;
+    box.appendChild(el('span',null,`<i style="background:${s.color}"></i>${esc(s.name)}`)); });
+}
 function renderResumen(){
-  const ps=DATA.projects, activos=ps.filter(p=>p.estado!=='Cerrado');
+  const ps=DATA.projects, activos=ps.filter(isActive);
   const avg=ps.length?Math.round(ps.reduce((a,p)=>a+p.pct,0)/ps.length):0;
-  const enproc=ps.filter(p=>p.estado==='En proceso').length;
+  const enproc=ps.filter(p=>p.s==='curso').length;
   const kpi=[[T('k_proj'),ps.length],[T('k_act'),activos.length],[T('k_avg'),avg+'%'],[T('k_prog'),enproc]];
   $('#kpis').innerHTML=kpi.map(k=>`<div class="kpi"><b>${k[1]}</b><span>${k[0]}</span></div>`).join('');
-  // activos con %
-  const al=$('#actlist'); al.innerHTML='';
-  activos.sort((a,b)=>b.pct-a.pct).forEach(p=>{
-    const r=el('div','arow');
-    r.innerHTML=`<div class="an">${esc(p.n)}</div><div class="pctn">${p.pct}%</div>
-      <div class="as">${esc(p.area)} · ${esc(p.estado)}</div>
-      <div class="ab bar"><i style="width:${p.pct}%;background:${p.color}"></i></div>`;
-    r.addEventListener('click',()=>goToProject(p.id));
-    al.appendChild(r);
-  });
-  // timeline de todos
+  // selector de orden (etiquetas i18n)
+  const ss=$('#act-sort');
+  if(!ss.options.length){['pct','name','area','state'].forEach(k=>{const o=el('option');o.value=k;ss.appendChild(o);});ss.value=ACT.sort;}
+  [...ss.options].forEach(o=>o.textContent=T('sort')+': '+T('s_'+o.value));
+  $('#act-q').placeholder=T('search'); $('#h-att').textContent=T('att_h');
+  // requieren atención
+  const ap=$('#attlist'); ap.innerHTML=''; let any=false;
+  activos.forEach(p=>{const r=attnReasons(p); if(r.length){any=true; ap.appendChild(arow(p,r));}});
+  if(!any) ap.appendChild(el('div','empty',T('att_ok')));
+  // lista activa buscable/ordenable
+  renderActive();
+  // línea de tiempo + leyenda de colores
+  stateLegend($('#tl-legend'));
   $('#timeline').innerHTML=''; $('#timeline').appendChild(timelineAll());
 }
+function renderActive(){
+  const q=ACT.q.toLowerCase();
+  const list=DATA.projects.filter(isActive).filter(p=>!q||(p.n+' '+p.area+' '+p.responsable+' '+(p.d||'')).toLowerCase().includes(q));
+  const cmp={pct:(a,b)=>b.pct-a.pct,name:(a,b)=>a.n.localeCompare(b.n),
+    area:(a,b)=>a.area.localeCompare(b.area)||b.pct-a.pct,state:(a,b)=>(a.estado||'').localeCompare(b.estado||'')||b.pct-a.pct};
+  list.sort(cmp[ACT.sort]||cmp.pct);
+  const al=$('#actlist'); al.innerHTML='';
+  if(!list.length){al.appendChild(el('div','empty','—'));return;}
+  list.forEach(p=>al.appendChild(arow(p)));
+}
+$('#act-q').addEventListener('input',e=>{ACT.q=e.target.value.trim();renderActive();});
+$('#act-sort').addEventListener('change',e=>{ACT.sort=e.target.value;renderActive();});
 function fmtMon(ms){return new Date(ms).toLocaleDateString(LANG,{month:'short',year:'2-digit'});}
 function monthTicks(min,max){const t=[];const d=new Date(min);d.setDate(1);d.setHours(0,0,0,0);let g=0;while(+d<=max&&g++<60){t.push(+d);d.setMonth(d.getMonth()+1);}return t;}
 function trackCalc(p){return 'calc(var(--gnw) + (100% - var(--gnw)) * '+(Math.max(0,Math.min(100,p))/100).toFixed(4)+')';}
