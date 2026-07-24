@@ -93,7 +93,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cfg['timezone'] = trim($in['timezone'] ?? 'UTC') ?: 'UTC';
 
     $ok = Settings::save($cfg);
-    echo json_encode(['ok' => $ok, 'configured' => Settings::isConfigured($cfg)]);
+
+    // First data pull right away, so the dashboard works immediately after setup.
+    $gen = null;
+    if ($ok && Settings::isConfigured($cfg)) {
+        try {
+            require_once dirname(__DIR__) . '/src/DashboardGenerator.php';
+            $flat = Settings::flat($cfg);
+            if (!empty($flat['timezone'])) { @date_default_timezone_set($flat['timezone']); }
+            $client = new GlpiClient($flat);
+            $g = new DashboardGenerator($client, $flat);
+            [$np, $nkb] = $g->run($flat['output']);
+            $gen = ['projects' => $np, 'kb' => $nkb];
+        } catch (\Throwable $e) {
+            $gen = ['error' => $e->getMessage()];
+        }
+    }
+    echo json_encode(['ok' => $ok, 'configured' => Settings::isConfigured($cfg), 'generated' => $gen]);
     exit;
 }
 
@@ -188,7 +204,12 @@ const data=()=>{const o={};new FormData(f).forEach((v,k)=>o[k]=v);
 function post(payload){return fetch('setup.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(r=>r.json());}
 document.getElementById('test').onclick=()=>{msg.style.color='var(--mu)';msg.textContent='Testing…';
   post(Object.assign(data(),{action:'test'})).then(j=>{msg.style.color=j.ok?'#1f9d55':'#d33';msg.textContent=(j.ok?'✓ ':'✕ ')+j.msg;}).catch(()=>{msg.style.color='#d33';msg.textContent='Request failed';});};
-f.onsubmit=e=>{e.preventDefault();msg.style.color='var(--mu)';msg.textContent='Saving…';
-  post(Object.assign(data(),{action:'save'})).then(j=>{if(j.ok){msg.style.color='#1f9d55';msg.textContent='✓ Saved';setTimeout(()=>location.href='index.html',700);}else{msg.style.color='#d33';msg.textContent='Save failed';}});};
+f.onsubmit=e=>{e.preventDefault();msg.style.color='var(--mu)';msg.textContent='Saving & syncing…';
+  post(Object.assign(data(),{action:'save'})).then(j=>{
+    if(j.ok){const g=j.generated;
+      if(g&&g.error){msg.style.color='#d33';msg.textContent='Saved, but sync failed: '+g.error;}
+      else{msg.style.color='#1f9d55';msg.textContent='✓ Saved'+(g?(' · '+g.projects+' projects'):'');setTimeout(()=>location.href='index.html',1300);}
+    }else{msg.style.color='#d33';msg.textContent='Save failed';}
+  }).catch(()=>{msg.style.color='#d33';msg.textContent='Request failed';});};
 </script>
 </body></html>
