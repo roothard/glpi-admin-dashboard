@@ -38,6 +38,32 @@ if ($isAdmin) {
     $where .= " AND t.users_id_recipient=$me";
 }
 
+// Team block for the "My team" panel (supervisor/admin): every technician in
+// scope — checked in or not — with their last visit and current status.
+$team = [];
+if ($scope === 'supervisor' || $scope === 'admin') {
+    if ($scope === 'supervisor') {
+        $tw = "u.id IN (" . implode(',', array_map('intval', $ids)) . ")";
+    } else {
+        $tw = "(u.users_id_supervisor>0 OR EXISTS(SELECT 1 FROM glpi_tickets tt WHERE tt.users_id_recipient=u.id AND tt.name LIKE 'Visita técnica%' AND tt.is_deleted=0))";
+    }
+    $q = "SELECT u.id,
+            COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.firstname,''),' ',COALESCE(u.realname,''))),''),u.name) nombre,
+            MAX(t.date) last_in,
+            MAX(CASE WHEN t.date>=CURDATE() THEN 1 ELSE 0 END) hoy,
+            MAX(CASE WHEN t.date>=CURDATE() AND t.solvedate IS NULL AND t.closedate IS NULL THEN 1 ELSE 0 END) abierta
+          FROM glpi_users u
+          LEFT JOIN glpi_tickets t ON t.users_id_recipient=u.id AND t.name LIKE 'Visita técnica%' AND t.is_deleted=0
+          WHERE u.is_deleted=0 AND u.is_active=1 AND u.name<>'glpi-system' AND $tw
+          GROUP BY u.id ORDER BY nombre";
+    if ($r = $db->query($q)) {
+        while ($x = $r->fetch_assoc()) {
+            $team[] = ['id' => (int)$x['id'], 'nombre' => $x['nombre'], 'last' => $x['last_in'],
+                       'hoy' => ((int)$x['hoy']) === 1, 'abierta' => ((int)$x['abierta']) === 1];
+        }
+    }
+}
+
 $from = $_GET['from'] ?? '';
 $to   = $_GET['to'] ?? '';
 if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $where .= " AND t.date>='" . $db->real_escape_string($from) . " 00:00:00'"; }
@@ -63,4 +89,4 @@ while ($x = $r->fetch_assoc()) {
                'entrada' => $x['entrada'], 'salida' => $x['salida'], 'dur' => $dur, 'lat' => $lat, 'lon' => $lon];
 }
 
-echo json_encode(['user' => $_SESSION['user'], 'scope' => $scope, 'fichadas' => $rows], JSON_UNESCAPED_UNICODE);
+echo json_encode(['user' => $_SESSION['user'], 'scope' => $scope, 'team' => $team, 'fichadas' => $rows], JSON_UNESCAPED_UNICODE);
