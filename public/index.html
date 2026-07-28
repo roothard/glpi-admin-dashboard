@@ -216,7 +216,11 @@ main{padding-top:20px;padding-bottom:60px}
 .tmchip:hover{border-color:var(--accent)}
 .tmchip.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .tmchip b{font-family:var(--mono)}
-#fi-team{margin-top:12px}
+#fi-team{margin-top:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.tm .tmn{min-width:0;flex:1}
+.tmc{display:flex;gap:4px;flex:none}
+.cbtn{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--border2);border-radius:8px;text-decoration:none;font-size:14px;background:var(--surface);line-height:1}
+.cbtn:hover{border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -700,6 +704,23 @@ function renderTeam(){
   });
   renderTeamList(cats);
 }
+function techMsg(m){
+  const c=CONFIG.contact||{};
+  const tpl=(!m.hoy&&!m.abierta)?(c.msg_reminder||''):(c.msg_default||'');
+  return (tpl||'').replace(/\{nombre\}/g,m.nom1||String(m.nombre||'').split(' ')[0]||'');
+}
+function contactBtns(m){
+  const c=CONFIG.contact||{};
+  if(c.enabled===false) return '';
+  const msg=encodeURIComponent(techMsg(m));
+  const tel=String(m.tel||'').replace(/[^\d+]/g,''); const wa=tel.replace(/\D/g,'');
+  let h='<div class="tmc">';
+  if(wa) h+=`<a class="cbtn" target="_blank" rel="noopener" title="WhatsApp" href="https://wa.me/${wa}?text=${msg}">🟢</a>`;
+  if(tel) h+=`<a class="cbtn" title="SMS" href="sms:${tel}?body=${msg}">📱</a>`;
+  if(m.email) h+=`<a class="cbtn" title="Email" href="mailto:${encodeURIComponent(m.email)}?body=${msg}">✉️</a>`;
+  if(c.google_chat) h+=`<a class="cbtn" target="_blank" rel="noopener" title="Google Chat" href="https://chat.google.com/">💬</a>`;
+  return h+'</div>';
+}
 function renderTeamList(cats){
   const box=$('#fi-team');
   if(!TEAMSEL||!(cats[TEAMSEL]||[]).length){box.style.display='none';box.innerHTML='';return;}
@@ -707,7 +728,7 @@ function renderTeamList(cats){
   box.style.display='';
   box.innerHTML=cats[TEAMSEL].map(m=>{
     let st=T('tm_never'); if(m.abierta)st=T('tm_onsite');else if(m.hoy)st=T('tm_today');else if(m.last)st=T('tm_last')+': '+fmtTm(m.last);
-    return '<div class="tm"><span class="tmdot '+cls+'"></span><div><b>'+esc(m.nombre)+'</b><small>'+esc(st)+'</small></div></div>';
+    return '<div class="tm"><span class="tmdot '+cls+'"></span><div class="tmn"><b>'+esc(m.nombre)+'</b><small>'+esc(st)+'</small></div>'+contactBtns(m)+'</div>';
   }).join('');
 }
 loadConfig().then(loadData);
