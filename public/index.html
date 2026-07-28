@@ -210,7 +210,13 @@ main{padding-top:20px;padding-bottom:60px}
 .tm b{font-size:13px;font-weight:600;display:block}
 .tm small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 .tmdot{width:9px;height:9px;border-radius:50%;flex:none}
-.tmdot.g{background:#22c55e}.tmdot.y{background:#eab308}.tmdot.gr{background:var(--dim)}
+.tmdot.g{background:#22c55e}.tmdot.y{background:#eab308}.tmdot.gr{background:var(--dim)}.tmdot.b{background:var(--accent)}
+.tmsum{display:flex;flex-wrap:wrap;gap:8px}
+.tmchip{display:inline-flex;align-items:center;gap:7px;font:600 12.5px var(--sans);color:var(--text);background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:7px 12px;cursor:pointer}
+.tmchip:hover{border-color:var(--accent)}
+.tmchip.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.tmchip b{font-family:var(--mono)}
+#fi-team{margin-top:12px}
 </style>
 </head>
 <body>
@@ -310,7 +316,7 @@ main{padding-top:20px;padding-bottom:60px}
         </div>
       </div>
     </div>
-    <div class="panel" id="fi-team-p" style="display:none;margin-bottom:14px"><h4 id="fi-th">Mi equipo</h4><div id="fi-team"></div></div>
+    <div class="panel" id="fi-team-p" style="display:none;margin-bottom:14px"><h4 id="fi-th">Mi equipo</h4><div class="tmsum" id="fi-team-sum"></div><div id="fi-team" style="display:none"></div></div>
     <nav class="freports" id="fi-reports"></nav>
     <div class="frep" id="fi-rep-over">
       <div class="kpis" id="fi-kpis"></div>
@@ -414,6 +420,11 @@ Object.assign(I18N.en,{prof_h:'Sync profile',prof_sub:'Your current GLPI profile
 Object.assign(I18N.fr,{prof_h:'Synchroniser le profil',prof_sub:'Vos profils GLPI actuels sont récupérés. Choisissez celui à utiliser. Les profils Technicien ne peuvent pas utiliser ce panneau.',prof_load:'Récupération des profils…',prof_cur:'actuel',prof_only:'Votre compte n’a qu’un profil Technicien. Ce panneau est pour Superviseurs et Administrateurs ; vous allez être déconnecté.',prof_err:'Impossible de changer de profil',tm_h_sup:'Mon équipe',tm_h_adm:'Techniciens',tm_onsite:'Sur site',tm_today:'Pointé aujourd’hui',tm_last:'Dernier pointage',tm_never:'Jamais pointé'});
 Object.assign(I18N.de,{prof_h:'Profil synchronisieren',prof_sub:'Ihre aktuellen GLPI-Profile werden abgerufen. Wählen Sie, welches Sie nutzen möchten. Techniker-Profile können dieses Panel nicht nutzen.',prof_load:'Profile werden abgerufen…',prof_cur:'aktuell',prof_only:'Ihr Benutzer hat nur ein Techniker-Profil. Dieses Panel ist für Supervisoren und Administratoren; Sie werden abgemeldet.',prof_err:'Profil konnte nicht gewechselt werden',tm_h_sup:'Mein Team',tm_h_adm:'Techniker',tm_onsite:'Vor Ort',tm_today:'Heute eingecheckt',tm_last:'Letzter Check-in',tm_never:'Nie eingecheckt'});
 Object.assign(I18N.pt,{prof_h:'Sincronizar perfil',prof_sub:'Seus perfis atuais do GLPI são consultados. Escolha qual usar. Perfis de Técnico não podem usar este painel.',prof_load:'Consultando perfis…',prof_cur:'atual',prof_only:'Seu usuário só tem perfil de Técnico. Este painel é para Supervisores e Administradores; a sessão será encerrada.',prof_err:'Não foi possível trocar o perfil',tm_h_sup:'Minha equipe',tm_h_adm:'Técnicos',tm_onsite:'Em campo agora',tm_today:'Registrou hoje',tm_last:'Último registro',tm_never:'Nunca registrou'});
+Object.assign(I18N.es,{k_onsite:'En sitio ahora',k_today:'Ficharon hoy',k_missing:'Sin fichar hoy'});
+Object.assign(I18N.en,{k_onsite:'On site now',k_today:'Checked in today',k_missing:'Not checked in'});
+Object.assign(I18N.fr,{k_onsite:'Sur site',k_today:'Pointés aujourd’hui',k_missing:'Non pointés'});
+Object.assign(I18N.de,{k_onsite:'Vor Ort',k_today:'Heute erfasst',k_missing:'Nicht erfasst'});
+Object.assign(I18N.pt,{k_onsite:'Em campo agora',k_today:'Registraram hoje',k_missing:'Sem registro'});
 let LANG=localStorage.getItem('rh-lang')||'es';
 const T=k=>(I18N[LANG]&&I18N[LANG][k])||k;
 
@@ -542,7 +553,7 @@ function fillFichTec(){const s=$('#fi-tec'),cur=s.value;while(s.options.length>1
   uniq([...((FICH&&FICH.team)||[]).map(m=>m.nombre),...((FICH&&FICH.fichadas)||[]).map(f=>f.tecnico)]).sort().forEach(t=>{const o=el('option');o.value=t;o.textContent=t;s.appendChild(o);});s.value=cur;}
 function fmtDur(sec){if(sec==null)return '—';const h=Math.floor(sec/3600),m=Math.round(sec%3600/60);return h?h+'h '+m+'m':m+'m';}
 function fmtDT(s){return s?String(s).substring(0,16).replace('T',' '):'—';}
-let FREP='over', PER='';
+let FREP='over', PER='today', FICH_INIT=false;
 function renderFReports(){
   const nav=$('#fi-reports'); nav.innerHTML='';
   [['over',T('rep_over')],['hours',T('rep_hours')],['anom',T('rep_anom')]].forEach(([k,t])=>{
@@ -550,7 +561,7 @@ function renderFReports(){
 }
 function renderPerBar(){
   const bar=$('#fi-per'); bar.innerHTML='';
-  [['',T('per_all')],['month',T('per_month')],['week',T('per_week')],['today',T('per_today')]].forEach(([k,t])=>{
+  [['today',T('per_today')],['week',T('per_week')],['month',T('per_month')],['',T('per_all')]].forEach(([k,t])=>{
     const b=el('button',PER===k?'on':'',esc(t)); b.addEventListener('click',()=>setPeriod(k)); bar.appendChild(b);});
 }
 function setPeriod(k){
@@ -573,8 +584,16 @@ function renderFich(){
   if(FREP==='over') renderFOver(list); else if(FREP==='hours') renderFHours(list); else renderFAnom(list);
 }
 function renderFOver(list){
-  const totSec=list.reduce((a,f)=>a+(f.dur||0),0), tecs=uniq(list.map(f=>f.tecnico)).length;
-  const kp=[[T('f_total'),list.length],[T('f_tec'),tecs],[T('f_hours'),fmtDur(totSec)]];
+  const totSec=list.reduce((a,f)=>a+(f.dur||0),0);
+  const tm=(FICH&&FICH.team)||[];
+  let kp;
+  if(tm.length){
+    const onsite=tm.filter(m=>m.abierta).length, today=tm.filter(m=>m.hoy).length;
+    kp=[[T('k_onsite'),onsite],[T('k_today'),today+' / '+tm.length],[T('k_missing'),tm.length-today],[T('f_hours'),fmtDur(totSec)]];
+  }else{
+    const tecs=uniq(list.map(f=>f.tecnico)).length;
+    kp=[[T('f_total'),list.length],[T('f_tec'),tecs],[T('f_hours'),fmtDur(totSec)]];
+  }
   $('#fi-kpis').innerHTML=kp.map(k=>`<div class="kpi"><b>${k[1]}</b><span>${k[0]}</span></div>`).join('');
   renderMap(list);
   const rows=list.map(f=>`<tr><td>${esc(f.tecnico||'—')}</td><td>${esc(f.cliente||'—')}</td><td>${fmtDT(f.entrada)}</td><td>${fmtDT(f.salida)}</td><td>${fmtDur(f.dur)}</td><td>${f.lat?'<a class="map" target="_blank" rel="noopener" href="https://maps.google.com/?q='+esc(f.lat)+','+esc(f.lon)+'">ver</a>':'—'}</td></tr>`).join('');
@@ -663,16 +682,31 @@ $('#profwrap').addEventListener('click',e=>{if(e.target.id==='profwrap')closePro
 $('#prof-list').addEventListener('click',e=>{const b=e.target.closest('.profitem');if(b)chooseProf(Number(b.dataset.id));});
 // ---- vista "Equipo" en Fichadas ----
 function fmtTm(s){if(!s)return'';const d=new Date(String(s).replace(' ','T'));return d.toLocaleDateString(LANG,{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString(LANG,{hour:'2-digit',minute:'2-digit'});}
+let TEAMSEL=null;
+const TEAM_META=()=>[['onsite','g','tm_onsite'],['today','b','tm_today'],['last','y','tm_last'],['never','gr','tm_never']];
+function teamCats(tm){const c={onsite:[],today:[],last:[],never:[]};
+  tm.forEach(m=>{ if(m.abierta)c.onsite.push(m); else if(m.hoy)c.today.push(m); else if(m.last)c.last.push(m); else c.never.push(m); });
+  return c;}
 function renderTeam(){
   const p=$('#fi-team-p'),tm=(FICH&&FICH.team)||[];
   if(!tm.length){p.style.display='none';return;}
   p.style.display='';
   $('#fi-th').textContent=FICH.scope==='admin'?T('tm_h_adm'):T('tm_h_sup');
-  $('#fi-team').innerHTML=tm.map(m=>{
-    let cls='gr',st=T('tm_never');
-    if(m.abierta){cls='g';st=T('tm_onsite');}
-    else if(m.hoy){cls='g';st=T('tm_today');}
-    else if(m.last){cls='y';st=T('tm_last')+': '+fmtTm(m.last);}
+  const cats=teamCats(tm), sum=$('#fi-team-sum'); sum.innerHTML='';
+  TEAM_META().forEach(([k,cls,key])=>{
+    const c=el('button','tmchip'+(TEAMSEL===k?' on':''),`<span class="tmdot ${cls}"></span>${esc(T(key))} <b>${cats[k].length}</b>`);
+    c.addEventListener('click',()=>{TEAMSEL=TEAMSEL===k?null:k; renderTeamList(cats);});
+    sum.appendChild(c);
+  });
+  renderTeamList(cats);
+}
+function renderTeamList(cats){
+  const box=$('#fi-team');
+  if(!TEAMSEL||!(cats[TEAMSEL]||[]).length){box.style.display='none';box.innerHTML='';return;}
+  const cls=(TEAM_META().find(m=>m[0]===TEAMSEL)||[])[1]||'gr';
+  box.style.display='';
+  box.innerHTML=cats[TEAMSEL].map(m=>{
+    let st=T('tm_never'); if(m.abierta)st=T('tm_onsite');else if(m.hoy)st=T('tm_today');else if(m.last)st=T('tm_last')+': '+fmtTm(m.last);
     return '<div class="tm"><span class="tmdot '+cls+'"></span><div><b>'+esc(m.nombre)+'</b><small>'+esc(st)+'</small></div></div>';
   }).join('');
 }
@@ -694,7 +728,7 @@ function showApp(app){
   $('#btnhome').style.display=app==='hub'?'none':'flex';
   document.querySelectorAll('.tab.pt').forEach(t=>t.style.display=app==='proyectos'?'flex':'none');
   if(app==='proyectos')setTab(curTab);
-  if(app==='fichadas')fetchFichadas();
+  if(app==='fichadas'){ if(!FICH_INIT){FICH_INIT=true;setPeriod('today');} else fetchFichadas(); }
   window.scrollTo({top:0});
 }
 function goToProject(id){ showApp('proyectos'); setTab('explorador'); SEL=id; renderExpl(); const p=DATA.projects.find(x=>x.id===id); if(p)detail(p); }
