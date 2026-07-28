@@ -85,6 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cfg['modules']['gps']['db']['user'] = trim($in['db_user'] ?? '');
     $cfg['modules']['gps']['db']['pass'] = $keepSecret($in['db_pass'] ?? '', $cfg['modules']['gps']['db']['pass']);
 
+    $cfg['contact']['enabled']      = true;
+    $cfg['contact']['google_chat']  = !empty($in['contact_gchat']);
+    $cfg['contact']['msg_default']  = trim($in['contact_msg_default'] ?? '') ?: ($cfg['contact']['msg_default'] ?? '');
+    $cfg['contact']['msg_reminder'] = trim($in['contact_msg_reminder'] ?? '') ?: ($cfg['contact']['msg_reminder'] ?? '');
+
     $cfg['timezone'] = trim($in['timezone'] ?? 'UTC') ?: 'UTC';
 
     $ok = Settings::save($cfg);
@@ -111,6 +116,7 @@ $b = $cfg['branding'];
 $g = $cfg['glpi'];
 $p = $cfg['projects'];
 $gps = $cfg['modules']['gps'];
+$ct = ($cfg['contact'] ?? []) + ['google_chat'=>true,'msg_default'=>'','msg_reminder'=>''];
 $mask = fn($v) => $v !== '' ? '••••••••' : '';
 $h = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES);
 $deflang = in_array($b['default_lang'], ['es','en','fr','de','pt'], true) ? $b['default_lang'] : 'es';
@@ -230,7 +236,7 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
 </details>
 
 <details class="step">
-  <summary><span data-i="s3">3 · Apariencia</span> <span class="opt" data-i="s2opt2">— opcional</span></summary>
+  <summary><span data-i="s3">3 · Apariencia</span> <span class="opt" data-i="optonly">— opcional</span></summary>
   <div class="body">
     <div class="field"><label data-i="l_name">Nombre de la app</label><input type="text" name="app_name" value="<?= $h($b['app_name']) ?>" placeholder="Projects Dashboard"><p class="help" data-i="h_name"></p></div>
     <div class="field"><label data-i="l_sub">Subtítulo</label><input type="text" name="subtitle" value="<?= $h($b['subtitle']) ?>"></div>
@@ -241,7 +247,7 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
 </details>
 
 <details class="step">
-  <summary><span data-i="s4">4 · Módulo Fichadas GPS</span> <span class="opt" data-i="s2opt3">— opcional</span></summary>
+  <summary><span data-i="s4">4 · Módulo Fichadas GPS</span> <span class="opt" data-i="optonly">— opcional</span></summary>
   <div class="body">
     <div class="field chk2"><input type="checkbox" name="gps_enabled" id="gps" <?= $gps['enabled'] ? 'checked' : '' ?>><label for="gps" style="margin:0" data-i="l_gpsen">Activar el módulo</label></div>
     <div class="field"><label data-i="l_gpslabel">Etiqueta de la pestaña</label><input type="text" name="gps_label" value="<?= $h($gps['label']) ?>" placeholder="GPS"></div>
@@ -255,7 +261,17 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
 </details>
 
 <details class="step">
-  <summary><span data-i="adv2">Avanzado</span> <span class="opt" data-i="s2opt4">— opcional</span></summary>
+  <summary><span data-i="s5c">Mensajes de contacto</span> <span class="opt" data-i="optonly">— opcional</span></summary>
+  <div class="body">
+    <p class="help" data-i="h_contact" style="margin:2px 0 12px"></p>
+    <div class="field"><label data-i="l_msgdef">Mensaje general</label><input type="text" name="contact_msg_default" value="<?= $h($ct['msg_default']) ?>"></div>
+    <div class="field"><label data-i="l_msgrem">Mensaje recordatorio (sin fichar)</label><input type="text" name="contact_msg_reminder" value="<?= $h($ct['msg_reminder']) ?>"></div>
+    <div class="field chk2"><input type="checkbox" name="contact_gchat" id="gchat" <?= !empty($ct['google_chat']) ? 'checked' : '' ?>><label for="gchat" style="margin:0" data-i="l_gchat">Mostrar botón de Google Chat</label></div>
+  </div>
+</details>
+
+<details class="step">
+  <summary><span data-i="adv2">Avanzado</span> <span class="opt" data-i="optonly">— opcional</span></summary>
   <div class="body">
     <div class="field"><label data-i="l_tz">Zona horaria</label><input type="text" name="timezone" value="<?= $h($cfg['timezone']) ?>" placeholder="UTC"><p class="help" data-i="h_tz"></p></div>
   </div>
@@ -352,6 +368,11 @@ const I18N={
   l_dbhost:'Host do BD',l_dbname:'Nome do BD',l_dbuser:'Usuário do BD',l_dbpass:'Senha do BD',adv2:'Avançado',l_tz:'Fuso horário',h_tz:'ex: <code>America/Argentina/Buenos_Aires</code>. Para o carimbo «Atualizado».',
   b_test:'Testar conexão',b_save:'Salvar e instalar',m_testing:'Testando…',m_saving:'Salvando e sincronizando…',m_ok:'✓ Conectado · {n} estados visíveis',m_saved:'✓ Salvo · {n} projetos',m_savefail:'Falha ao salvar',m_reqfail:'Falha na solicitação',m_syncfail:'Salvo, mas a sincronização falhou: '}
 };
+Object.assign(I18N.es,{optonly:'— opcional',s5c:'Mensajes de contacto',h_contact:'Botones para escribir a los técnicos (WhatsApp/SMS/Mail) con un mensaje pre-cargado. Usá <code>{nombre}</code> para el nombre del técnico.',l_msgdef:'Mensaje general',l_msgrem:'Mensaje recordatorio (sin fichar hoy)',l_gchat:'Mostrar botón de Google Chat'});
+Object.assign(I18N.en,{optonly:'— optional',s5c:'Contact messages',h_contact:'Buttons to message technicians (WhatsApp/SMS/Mail) with a pre-filled text. Use <code>{nombre}</code> for the technician’s name.',l_msgdef:'Default message',l_msgrem:'Reminder message (not checked in today)',l_gchat:'Show Google Chat button'});
+Object.assign(I18N.fr,{optonly:'— optionnel',s5c:'Messages de contact',h_contact:'Boutons pour écrire aux techniciens (WhatsApp/SMS/Mail) avec un message pré-rempli. Utilisez <code>{nombre}</code> pour le nom.',l_msgdef:'Message par défaut',l_msgrem:'Message de rappel (non pointé)',l_gchat:'Afficher le bouton Google Chat'});
+Object.assign(I18N.de,{optonly:'— optional',s5c:'Kontaktnachrichten',h_contact:'Buttons, um Technikern zu schreiben (WhatsApp/SMS/Mail) mit vorausgefülltem Text. <code>{nombre}</code> = Name.',l_msgdef:'Standardnachricht',l_msgrem:'Erinnerung (heute nicht erfasst)',l_gchat:'Google-Chat-Button anzeigen'});
+Object.assign(I18N.pt,{optonly:'— opcional',s5c:'Mensagens de contato',h_contact:'Botões para escrever aos técnicos (WhatsApp/SMS/Mail) com texto pré-preenchido. Use <code>{nombre}</code> para o nome.',l_msgdef:'Mensagem padrão',l_msgrem:'Mensagem de lembrete (sem registro hoje)',l_gchat:'Mostrar botão do Google Chat'});
 let LANG=localStorage.getItem('pd-lang')||DEF||'es';
 if(!I18N[LANG])LANG='es';
 const T=k=>(I18N[LANG]&&I18N[LANG][k])||(I18N.en[k])||k;

@@ -51,6 +51,12 @@ class Settings
                     'db' => ['host' => '', 'name' => '', 'user' => '', 'pass' => ''],
                 ],
             ],
+            'contact' => [
+                'enabled'      => true,
+                'google_chat'  => true,
+                'msg_default'  => 'Hola {nombre}, te contacto desde el panel.',
+                'msg_reminder' => 'Hola {nombre}, ¿podés registrar tu visita de hoy?',
+            ],
             'output'   => '',   // defaults to ../data-cache.json
             'timezone' => 'UTC',
         ];
@@ -136,6 +142,7 @@ class Settings
                     'app_url' => $cfg['modules']['gps']['app_url'],
                 ],
             ],
+            'contact'  => $cfg['contact'] ?? [],
             'configured' => self::isConfigured($cfg),
         ];
     }

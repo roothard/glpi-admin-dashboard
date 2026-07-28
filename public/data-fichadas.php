@@ -49,6 +49,8 @@ if ($scope === 'supervisor' || $scope === 'admin') {
     }
     $q = "SELECT u.id,
             COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.firstname,''),' ',COALESCE(u.realname,''))),''),u.name) nombre,
+            u.firstname, COALESCE(NULLIF(u.mobile,''),u.phone) tel,
+            (SELECT email FROM glpi_useremails ue WHERE ue.users_id=u.id AND ue.is_default=1 LIMIT 1) email,
             MAX(t.date) last_in,
             MAX(CASE WHEN t.date>=CURDATE() THEN 1 ELSE 0 END) hoy,
             MAX(CASE WHEN t.date>=CURDATE() AND t.solvedate IS NULL AND t.closedate IS NULL THEN 1 ELSE 0 END) abierta
@@ -58,7 +60,9 @@ if ($scope === 'supervisor' || $scope === 'admin') {
           GROUP BY u.id ORDER BY nombre";
     if ($r = $db->query($q)) {
         while ($x = $r->fetch_assoc()) {
-            $team[] = ['id' => (int)$x['id'], 'nombre' => $x['nombre'], 'last' => $x['last_in'],
+            $team[] = ['id' => (int)$x['id'], 'nombre' => $x['nombre'],
+                       'nom1' => $x['firstname'] ?: strtok((string)$x['nombre'], ' '),
+                       'tel' => $x['tel'], 'email' => $x['email'], 'last' => $x['last_in'],
                        'hoy' => ((int)$x['hoy']) === 1, 'abierta' => ((int)$x['abierta']) === 1];
         }
     }
