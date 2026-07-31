@@ -1,19 +1,26 @@
 # GLPI Projects Dashboard
 
 A lightweight, self-hosted **dashboard for GLPI Projects**. It reads your GLPI
-over the **REST API** (App-Token + user token), builds a static `data.json`, and
-serves a clean, zero-dependency board grouped into zones, with per-project
-progress, tasks, and linked knowledge-base articles.
+over the **REST API** (App-Token + user token), builds a static cache, and
+serves a clean, zero-dependency portal with per-project progress, tasks, a
+timeline and linked knowledge-base articles.
 
 - **Runs anywhere** — same server as GLPI or a separate host; it only needs the
   GLPI REST API over HTTPS.
-- **Read-only & safe** — never writes to GLPI; secrets live in `.env` outside the
-  web docroot.
+- **Web setup wizard** — enter/test your connection and options in the browser;
+  nothing is hardcoded, everything lives in one config file above the docroot.
+- **Read-only & safe** — never writes to GLPI; users sign in with their own GLPI
+  account and only see the projects GLPI grants them.
 - **Configurable** — filter by project type, group by parent/entity/type, map
-  your own state names (any language).
+  your own state names (any language), custom branding.
+- **Custom Map board** — group projects into your own drag-and-drop areas
+  (defined in the dashboard, independent of GLPI; shared, admin-editable).
+- **Multilingual** — UI in ES/EN/FR/DE/PT with a light/dark theme.
+- **Optional GPS check-ins module** — field-technician presence from
+  "site visit" tickets (example add-on module).
 
-> Status: **Phase 1** — REST generator + login-gated portal working. Setup
-> wizard and Docker image are on the roadmap (see below).
+> Status: **working** — REST generator, web setup wizard, and login-gated
+> portal are all in use. A Docker image is on the roadmap (see below).
 
 ---
 
@@ -30,8 +37,9 @@ GLPI REST API ─► bin/generate.php ─► ../data-cache.json ─┐
 - `generate.php` pulls Projects, tasks, states, entities, users and linked
   KnowbaseItems over REST and writes **`data-cache.json`** (kept above the
   docroot). Run it from cron.
-- The **front-end** (hub + three project tabs: Summary / Explorer / Map) is a
-  single self-contained HTML file.
+- The **front-end** is a single self-contained HTML file: an app hub, three
+  project tabs (Summary / Explorer / **Map** — your custom drag-and-drop area
+  board), and the optional GPS check-ins module.
 - **Login-gated**: users sign in with their **own GLPI credentials**
   (`login.php`), and `data.php` returns only the projects that user can see in
   GLPI. The App-Token never leaves the server; the browser gets an HttpOnly
@@ -73,7 +81,8 @@ your-install/
 └── public/                ← docroot (point your vhost here)
     ├── index.html  setup.php  config.php
     ├── login.php   logout.php  data.php
-    ├── data-fichadas.php  license-key.php   (optional GPS module)
+    ├── board.php   profile.php               (Map areas + profile switch)
+    ├── data-fichadas.php  license-key.php     (optional GPS module)
     └── vendor/leaflet/
 ```
 
@@ -92,7 +101,8 @@ Everything is edited in the **setup panel** (`/setup.php`) and stored in
 |---|---|
 | **GLPI** | URL, App-Token, user token, `tokens_in_query` (Cloudflare), profile id, TLS, same-host resolve |
 | **Projects** | project type filter, group-by (`parent`/`entity`/`type`), state-name → status keywords |
-| **Branding** | app name, subtitle, accent colour, logo URL, default language |
+| **Branding** | company / app name (or fetch it from your GLPI root entity), accent colour, logo URL, default language |
+| **Map board** | your own areas (create / rename / reorder / delete) + drag projects between them; shared server-side, admin-editable |
 | **Modules** | GPS check-ins on/off, tab label, **app website link**, its read-only DB |
 
 Every value can also be supplied as an **environment variable** (`GLPI_URL`,
@@ -123,9 +133,10 @@ for Docker. See [`config/settings.example.json`](config/settings.example.json).
 ## Roadmap
 
 - [x] **Phase 1** — REST generator + login-gated portal (GLPI-credential login,
-  per-user scoping, ES/EN i18n, light/dark, Summary/Explorer/Map tabs with
-  Gantt & Kanban)
-- [ ] **Phase 2** — first-run setup wizard (web UI to enter/test connection & options)
+  per-user scoping, light/dark, Summary/Explorer/Map tabs with Gantt & Kanban)
+- [x] **Phase 2** — web setup wizard (enter/test connection & options in the
+  browser), 5-language UI (ES/EN/FR/DE/PT), profile switcher, custom Map area
+  board, optional GPS check-ins module
 - [ ] **Phase 3** — Docker image + release tarball, CI
 - [ ] **Phase 4** — extra auth modes (no-login / shared password), richer polish
 
