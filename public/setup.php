@@ -51,6 +51,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    if ($action === 'entity') { // fetch the GLPI root entity name to prefill the company/app name
+        $url  = trim($in['glpi_url'] ?? $cfg['glpi']['url']);
+        $app  = trim($in['glpi_app_token'] ?? '') ?: $cfg['glpi']['app_token'];
+        $user = trim($in['glpi_user_token'] ?? '') ?: $cfg['glpi']['user_token'];
+        try {
+            $c = new GlpiClient([
+                'url' => $url, 'app_token' => $app, 'user_token' => $user,
+                'tokens_in_query' => !empty($in['glpi_tokens_in_query']),
+                'profile_id' => (int)($in['glpi_profile_id'] ?? $cfg['glpi']['profile_id']),
+                'insecure' => !empty($in['glpi_insecure']),
+            ]);
+            $c->initSession();
+            $e = $c->getItem('Entity', 0);
+            $c->killSession();
+            $name = $e ? trim((string)($e['name'] ?? $e['completename'] ?? '')) : '';
+            echo json_encode(['ok' => $name !== '', 'name' => $name]);
+        } catch (\Throwable $e) {
+            echo json_encode(['ok' => false, 'msg' => $e->getMessage()]);
+        }
+        exit;
+    }
+
     $keepSecret = fn($new, $old) => (trim((string)$new) === '') ? $old : trim((string)$new);
     $csv = fn($s) => array_values(array_filter(array_map('trim', explode(',', (string)$s))));
 
@@ -72,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cfg['projects']['state_planned']     = $csv($in['state_planned'] ?? '');
 
     $cfg['branding']['app_name']     = trim($in['app_name'] ?? '') ?: 'Projects Dashboard';
-    $cfg['branding']['subtitle']     = trim($in['subtitle'] ?? '');
+    $cfg['branding']['subtitle']     = trim($in['subtitle'] ?? ($cfg['branding']['subtitle'] ?? ''));
     $cfg['branding']['accent']       = preg_match('/^#[0-9a-fA-F]{6}$/', $in['accent'] ?? '') ? $in['accent'] : '#405cde';
     $cfg['branding']['logo_url']     = trim($in['logo_url'] ?? '');
     $cfg['branding']['default_lang'] = in_array(($in['default_lang'] ?? 'es'), ['es', 'en', 'fr', 'de', 'pt'], true) ? $in['default_lang'] : 'es';
@@ -238,8 +260,12 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
 <details class="step">
   <summary><span data-i="s3">3 · Apariencia</span> <span class="opt" data-i="optonly">— opcional</span></summary>
   <div class="body">
-    <div class="field"><label data-i="l_name">Nombre de la app</label><input type="text" name="app_name" value="<?= $h($b['app_name']) ?>" placeholder="Projects Dashboard"><p class="help" data-i="h_name"></p></div>
-    <div class="field"><label data-i="l_sub">Subtítulo</label><input type="text" name="subtitle" value="<?= $h($b['subtitle']) ?>"></div>
+    <div class="field"><label data-i="l_name">Nombre de la app</label>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <input type="text" name="app_name" value="<?= $h($b['app_name']) ?>" placeholder="Projects Dashboard" style="flex:1">
+        <button type="button" class="act test" id="fetchent" data-i="b_fetchent" style="white-space:nowrap;padding:9px 13px">Traer de GLPI</button>
+      </div>
+      <p class="help" data-i="h_name"></p></div>
     <div class="field"><label data-i="l_accent">Color principal</label><input type="color" name="accent" value="<?= $h($b['accent']) ?>"></div>
     <div class="field"><label data-i="l_logo">URL del logo</label><input type="url" name="logo_url" value="<?= $h($b['logo_url']) ?>" placeholder="opcional"><p class="help" data-i="h_logo"></p></div>
     <div class="field"><label data-i="l_lang">Idioma por defecto</label><select name="default_lang"><?php foreach (['es'=>'Español','en'=>'English','fr'=>'Français','de'=>'Deutsch','pt'=>'Português'] as $k=>$v) echo '<option value="'.$k.'" '.($b['default_lang']===$k?'selected':'').">$v</option>"; ?></select></div>
@@ -298,7 +324,7 @@ const I18N={
   l_group:'Agrupar zonas por',h_group:'Cómo se agrupan las <b>zonas</b> del tablero.',g_parent:'Proyecto padre',g_entity:'Entidad',g_type:'Tipo',
   l_leaf:'Solo proyectos que tengan un proyecto padre',l_states:'Estados → color',h_states:'Palabras clave (separadas por coma) que mapean el <b>nombre</b> de tus estados de GLPI a un color: en proceso (azul), terminado (verde), planificado (naranja). Funciona en cualquier idioma.',
   l_prefix:'Quitar prefijo de zona',h_prefix:'Si tus proyectos padre se llaman «Portfolio · Infra», poné <code>Portfolio · </code> para mostrar solo «Infra».',
-  s3:'3 · Apariencia',l_name:'Nombre de la app',h_name:'Aparece en el encabezado y en el login.',l_sub:'Subtítulo',l_accent:'Color principal',l_logo:'URL del logo',h_logo:'Un PNG/SVG accesible por URL. Reemplaza el ícono por defecto.',l_lang:'Idioma por defecto',
+  s3:'3 · Apariencia',l_name:'Nombre de la app',h_name:'El nombre de tu empresa. Aparece en el encabezado y en el login. Podés traerlo de GLPI (entidad raíz).',l_sub:'Subtítulo',l_accent:'Color principal',l_logo:'URL del logo',h_logo:'Un PNG/SVG accesible por URL. Reemplaza el ícono por defecto.',l_lang:'Idioma por defecto',
   s4:'4 · Módulo Fichadas GPS',l_gpsen:'Activar el módulo de fichadas',l_gpslabel:'Etiqueta de la pestaña',l_gpsurl:'Link a la web de la app',h_gpsurl:'Se muestra como un botón dentro del módulo.',
   h_gpsdb:'<b>Base de datos:</b> este módulo lee tickets «Visita técnica» directo de la base de GLPI. Los datos de conexión están en el archivo <code>config/config_db.php</code> de tu GLPI.',
   l_dbhost:'Host de la DB',l_dbname:'Nombre de la DB',l_dbuser:'Usuario de la DB',l_dbpass:'Contraseña de la DB',adv2:'Avanzado',l_tz:'Zona horaria',h_tz:'Ej: <code>America/Argentina/Buenos_Aires</code>. Para el sello de «Actualizado».',
@@ -314,7 +340,7 @@ const I18N={
   l_group:'Group zones by',h_group:'How the board <b>zones</b> are grouped.',g_parent:'Parent project',g_entity:'Entity',g_type:'Type',
   l_leaf:'Only projects that have a parent project',l_states:'States → colour',h_states:'Comma-separated keywords mapping your GLPI state <b>names</b> to a colour: in-progress (blue), done (green), planned (orange). Works in any language.',
   l_prefix:'Strip zone prefix',h_prefix:'If your parent projects are named «Portfolio · Infra», set <code>Portfolio · </code> to show just «Infra».',
-  s3:'3 · Appearance',l_name:'App name',h_name:'Shown in the header and on the login screen.',l_sub:'Subtitle',l_accent:'Accent colour',l_logo:'Logo URL',h_logo:'A PNG/SVG reachable by URL. Replaces the default icon.',l_lang:'Default language',
+  s3:'3 · Appearance',l_name:'App name',h_name:'Your company name. Shown in the header and on the login screen. You can fetch it from GLPI (root entity).',l_sub:'Subtitle',l_accent:'Accent colour',l_logo:'Logo URL',h_logo:'A PNG/SVG reachable by URL. Replaces the default icon.',l_lang:'Default language',
   s4:'4 · GPS Check-ins module',l_gpsen:'Enable the check-ins module',l_gpslabel:'Tab label',l_gpsurl:'App website link',h_gpsurl:'Shown as a button inside the module.',
   h_gpsdb:'<b>Database:</b> this module reads «Visita técnica» tickets straight from the GLPI database. The connection details are in your GLPI <code>config/config_db.php</code> file.',
   l_dbhost:'DB host',l_dbname:'DB name',l_dbuser:'DB user',l_dbpass:'DB password',adv2:'Advanced',l_tz:'Timezone',h_tz:'e.g. <code>America/Argentina/Buenos_Aires</code>. For the «Updated» stamp.',
@@ -330,7 +356,7 @@ const I18N={
   l_group:'Grouper les zones par',h_group:'Comment les <b>zones</b> sont regroupées.',g_parent:'Projet parent',g_entity:'Entité',g_type:'Type',
   l_leaf:'Uniquement les projets ayant un projet parent',l_states:'États → couleur',h_states:'Mots-clés (séparés par virgule) associant le <b>nom</b> de vos états GLPI à une couleur : en cours (bleu), terminé (vert), planifié (orange).',
   l_prefix:'Retirer le préfixe de zone',h_prefix:'Si vos projets parents s’appellent «Portfolio · Infra», mettez <code>Portfolio · </code> pour n’afficher que «Infra».',
-  s3:'3 · Apparence',l_name:'Nom de l’app',h_name:'Affiché dans l’en-tête et sur la page de connexion.',l_sub:'Sous-titre',l_accent:'Couleur principale',l_logo:'URL du logo',h_logo:'Un PNG/SVG accessible par URL. Remplace l’icône par défaut.',l_lang:'Langue par défaut',
+  s3:'3 · Apparence',l_name:'Nom de l’app',h_name:'Le nom de votre entreprise. Affiché dans l’en-tête et sur la page de connexion. Vous pouvez le récupérer depuis GLPI (entité racine).',l_sub:'Sous-titre',l_accent:'Couleur principale',l_logo:'URL du logo',h_logo:'Un PNG/SVG accessible par URL. Remplace l’icône par défaut.',l_lang:'Langue par défaut',
   s4:'4 · Module Pointages GPS',l_gpsen:'Activer le module de pointages',l_gpslabel:'Libellé de l’onglet',l_gpsurl:'Lien du site de l’app',h_gpsurl:'Affiché comme un bouton dans le module.',
   h_gpsdb:'<b>Base de données :</b> ce module lit les tickets «Visita técnica» directement dans la base GLPI. Les identifiants sont dans le fichier <code>config/config_db.php</code> de votre GLPI.',
   l_dbhost:'Hôte de la BD',l_dbname:'Nom de la BD',l_dbuser:'Utilisateur BD',l_dbpass:'Mot de passe BD',adv2:'Avancé',l_tz:'Fuseau horaire',h_tz:'ex : <code>America/Argentina/Buenos_Aires</code>. Pour l’horodatage «Mis à jour».',
@@ -346,7 +372,7 @@ const I18N={
   l_group:'Zonen gruppieren nach',h_group:'Wie die <b>Zonen</b> gruppiert werden.',g_parent:'Übergeordnetes Projekt',g_entity:'Entität',g_type:'Typ',
   l_leaf:'Nur Projekte mit übergeordnetem Projekt',l_states:'Status → Farbe',h_states:'Schlüsselwörter (kommagetrennt), die den <b>Namen</b> Ihrer GLPI-Status einer Farbe zuordnen: in Arbeit (blau), erledigt (grün), geplant (orange).',
   l_prefix:'Zonen-Präfix entfernen',h_prefix:'Heißen die übergeordneten Projekte «Portfolio · Infra», setzen Sie <code>Portfolio · </code>, um nur «Infra» zu zeigen.',
-  s3:'3 · Aussehen',l_name:'App-Name',h_name:'Erscheint im Kopf und im Login.',l_sub:'Untertitel',l_accent:'Akzentfarbe',l_logo:'Logo-URL',h_logo:'Ein per URL erreichbares PNG/SVG. Ersetzt das Standardsymbol.',l_lang:'Standardsprache',
+  s3:'3 · Aussehen',l_name:'App-Name',h_name:'Ihr Firmenname. Erscheint im Kopf und im Login. Sie können ihn aus GLPI holen (Stammentität).',l_sub:'Untertitel',l_accent:'Akzentfarbe',l_logo:'Logo-URL',h_logo:'Ein per URL erreichbares PNG/SVG. Ersetzt das Standardsymbol.',l_lang:'Standardsprache',
   s4:'4 · GPS-Check-ins-Modul',l_gpsen:'Modul aktivieren',l_gpslabel:'Tab-Beschriftung',l_gpsurl:'Link zur App-Website',h_gpsurl:'Wird als Button im Modul angezeigt.',
   h_gpsdb:'<b>Datenbank:</b> dieses Modul liest «Visita técnica»-Tickets direkt aus der GLPI-Datenbank. Die Zugangsdaten stehen in der Datei <code>config/config_db.php</code> Ihres GLPI.',
   l_dbhost:'DB-Host',l_dbname:'DB-Name',l_dbuser:'DB-Benutzer',l_dbpass:'DB-Passwort',adv2:'Erweitert',l_tz:'Zeitzone',h_tz:'z. B. <code>America/Argentina/Buenos_Aires</code>. Für den «Aktualisiert»-Stempel.',
@@ -362,12 +388,17 @@ const I18N={
   l_group:'Agrupar zonas por',h_group:'Como as <b>zonas</b> são agrupadas.',g_parent:'Projeto pai',g_entity:'Entidade',g_type:'Tipo',
   l_leaf:'Só projetos que tenham um projeto pai',l_states:'Estados → cor',h_states:'Palavras-chave (separadas por vírgula) que mapeiam o <b>nome</b> dos seus estados do GLPI a uma cor: em andamento (azul), concluído (verde), planejado (laranja).',
   l_prefix:'Remover prefixo de zona',h_prefix:'Se seus projetos pai se chamam «Portfolio · Infra», ponha <code>Portfolio · </code> para mostrar só «Infra».',
-  s3:'3 · Aparência',l_name:'Nome do app',h_name:'Aparece no cabeçalho e no login.',l_sub:'Subtítulo',l_accent:'Cor principal',l_logo:'URL do logo',h_logo:'Um PNG/SVG acessível por URL. Substitui o ícone padrão.',l_lang:'Idioma padrão',
+  s3:'3 · Aparência',l_name:'Nome do app',h_name:'O nome da sua empresa. Aparece no cabeçalho e no login. Você pode trazê-lo do GLPI (entidade raiz).',l_sub:'Subtítulo',l_accent:'Cor principal',l_logo:'URL do logo',h_logo:'Um PNG/SVG acessível por URL. Substitui o ícone padrão.',l_lang:'Idioma padrão',
   s4:'4 · Módulo Registros GPS',l_gpsen:'Ativar o módulo',l_gpslabel:'Rótulo da aba',l_gpsurl:'Link do site do app',h_gpsurl:'Exibido como um botão dentro do módulo.',
   h_gpsdb:'<b>Banco de dados:</b> este módulo lê tickets «Visita técnica» direto do banco do GLPI. Os dados de conexão estão no arquivo <code>config/config_db.php</code> do seu GLPI.',
   l_dbhost:'Host do BD',l_dbname:'Nome do BD',l_dbuser:'Usuário do BD',l_dbpass:'Senha do BD',adv2:'Avançado',l_tz:'Fuso horário',h_tz:'ex: <code>America/Argentina/Buenos_Aires</code>. Para o carimbo «Atualizado».',
   b_test:'Testar conexão',b_save:'Salvar e instalar',m_testing:'Testando…',m_saving:'Salvando e sincronizando…',m_ok:'✓ Conectado · {n} estados visíveis',m_saved:'✓ Salvo · {n} projetos',m_savefail:'Falha ao salvar',m_reqfail:'Falha na solicitação',m_syncfail:'Salvo, mas a sincronização falhou: '}
 };
+Object.assign(I18N.es,{b_fetchent:'Traer de GLPI',m_fetching:'Consultando GLPI…',m_fetched:'✓ Nombre traído de GLPI',m_fetchnone:'No se pudo leer la entidad raíz de GLPI'});
+Object.assign(I18N.en,{b_fetchent:'Fetch from GLPI',m_fetching:'Querying GLPI…',m_fetched:'✓ Name fetched from GLPI',m_fetchnone:'Could not read the GLPI root entity'});
+Object.assign(I18N.fr,{b_fetchent:'Depuis GLPI',m_fetching:'Interrogation de GLPI…',m_fetched:'✓ Nom récupéré depuis GLPI',m_fetchnone:'Impossible de lire l’entité racine GLPI'});
+Object.assign(I18N.de,{b_fetchent:'Aus GLPI holen',m_fetching:'GLPI wird abgefragt…',m_fetched:'✓ Name aus GLPI übernommen',m_fetchnone:'GLPI-Stammentität konnte nicht gelesen werden'});
+Object.assign(I18N.pt,{b_fetchent:'Trazer do GLPI',m_fetching:'Consultando GLPI…',m_fetched:'✓ Nome trazido do GLPI',m_fetchnone:'Não foi possível ler a entidade raiz do GLPI'});
 Object.assign(I18N.es,{optonly:'— opcional',s5c:'Mensajes de contacto',h_contact:'Botones para escribir a los técnicos (WhatsApp/SMS/Mail) con un mensaje pre-cargado. Usá <code>{nombre}</code> para el nombre del técnico.',l_msgdef:'Mensaje general',l_msgrem:'Mensaje recordatorio (sin fichar hoy)',l_gchat:'Mostrar botón de Google Chat'});
 Object.assign(I18N.en,{optonly:'— optional',s5c:'Contact messages',h_contact:'Buttons to message technicians (WhatsApp/SMS/Mail) with a pre-filled text. Use <code>{nombre}</code> for the technician’s name.',l_msgdef:'Default message',l_msgrem:'Reminder message (not checked in today)',l_gchat:'Show Google Chat button'});
 Object.assign(I18N.fr,{optonly:'— optionnel',s5c:'Messages de contact',h_contact:'Boutons pour écrire aux techniciens (WhatsApp/SMS/Mail) avec un message pré-rempli. Utilisez <code>{nombre}</code> pour le nom.',l_msgdef:'Message par défaut',l_msgrem:'Message de rappel (non pointé)',l_gchat:'Afficher le bouton Google Chat'});
@@ -396,6 +427,11 @@ const data=()=>{const o={};new FormData(f).forEach((v,k)=>o[k]=v);
 const post=pl=>fetch('setup.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pl)}).then(r=>r.json());
 $('#test').onclick=()=>{msg.style.color='var(--mu)';msg.textContent=T('m_testing');
   post(Object.assign(data(),{action:'test'})).then(j=>{msg.style.color=j.ok?'#1f9d55':'#d33';msg.textContent=j.ok?T('m_ok').replace('{n}',j.n):('✕ '+j.msg);}).catch(()=>{msg.style.color='#d33';msg.textContent=T('m_reqfail');});};
+$('#fetchent').onclick=()=>{msg.style.color='var(--mu)';msg.textContent=T('m_fetching');
+  post(Object.assign(data(),{action:'entity'})).then(j=>{
+    if(j.ok&&j.name){f.elements['app_name'].value=j.name;msg.style.color='#1f9d55';msg.textContent=T('m_fetched');}
+    else{msg.style.color='#d33';msg.textContent=j.msg?('✕ '+j.msg):T('m_fetchnone');}
+  }).catch(()=>{msg.style.color='#d33';msg.textContent=T('m_reqfail');});};
 f.onsubmit=e=>{e.preventDefault();msg.style.color='var(--mu)';msg.textContent=T('m_saving');
   post(Object.assign(data(),{action:'save'})).then(j=>{
     if(j.ok){const gg=j.generated;
