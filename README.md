@@ -1,4 +1,4 @@
-# GLPI Projects Dashboard
+# GLPI Admin Dashboard
 
 A lightweight, self-hosted **dashboard for GLPI Projects**. It reads your GLPI
 over the **REST API** (App-Token + user token), builds a static cache, and
@@ -55,8 +55,8 @@ GLPI REST API ─► bin/generate.php ─► ../data-cache.json ─┐
 ## Quick start
 
 ```bash
-git clone https://github.com/your-org/glpi-projects-dashboard.git
-cd glpi-projects-dashboard
+git clone https://github.com/RootHard/glpi-admin-dashboard.git
+cd glpi-admin-dashboard
 php -S localhost:8080 -t public
 # 1) open http://localhost:8080/setup.php  → fill in the config panel
 #    (GLPI URL + tokens, project type, branding, modules) and Save
@@ -89,7 +89,7 @@ your-install/
 ### Keep it fresh (cron)
 
 ```cron
-*/15 * * * * php /path/to/glpi-projects-dashboard/bin/generate.php >/dev/null 2>&1
+*/15 * * * * php /path/to/glpi-admin-dashboard/bin/generate.php >/dev/null 2>&1
 ```
 
 ## Configuration

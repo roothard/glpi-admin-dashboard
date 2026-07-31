@@ -1,4 +1,4 @@
-# --- GLPI Projects Dashboard — docroot hardening (Apache 2.4+) -------------
+# --- GLPI Admin Dashboard — docroot hardening (Apache 2.4+) -------------
 Options -Indexes
 
 <IfModule mod_headers.c>
