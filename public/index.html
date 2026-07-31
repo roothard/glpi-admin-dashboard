@@ -221,6 +221,27 @@ main{padding-top:20px;padding-bottom:60px}
 .tmc{display:flex;gap:4px;flex:none}
 .cbtn{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--border2);border-radius:8px;text-decoration:none;font-size:14px;background:var(--surface);line-height:1}
 .cbtn:hover{border-color:var(--accent)}
+/* ---- tablero de áreas (Mapa) ---- */
+.boardbar{display:flex;gap:8px;align-items:center;margin:0 0 14px;flex-wrap:wrap}
+.boardbar .bstat{color:var(--dim);font:600 12px var(--mono)}
+.board{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px;align-items:flex-start}
+.bcol{flex:0 0 250px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:12px;min-height:90px}
+.bcol.over{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.bcol.none{background:transparent;border-style:dashed}
+.bch{display:flex;align-items:center;gap:5px;margin:0 2px 10px}
+.bch b{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bch .cn{color:var(--dim);font:700 11px var(--mono);margin-right:2px}
+.bcbtn{width:24px;height:24px;display:grid;place-items:center;border:none;background:none;cursor:pointer;color:var(--muted);border-radius:6px;font-size:12px;flex:none}
+.bcbtn:hover{background:var(--surface);color:var(--accent)}
+.bcbtn.grow{margin-left:auto}
+.bcard{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 11px;margin-bottom:8px;cursor:pointer}
+.bcard:hover{border-color:var(--accent)}
+.bcard.drag{opacity:.45}
+.bcard[draggable=true]{cursor:grab}
+.bcard .bcdot{width:9px;height:9px;border-radius:50%;flex:none}
+.bcard .bci{min-width:0}
+.bcard b{font-size:13px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcard small{color:var(--muted);font-size:11px}
 </style>
 </head>
 <body>
@@ -288,9 +309,10 @@ main{padding-top:20px;padding-bottom:60px}
     <section id="detail"></section>
   </section>
 
-  <!-- MAPA -->
+  <!-- MAPA / TABLERO DE ÁREAS -->
   <section class="view" id="v-mapa">
-    <div class="continents" id="continents"></div>
+    <div class="boardbar" id="board-bar"></div>
+    <div class="board" id="board"></div>
   </section>
   </section><!-- /app proyectos -->
   <!-- APP: FICHADAS GPS -->
@@ -429,6 +451,11 @@ Object.assign(I18N.en,{k_onsite:'On site now',k_today:'Checked in today',k_missi
 Object.assign(I18N.fr,{k_onsite:'Sur site',k_today:'Pointés aujourd’hui',k_missing:'Non pointés'});
 Object.assign(I18N.de,{k_onsite:'Vor Ort',k_today:'Heute erfasst',k_missing:'Nicht erfasst'});
 Object.assign(I18N.pt,{k_onsite:'Em campo agora',k_today:'Registraram hoje',k_missing:'Sem registro'});
+Object.assign(I18N.es,{board_none:'Sin asignar',board_add:'+ Área',board_addname:'Nombre del área',board_rename:'Renombrar área',board_del:'Eliminar',board_delc:'¿Eliminar el área',board_saved:'Guardado'});
+Object.assign(I18N.en,{board_none:'Unassigned',board_add:'+ Area',board_addname:'Area name',board_rename:'Rename area',board_del:'Delete',board_delc:'Delete area',board_saved:'Saved'});
+Object.assign(I18N.fr,{board_none:'Non assignés',board_add:'+ Zone',board_addname:'Nom de la zone',board_rename:'Renommer la zone',board_del:'Supprimer',board_delc:'Supprimer la zone',board_saved:'Enregistré'});
+Object.assign(I18N.de,{board_none:'Nicht zugeordnet',board_add:'+ Bereich',board_addname:'Bereichsname',board_rename:'Bereich umbenennen',board_del:'Löschen',board_delc:'Bereich löschen',board_saved:'Gespeichert'});
+Object.assign(I18N.pt,{board_none:'Sem atribuição',board_add:'+ Área',board_addname:'Nome da área',board_rename:'Renomear área',board_del:'Excluir',board_delc:'Excluir a área',board_saved:'Salvo'});
 let LANG=localStorage.getItem('rh-lang')||'es';
 const T=k=>(I18N[LANG]&&I18N[LANG][k])||k;
 
@@ -480,6 +507,7 @@ function loadData(){
     fillSel('#f-entidad',uniq(d.projects.map(p=>p.entidad)));
     fillSel('#f-resp',uniq(d.projects.map(p=>p.responsable)));
     applyStatic(); renderResumen(); renderExpl(); renderMapa(); renderHub(); showApp('hub');
+    loadBoard().then(renderMapa);
   }).catch(()=>{$('#kpis').innerHTML='<div class="empty">'+T('noData')+'</div>';});
 }
 function renderHub(){
@@ -926,28 +954,73 @@ function kbPanel(p){
   return wrap;
 }
 
-// ================= MAPA (continentes) =================
-const CONT_BG={'Infraestructura':'rgba(230,80,110,.10)','Aplicaciones':'rgba(64,92,222,.10)','Personal':'rgba(90,180,120,.10)'};
-const CONT_ICON={'Infraestructura':'🛡️','Aplicaciones':'📱','Personal':'🎮'};
+// ================= MAPA (tablero de áreas propias) =================
+// Áreas definidas en el dashboard (NO en GLPI), compartidas para todos;
+// solo un admin puede editar/arrastrar. Persistido server-side (board.php).
+let BOARD={areas:[],assign:{},canEdit:false};
+const NONE='__none__';
+function loadBoard(){
+  return fetch('board.php?_='+Date.now(),{credentials:'same-origin'})
+    .then(r=>r.ok?r.json():null).then(b=>{ if(b&&b.areas)BOARD=b; }).catch(()=>{});
+}
+function saveBoard(){
+  if(!BOARD.canEdit) return;
+  const s=$('#board-stat'); if(s)s.textContent='…';
+  fetch('board.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({areas:BOARD.areas,assign:BOARD.assign})})
+    .then(r=>r.json()).then(j=>{ if(s)s.textContent=j&&j.ok?'✓ '+T('board_saved'):'⚠'; if(s)setTimeout(()=>{s.textContent='';},1600); })
+    .catch(()=>{ if(s)s.textContent='⚠'; });
+}
+function renderBoardBar(){
+  const bar=$('#board-bar'); if(!bar) return; bar.innerHTML='';
+  if(!BOARD.canEdit){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  const add=el('button','clr',T('board_add'));
+  add.addEventListener('click',()=>{ const n=prompt(T('board_addname')); if(n&&n.trim()&&!BOARD.areas.includes(n.trim())){ BOARD.areas.push(n.trim()); saveBoard(); renderMapa(); } });
+  const stat=el('span','bstat'); stat.id='board-stat';
+  bar.appendChild(add); bar.appendChild(stat);
+}
 function renderMapa(){
-  const byArea={};
-  DATA.projects.forEach(p=>{(byArea[p.area]=byArea[p.area]||[]).push(p);});
-  const cw=$('#continents'); cw.innerHTML='';
-  Object.keys(byArea).sort().forEach(area=>{
-    const cont=el('div','cont'); cont.style.setProperty('--cbg',CONT_BG[area]||'rgba(64,92,222,.06)');
-    cont.innerHTML=`<div class="ch"><span style="font-size:18px">${CONT_ICON[area]||'🌐'}</span><b>${esc(area)}</b><span class="cn">${byArea[area].length}</span></div>`;
-    const nodes=el('div','cnodes');
-    byArea[area].sort((a,b)=>b.pct-a.pct).forEach(p=>{
-      const n=el('div','cnode');
-      const C=2*Math.PI*20, off=C*(1-p.pct/100);
-      n.innerHTML=`<div class="ring"><svg width="52" height="52" viewBox="0 0 52 52">
-        <circle cx="26" cy="26" r="20" fill="none" stroke="var(--surface2)" stroke-width="5"/>
-        <circle cx="26" cy="26" r="20" fill="none" stroke="${p.color}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg>
-        <span class="rp">${p.pct}%</span></div><div class="cnm">${esc(p.n)}</div>`;
-      n.title=p.n+' · '+p.estado; n.addEventListener('click',()=>goToProject(p.id));
-      nodes.appendChild(n);
+  renderBoardBar();
+  const wrap=$('#board'); if(!wrap) return; wrap.innerHTML='';
+  const byArea={}; BOARD.areas.forEach(a=>byArea[a]=[]); byArea[NONE]=[];
+  DATA.projects.forEach(p=>{
+    const a=BOARD.assign[p.id];
+    if(a && BOARD.areas.includes(a)) byArea[a].push(p); else byArea[NONE].push(p);
+  });
+  const order=[...BOARD.areas, NONE];
+  order.forEach((a,idx)=>{
+    const isNone=a===NONE, items=byArea[a]||[];
+    const col=el('div','bcol'+(isNone?' none':'')); col.dataset.area=a;
+    const h=el('div','bch');
+    h.innerHTML=`<span class="cn">${items.length}</span><b>${isNone?esc(T('board_none')):esc(a)}</b>`;
+    if(BOARD.canEdit && !isNone){
+      const mk=(txt,cls,fn)=>{ const b=el('button','bcbtn'+(cls||''),txt); b.addEventListener('click',ev=>{ev.stopPropagation();fn();}); return b; };
+      h.appendChild(mk('◀',' grow',()=>{ if(idx>0){ const t=BOARD.areas[idx-1]; BOARD.areas[idx-1]=a; BOARD.areas[idx]=t; saveBoard(); renderMapa(); } }));
+      h.appendChild(mk('▶','',()=>{ if(idx<BOARD.areas.length-1){ const t=BOARD.areas[idx+1]; BOARD.areas[idx+1]=a; BOARD.areas[idx]=t; saveBoard(); renderMapa(); } }));
+      h.appendChild(mk('✎','',()=>{ const nn=prompt(T('board_rename'),a); if(nn&&nn.trim()&&nn.trim()!==a&&!BOARD.areas.includes(nn.trim())){ const old=a,nu=nn.trim(); BOARD.areas=BOARD.areas.map(x=>x===old?nu:x); Object.keys(BOARD.assign).forEach(k=>{if(BOARD.assign[k]===old)BOARD.assign[k]=nu;}); saveBoard(); renderMapa(); } }));
+      h.appendChild(mk('🗑','',()=>{ if(confirm(T('board_delc')+' "'+a+'"?')){ BOARD.areas=BOARD.areas.filter(x=>x!==a); Object.keys(BOARD.assign).forEach(k=>{if(BOARD.assign[k]===a)delete BOARD.assign[k];}); saveBoard(); renderMapa(); } }));
+    }
+    col.appendChild(h);
+    items.sort((x,y)=>y.pct-x.pct).forEach(p=>{
+      const c=el('div','bcard'); c.dataset.id=p.id; c.draggable=!!BOARD.canEdit;
+      c.innerHTML=`<span class="bcdot" style="background:${p.color}"></span><div class="bci"><b>${esc(p.n)}</b><small>${p.pct}% · ${esc(p.estado)}</small></div>`;
+      c.addEventListener('click',()=>goToProject(p.id));
+      if(BOARD.canEdit){
+        c.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain',String(p.id)); e.dataTransfer.effectAllowed='move'; c.classList.add('drag'); });
+        c.addEventListener('dragend',()=>c.classList.remove('drag'));
+      }
+      col.appendChild(c);
     });
-    cont.appendChild(nodes); cw.appendChild(cont);
+    if(BOARD.canEdit){
+      col.addEventListener('dragover',e=>{ e.preventDefault(); col.classList.add('over'); });
+      col.addEventListener('dragleave',e=>{ if(!col.contains(e.relatedTarget))col.classList.remove('over'); });
+      col.addEventListener('drop',e=>{ e.preventDefault(); col.classList.remove('over');
+        const id=parseInt(e.dataTransfer.getData('text/plain'),10); if(!id) return;
+        if(isNone) delete BOARD.assign[id]; else BOARD.assign[id]=a;
+        saveBoard(); renderMapa(); });
+    }
+    wrap.appendChild(col);
   });
 }
 </script>
