@@ -146,6 +146,10 @@ main{padding-top:20px;padding-bottom:60px}
 /* ---- login ---- */
 #loginwrap{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:var(--bg)}
 #loginwrap.on{display:grid}
+.lctrls{position:absolute;top:18px;right:18px;display:flex;gap:8px;align-items:center}
+.lctrls .ltoggle{font:600 12px var(--sans);color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:9px;padding:8px 10px;cursor:pointer;outline:none}
+.lctrls .ltoggle:hover{border-color:var(--accent)}
+.lctrls select.ltoggle{padding:8px 9px}
 .logincard{width:340px;max-width:90vw;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:30px 28px;box-shadow:0 20px 45px rgba(0,0,0,.18);text-align:center}
 .logincard .lmark{width:44px;height:44px;margin:0 auto 14px;display:block}
 .logincard h2{font-size:18px;font-weight:700;margin:0 0 4px}
@@ -359,7 +363,14 @@ main{padding-top:20px;padding-bottom:60px}
   </section>
 </main>
 
-<div id="loginwrap"><form class="logincard" id="loginform">
+<div id="loginwrap">
+  <div class="lctrls">
+    <button class="ltoggle" id="l-theme" type="button" title="Tema">🌙</button>
+    <select class="ltoggle" id="l-lang" aria-label="Idioma">
+      <option value="es">ES</option><option value="en">EN</option><option value="fr">FR</option><option value="de">DE</option><option value="pt">PT</option>
+    </select>
+  </div>
+  <form class="logincard" id="loginform">
   <svg class="lmark" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#405cde"/><stop offset="1" stop-color="#6a83f2"/></linearGradient></defs><path d="M4 20c5-9 11-13.5 16-13.5S31 11 36 20c-5 9-11 13.5-16 13.5S9 29 4 20Z" stroke="url(#lg)" stroke-width="2.4"/><circle cx="20" cy="20" r="5" fill="url(#lg)"/></svg>
   <h2 id="l-tit">Centro de Proyectos</h2>
   <p id="l-sub">Ingresá con tu cuenta de GLPI</p>
@@ -459,16 +470,20 @@ Object.assign(I18N.pt,{board_none:'Sem atribuição',board_add:'+ Área',board_a
 let LANG=localStorage.getItem('rh-lang')||'es';
 const T=k=>(I18N[LANG]&&I18N[LANG][k])||k;
 
-// ---- tema ----
-const $theme=$('#theme');
+// ---- tema (sincroniza header + login) ----
+const $theme=$('#theme'), $ltheme=$('#l-theme');
 function themeNow(){return document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');}
-function updThemeIcon(){$theme.textContent=themeNow()==='dark'?'☀️':'🌙';}
-$theme.addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('rh-theme',n);updThemeIcon();});
+function updThemeIcon(){const i=themeNow()==='dark'?'☀️':'🌙';$theme.textContent=i;if($ltheme)$ltheme.textContent=i;}
+function toggleTheme(){const n=themeNow()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('rh-theme',n);updThemeIcon();}
+$theme.addEventListener('click',toggleTheme);
+if($ltheme)$ltheme.addEventListener('click',toggleTheme);
 updThemeIcon();
 
-// ---- idioma ----
-const $lang=$('#lang'); $lang.value=LANG;
-$lang.addEventListener('change',()=>{LANG=$lang.value;localStorage.setItem('rh-lang',LANG);applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();});
+// ---- idioma (sincroniza header + login) ----
+const $lang=$('#lang'), $llang=$('#l-lang'); $lang.value=LANG; if($llang)$llang.value=LANG;
+function setLang(v){LANG=v;localStorage.setItem('rh-lang',LANG);$lang.value=LANG;if($llang)$llang.value=LANG;applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();}
+$lang.addEventListener('change',()=>setLang($lang.value));
+if($llang)$llang.addEventListener('change',()=>setLang($llang.value));
 function applyStatic(){
   document.querySelector('.tab[data-v="resumen"]').textContent='▦ '+T('t_res');
   document.querySelector('.tab[data-v="explorador"]').textContent='🔍 '+T('t_exp');
