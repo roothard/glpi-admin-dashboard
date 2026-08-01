@@ -79,6 +79,14 @@ main{padding-top:20px;padding-bottom:60px}
 .rchip.stuck{background:rgba(200,140,0,.16);color:#c88c00}
 .rchip.nodate{background:var(--surface2);color:var(--muted)}
 #att-panel>h4{color:#e2506e}
+.atthead{cursor:pointer;display:flex;align-items:center;gap:9px;user-select:none}
+.atthead:hover .attcaret{color:var(--text)}
+.attn{font:700 11.5px var(--mono);background:rgba(226,80,110,.14);color:#e2506e;padding:2px 9px;border-radius:99px}
+.attn.ok{background:rgba(31,140,95,.12);color:#1f8c5f}
+.attcaret{margin-left:auto;font-style:normal;color:var(--muted);font-size:12px;transition:transform .2s}
+#att-panel.open .attcaret{transform:rotate(90deg)}
+#att-panel.open>h4{margin-bottom:14px}
+#att-panel:not(.open)>h4{margin-bottom:0;border-bottom:none;padding-bottom:0}
 /* timeline (gantt de proyectos) */
 .grow{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:10px;margin:5px 0;position:relative;z-index:1}
 .gname{font-size:12px;color:var(--text);overflow:hidden}
@@ -347,7 +355,10 @@ body.dockon .wrap{padding-left:104px}
   <!-- RESUMEN -->
   <section class="view on" id="v-resumen">
     <div class="kpis" id="kpis"></div>
-    <div class="panel" id="att-panel"><h4 id="h-att">Requieren atención</h4><div class="actlist" id="attlist"></div></div>
+    <div class="panel" id="att-panel">
+      <h4 class="atthead" id="att-head"><span id="h-att">Requieren atención</span><b class="attn" id="att-n">0</b><i class="attcaret">▸</i></h4>
+      <div class="actlist" id="attlist" style="display:none"></div>
+    </div>
     <div class="panel">
       <div class="acthead"><h4 id="h-act">Proyectos activos · avance</h4>
         <div class="acttools">
@@ -966,6 +977,15 @@ function stateLegend(box){
   (DATA.states||[]).forEach(s=>{ if(seen[s.name])return; seen[s.name]=1;
     box.appendChild(el('span',null,`<i style="background:${s.color}"></i>${esc(s.name)}`)); });
 }
+// panel "Requieren atención": contraído muestra el número, expandido el detalle
+function attSet(open){
+  $('#att-panel').classList.toggle('open',open);
+  $('#attlist').style.display=open?'':'none';
+}
+$('#att-head').addEventListener('click',()=>{
+  const open=!$('#att-panel').classList.contains('open');
+  attSet(open); localStorage.setItem('rh-att-open',open?'1':'0');
+});
 function renderResumen(){
   const ps=DATA.projects, activos=ps.filter(isActive);
   const avg=ps.length?Math.round(ps.reduce((a,p)=>a+p.pct,0)/ps.length):0;
@@ -976,9 +996,12 @@ function renderResumen(){
   if(!ss.options.length){['pct','name','area','state'].forEach(k=>{const o=el('option');o.value=k;ss.appendChild(o);});ss.value=ACT.sort;}
   [...ss.options].forEach(o=>o.textContent=T('sort')+': '+T('s_'+o.value));
   $('#act-q').placeholder=T('search'); $('#h-att').textContent=T('att_h');
-  const ap=$('#attlist'); ap.innerHTML=''; let any=false;
-  activos.forEach(p=>{const r=attnReasons(p); if(r.length){any=true; ap.appendChild(arow(p,r));}});
-  if(!any) ap.appendChild(el('div','empty',T('att_ok')));
+  const ap=$('#attlist'); ap.innerHTML='';
+  const attn=activos.map(p=>({p,r:attnReasons(p)})).filter(x=>x.r.length);
+  attn.forEach(x=>ap.appendChild(arow(x.p,x.r)));
+  if(!attn.length) ap.appendChild(el('div','empty',T('att_ok')));
+  const nb=$('#att-n'); nb.textContent=attn.length; nb.classList.toggle('ok',!attn.length);
+  attSet(localStorage.getItem('rh-att-open')==='1');
   renderActive();
   stateLegend($('#tl-legend'));
   $('#timeline').innerHTML=''; $('#timeline').appendChild(timelineAll());
