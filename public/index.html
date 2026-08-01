@@ -270,9 +270,16 @@ main{padding-top:20px;padding-bottom:60px}
 .bcard b{font-size:13px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bcard small{color:var(--muted);font-size:11px}
 /* ---- dock de cubos 3D (apps) ---- */
-#dock{position:fixed;left:18px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:22px;z-index:40;perspective:600px}
+#dock{position:fixed;left:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:40;perspective:600px;width:84px;align-items:center}
+.dcap{font:600 9.5px var(--disp);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);padding-bottom:6px;border-bottom:1px solid var(--border2);margin-bottom:10px;width:64px;text-align:center}
+.cubewrap{display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;padding:4px 0 8px}
+.clbl{font:600 10px var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;line-height:1.3;max-width:80px}
+.cubewrap:hover .clbl{color:var(--text)}
 .cube{width:46px;height:46px;cursor:pointer;position:relative;animation:cpop .35s cubic-bezier(.3,1.4,.5,1)}
 @keyframes cpop{from{transform:scale(.2);opacity:0}}
+/* pulso de atención (hasta que el usuario use el dock por primera vez) */
+.cubewrap.pulse .cube::before{content:"";position:absolute;inset:-8px;border-radius:14px;border:2px solid var(--accent);opacity:0;animation:dpulse 2.2s ease-out 3;animation-delay:1.2s;pointer-events:none}
+@keyframes dpulse{0%{opacity:.85;transform:scale(.82)}70%{opacity:0;transform:scale(1.25)}100%{opacity:0}}
 .cube .box{width:100%;height:100%;position:relative;transform-style:preserve-3d;transform:rotateX(-20deg) rotateY(30deg);transition:transform .45s cubic-bezier(.2,.8,.3,1)}
 .cube:hover .box{transform:rotateX(-20deg) rotateY(-38deg)}
 .cube.spin .box{animation:cspin .45s cubic-bezier(.5,0,.3,1) forwards}
@@ -287,8 +294,12 @@ main{padding-top:20px;padding-bottom:60px}
 .cube::after{content:"";position:absolute;left:8%;right:8%;bottom:-13px;height:9px;border-radius:50%;background:#141416;filter:blur(8px);opacity:.18}
 .cube .tip{position:absolute;left:62px;top:50%;transform:translateY(-50%) translateX(-6px);white-space:nowrap;font:600 12px var(--disp);background:var(--surface);border:1px solid var(--border);padding:5px 12px;border-radius:9px;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow)}
 .cube:hover .tip{opacity:1;transform:translateY(-50%) translateX(0)}
-body.dockon .wrap{padding-left:96px}
-@media(max-width:760px){#dock{flex-direction:row;left:50%;top:auto;bottom:14px;transform:translateX(-50%)} body.dockon .wrap{padding-left:28px}}
+body.dockon .wrap{padding-left:104px}
+@media(max-width:760px){
+  #dock{flex-direction:row;left:50%;top:auto;bottom:10px;transform:translateX(-50%);width:auto;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:8px 14px 4px;box-shadow:var(--shadow)}
+  #dock .dcap{display:none}
+  body.dockon .wrap{padding-left:28px}
+}
 /* transición CÍRCULO: la app nueva se revela en un círculo que crece desde el dock */
 .appview.circ{animation:circreveal .72s cubic-bezier(.55,0,.3,1)}
 @keyframes circreveal{from{clip-path:circle(0% at -30px 38vh)}to{clip-path:circle(145% at -30px 38vh)}}
@@ -591,14 +602,20 @@ function renderHub(){
   const d=$('#dock'); if(!d)return; d.innerHTML='';
   const apps=appsList();
   document.body.classList.toggle('dockon',apps.length>1);
+  if(apps.length<2)return;
+  const cap=el('div','dcap',esc(T('apps'))); d.appendChild(cap);
+  const fresh=!localStorage.getItem('rh-dock-used'); // pulso hasta el primer uso
   apps.filter(a=>a.k!==APP).forEach(a=>{
     const m=APP_META[a.k]||APP_META.proyectos;
     const L=esc(((a.t||'·')[0]||'·').toUpperCase());
+    const w=el('div','cubewrap'+(fresh?' pulse':''));
     const c=el('div','cube');
     c.style.setProperty('--c',m.c);c.style.setProperty('--c2',m.c2);c.style.setProperty('--c3',m.c3);c.style.setProperty('--fc',m.fc);
-    c.innerHTML=`<div class="box"><div class="cface cf1">${L}</div><div class="cface cf2">${L}</div><div class="cface cf3"></div><div class="cface cf4"></div><div class="cface cf5"></div><div class="cface cf6"></div></div><span class="tip">${esc(a.t)}</span>`;
-    c.addEventListener('click',()=>{ if(BUSYAPP)return; BUSYAPP=true; c.classList.add('spin'); setTimeout(()=>{showApp(a.k,true);BUSYAPP=false;},430); });
-    d.appendChild(c);
+    c.innerHTML=`<div class="box"><div class="cface cf1">${L}</div><div class="cface cf2">${L}</div><div class="cface cf3"></div><div class="cface cf4"></div><div class="cface cf5"></div><div class="cface cf6"></div></div>`;
+    const lb=el('div','clbl',esc(a.t));
+    w.appendChild(c); w.appendChild(lb);
+    w.addEventListener('click',()=>{ if(BUSYAPP)return; BUSYAPP=true; localStorage.setItem('rh-dock-used','1'); c.classList.add('spin'); setTimeout(()=>{showApp(a.k,true);BUSYAPP=false;},430); });
+    d.appendChild(w);
   });
 }
 let FICH=null;
