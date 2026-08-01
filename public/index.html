@@ -604,7 +604,9 @@ function loadData(){
     fillSel('#f-estado',uniq(d.projects.map(p=>p.estado)));
     fillSel('#f-entidad',uniq(d.projects.map(p=>p.entidad)));
     fillSel('#f-resp',uniq(d.projects.map(p=>p.responsable)));
-    applyStatic(); renderResumen(); renderExpl(); renderMapa(); renderHub(); showApp(APP==='hub'?'proyectos':APP);
+    applyStatic(); renderResumen(); renderExpl(); renderMapa(); renderHub();
+    const _dest=appsList().some(a=>a.k===APP)?APP:'proyectos'; // recarga: quedarse donde estaba
+    showApp(_dest);
     loadBoard().then(renderMapa);
   }).catch(()=>{$('#kpis').innerHTML='<div class="empty">'+T('noData')+'</div>';});
 }
@@ -926,11 +928,12 @@ function renderTeamList(cats){
 loadConfig().then(loadData);
 
 // ---- navegación: apps (hub/proyectos/fichadas) + tabs de proyectos ----
-let APP='hub', curTab='resumen';
+// recordar dónde estaba el usuario (app y pestaña) para que recargar no lo mueva
+let APP=localStorage.getItem('rh-app')||'hub', curTab=localStorage.getItem('rh-tab')||'resumen';
 document.querySelectorAll('.tab.pt').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.v)));
 $('#btnhome').addEventListener('click',()=>showApp('proyectos'));
 function setTab(v){
-  curTab=v;
+  curTab=v; localStorage.setItem('rh-tab',v);
   document.querySelectorAll('.tab.pt').forEach(t=>t.classList.toggle('on',t.dataset.v===v));
   document.querySelectorAll('#v-proyectos .view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
   window.scrollTo({top:0});
@@ -938,6 +941,7 @@ function setTab(v){
 let BUSYAPP=false;
 function showApp(app,anim){
   APP=app;
+  if(app!=='hub')localStorage.setItem('rh-app',app);
   ['hub','proyectos','fichadas'].forEach(a=>{const s=$('#v-'+a);s.classList.toggle('appon',a===app);s.classList.remove('circ');});
   if(anim){const s=$('#v-'+app);void s.offsetWidth;s.classList.add('circ');setTimeout(()=>s.classList.remove('circ'),820);}
   $('#btnhome').style.display='none';
