@@ -22,6 +22,15 @@ timeline and linked knowledge-base articles.
 > Status: **working** — REST generator, web setup wizard, and login-gated
 > portal are all in use. A Docker image is on the roadmap (see below).
 
+![Overview — light theme](docs/shots/overview.png)
+
+| Custom drag-and-drop area board | Dark theme (Explorer) |
+|---|---|
+| ![Map board](docs/shots/map-board.png) | ![Dark theme](docs/shots/dark.png) |
+
+<p align="center"><img src="docs/shots/login.png" width="70%" alt="Login — your company name drawn in interactive particles"></p>
+<p align="center"><sub>The login draws <b>your company name</b> in ~2,000 interactive particles (hover scatters them; click &amp; drag swirls them).</sub></p>
+
 ---
 
 ## How it works
