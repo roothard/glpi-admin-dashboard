@@ -31,6 +31,7 @@ class Settings
             ],
             'projects' => [
                 'project_type' => '', 'group_by' => 'parent',
+                'include_untyped' => true,   // with a type filter set, still show untyped projects (flagged)
                 'include_only_leaf' => false, 'area_strip_prefix' => '',
                 'state_inprogress' => ['proceso', 'progress', 'curso', 'doing', 'en cours'],
                 'state_done'       => ['cerrado', 'closed', 'done', 'finished', 'terminé'],
@@ -120,6 +121,7 @@ class Settings
             'tokens_in_query' => (bool)$g['tokens_in_query'], 'profile_id' => (int)$g['profile_id'],
             'insecure' => (bool)$g['insecure'], 'timeout' => 30,
             'project_type' => $p['project_type'], 'group_by' => $p['group_by'],
+            'include_untyped' => (bool)($p['include_untyped'] ?? true),
             'include_only_leaf' => (bool)$p['include_only_leaf'], 'area_strip_prefix' => $p['area_strip_prefix'],
             'state_map' => [
                 'inprogress' => $p['state_inprogress'], 'done' => $p['state_done'], 'planned' => $p['state_planned'],

@@ -230,8 +230,10 @@ main{padding-top:20px;padding-bottom:60px}
 .anomrow .aw{color:var(--dim);font:600 11px var(--mono)}
 .anomrow .at{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap}
 /* ---- selector de perfil + equipo ---- */
-#profwrap{position:fixed;inset:0;z-index:110;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 62%,transparent);backdrop-filter:blur(4px)}
-#profwrap.on{display:grid}
+#profwrap,#infowrap{position:fixed;inset:0;z-index:110;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 62%,transparent);backdrop-filter:blur(4px)}
+#profwrap.on,#infowrap.on{display:grid}
+#info-stats{font:600 13.5px var(--disp);margin:2px 0 10px;line-height:1.8}
+#info-stats .nt{color:#c88c00}
 .profcard{width:360px;max-width:92vw;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:26px 24px;box-shadow:0 20px 45px rgba(0,0,0,.18)}
 .profcard h2{font-size:16px;font-weight:700;margin:0 0 4px}
 .profcard p{color:var(--muted);font-size:12.5px;margin:0 0 16px;line-height:1.5}
@@ -266,8 +268,10 @@ main{padding-top:20px;padding-bottom:60px}
 .bch{display:flex;align-items:center;gap:5px;margin:0 2px 10px}
 .bch b{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bch .cn{color:var(--dim);font:700 11px var(--mono);margin-right:2px}
-.bcbtn{width:24px;height:24px;display:grid;place-items:center;border:none;background:none;cursor:pointer;color:var(--muted);border-radius:6px;font-size:12px;flex:none}
-.bcbtn:hover{background:var(--surface);color:var(--accent)}
+.bcbtn{width:26px;height:26px;display:grid;place-items:center;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--muted);border-radius:7px;font-size:13px;flex:none}
+.bcbtn:hover{border-color:var(--accent);color:var(--accent)}
+.bcbtn.del{color:#e2506e;border-color:rgba(226,80,110,.4);margin-left:7px} /* separado y en rojo: es destructivo */
+.bcbtn.del:hover{border-color:#e2506e;color:#fff;background:#e2506e}
 .bcbtn.grow{margin-left:auto}
 .bcard{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 11px;margin-bottom:8px;cursor:pointer}
 .bcard:hover{border-color:var(--accent)}
@@ -327,6 +331,8 @@ body.dockon .wrap{padding-left:104px}
     <h1><span id="brand"></span><span id="tit">Centro de Proyectos</span></h1>
     <div class="ctrls">
       <span class="gen" id="gen"></span>
+      <span class="gen" id="cnt" style="cursor:pointer" title=""></span>
+      <button class="iconbtn" id="whyinfo" title="¿Qué proyectos veo?" style="display:none">ℹ️</button>
       <span id="who"></span>
       <button class="iconbtn" id="profsync" title="Perfil" style="display:none">⇄</button>
       <button class="iconbtn" id="theme" title="Tema">🌙</button>
@@ -355,6 +361,7 @@ body.dockon .wrap{padding-left:104px}
   <!-- RESUMEN -->
   <section class="view on" id="v-resumen">
     <div class="kpis" id="kpis"></div>
+    <div id="ntnote" style="display:none;font:500 12.5px var(--sans);color:#c88c00;margin:0 2px 12px"></div>
     <div class="panel" id="att-panel">
       <h4 class="atthead" id="att-head"><span id="h-att">Requieren atención</span><b class="attn" id="att-n">0</b><i class="attcaret">▸</i></h4>
       <div class="actlist" id="attlist" style="display:none"></div>
@@ -460,6 +467,13 @@ body.dockon .wrap{padding-left:104px}
   <div class="l-corner" id="l-corner"></div>
 </div>
 
+<div id="infowrap"><div class="profcard">
+  <h2 id="info-h">¿Qué proyectos veo?</h2>
+  <p id="info-p" style="color:var(--muted);font-size:13px;line-height:1.65;margin:0 0 12px"></p>
+  <div id="info-stats"></div>
+  <button class="profclose" id="info-close" type="button">Cerrar</button>
+</div></div>
+
 <div id="profwrap"><div class="profcard">
   <h2 id="prof-h">Sincronizar perfil</h2>
   <p id="prof-sub"></p>
@@ -542,11 +556,16 @@ Object.assign(I18N.en,{k_onsite:'On site now',k_today:'Checked in today',k_missi
 Object.assign(I18N.fr,{k_onsite:'Sur site',k_today:'Pointés aujourd’hui',k_missing:'Non pointés'});
 Object.assign(I18N.de,{k_onsite:'Vor Ort',k_today:'Heute erfasst',k_missing:'Nicht erfasst'});
 Object.assign(I18N.pt,{k_onsite:'Em campo agora',k_today:'Registraram hoje',k_missing:'Sem registro'});
-Object.assign(I18N.es,{board_none:'Sin asignar',board_add:'+ Área',board_addname:'Nombre del área',board_rename:'Renombrar área',board_del:'Eliminar',board_delc:'¿Eliminar el área',board_saved:'Guardado'});
-Object.assign(I18N.en,{board_none:'Unassigned',board_add:'+ Area',board_addname:'Area name',board_rename:'Rename area',board_del:'Delete',board_delc:'Delete area',board_saved:'Saved'});
-Object.assign(I18N.fr,{board_none:'Non assignés',board_add:'+ Zone',board_addname:'Nom de la zone',board_rename:'Renommer la zone',board_del:'Supprimer',board_delc:'Supprimer la zone',board_saved:'Enregistré'});
-Object.assign(I18N.de,{board_none:'Nicht zugeordnet',board_add:'+ Bereich',board_addname:'Bereichsname',board_rename:'Bereich umbenennen',board_del:'Löschen',board_delc:'Bereich löschen',board_saved:'Gespeichert'});
-Object.assign(I18N.pt,{board_none:'Sem atribuição',board_add:'+ Área',board_addname:'Nome da área',board_rename:'Renomear área',board_del:'Excluir',board_delc:'Excluir a área',board_saved:'Salvo'});
+Object.assign(I18N.es,{board_none:'Sin asignar',board_add:'+ Área',board_addname:'Nombre del área',board_rename:'Renombrar área',board_del:'Eliminar',board_delc:'¿Eliminar el área',board_saved:'Guardado',board_move:'Mover'});
+Object.assign(I18N.en,{board_none:'Unassigned',board_add:'+ Area',board_addname:'Area name',board_rename:'Rename area',board_del:'Delete',board_delc:'Delete area',board_saved:'Saved',board_move:'Move'});
+Object.assign(I18N.fr,{board_none:'Non assignés',board_add:'+ Zone',board_addname:'Nom de la zone',board_rename:'Renommer la zone',board_del:'Supprimer',board_delc:'Supprimer la zone',board_saved:'Enregistré',board_move:'Déplacer'});
+Object.assign(I18N.de,{board_none:'Nicht zugeordnet',board_add:'+ Bereich',board_addname:'Bereichsname',board_rename:'Bereich umbenennen',board_del:'Löschen',board_delc:'Bereich löschen',board_saved:'Gespeichert',board_move:'Verschieben'});
+Object.assign(I18N.es,{seeing:'Viendo',of:'de',why_h:'¿Qué proyectos veo?',why_p:'Ves los proyectos que tu usuario puede ver en GLPI, según tu perfil y tu entidad activa. El administrador puede además filtrar el tablero por tipo de proyecto. Si esperás un proyecto y no aparece, revisá esas tres cosas en GLPI: permisos del perfil, entidad y tipo.',why_filter:'Filtro de tipo',untyped:'Sin tipo',nt_note:'proyecto(s) sin tipo en GLPI — se muestran con el aviso «Sin tipo»'});
+Object.assign(I18N.en,{seeing:'Showing',of:'of',why_h:'Which projects do I see?',why_p:'You see the projects your user can see in GLPI, based on your profile and active entity. The administrator can also filter the board by project type. If a project you expect is missing, check those three things in GLPI: profile permissions, entity and type.',why_filter:'Type filter',untyped:'Untyped',nt_note:'project(s) with no type in GLPI — shown with an “Untyped” notice'});
+Object.assign(I18N.fr,{seeing:'Affichage',of:'sur',why_h:'Quels projets est-ce que je vois ?',why_p:'Vous voyez les projets que votre utilisateur peut voir dans GLPI, selon votre profil et votre entité active. L\'administrateur peut aussi filtrer le tableau par type de projet. S\'il manque un projet attendu, vérifiez ces trois points dans GLPI : permissions du profil, entité et type.',why_filter:'Filtre de type',untyped:'Sans type',nt_note:'projet(s) sans type dans GLPI — affichés avec la mention « Sans type »'});
+Object.assign(I18N.de,{seeing:'Angezeigt',of:'von',why_h:'Welche Projekte sehe ich?',why_p:'Sie sehen die Projekte, die Ihr Benutzer in GLPI sehen darf — gemäß Profil und aktiver Entität. Der Administrator kann das Board zusätzlich nach Projekttyp filtern. Fehlt ein erwartetes Projekt, prüfen Sie in GLPI: Profilrechte, Entität und Typ.',why_filter:'Typ-Filter',untyped:'Ohne Typ',nt_note:'Projekt(e) ohne Typ in GLPI — mit Hinweis „Ohne Typ“ angezeigt'});
+Object.assign(I18N.pt,{seeing:'Exibindo',of:'de',why_h:'Quais projetos eu vejo?',why_p:'Você vê os projetos que seu usuário pode ver no GLPI, conforme seu perfil e entidade ativa. O administrador também pode filtrar o painel por tipo de projeto. Se um projeto esperado não aparece, verifique no GLPI: permissões do perfil, entidade e tipo.',why_filter:'Filtro de tipo',untyped:'Sem tipo',nt_note:'projeto(s) sem tipo no GLPI — exibidos com o aviso «Sem tipo»'});
+Object.assign(I18N.pt,{board_none:'Sem atribuição',board_add:'+ Área',board_addname:'Nome da área',board_rename:'Renomear área',board_del:'Excluir',board_delc:'Excluir a área',board_saved:'Salvo',board_move:'Mover'});
 let LANG=localStorage.getItem('rh-lang')||'es';
 const T=k=>(I18N[LANG]&&I18N[LANG][k])||k;
 
@@ -599,7 +618,7 @@ function loadData(){
   }).then(d=>{
     if(!d)return;
     DATA=d; hideLogin();
-    $('#who').textContent=d.user||''; $('#logout').style.display='grid'; $('#profsync').style.display='grid';
+    $('#who').textContent=d.user||''; $('#logout').style.display='grid'; $('#profsync').style.display='grid'; $('#whyinfo').style.display='grid';
     fillSel('#f-area',uniq(d.projects.map(p=>p.area)));
     fillSel('#f-estado',uniq(d.projects.map(p=>p.estado)));
     fillSel('#f-entidad',uniq(d.projects.map(p=>p.entidad)));
@@ -816,7 +835,7 @@ if(lcv){
   addEventListener('resize',()=>{if(LRUN)lpBuild();});
 }
 function showLogin(){
-  $('#loginwrap').classList.add('on');$('#logout').style.display='none';$('#profsync').style.display='none';$('#who').textContent='';applyStatic();
+  $('#loginwrap').classList.add('on');$('#logout').style.display='none';$('#profsync').style.display='none';$('#whyinfo').style.display='none';$('#cnt').textContent='';$('#who').textContent='';applyStatic();
   const start=()=>{lpBuild();if(!LRUN){LRUN=true;lpLoop();}};
   (document.fonts&&document.fonts.load)?document.fonts.load("700 100px 'Space Grotesk'").then(start).catch(start):start();
 }
@@ -981,6 +1000,30 @@ function stateLegend(box){
   (DATA.states||[]).forEach(s=>{ if(seen[s.name])return; seen[s.name]=1;
     box.appendChild(el('span',null,`<i style="background:${s.color}"></i>${esc(s.name)}`)); });
 }
+// ---- "¿Qué proyectos veo?": modal + contador honesto (stats de data.php) ----
+function updWhy(){
+  const s=DATA.stats||null, c=$('#cnt');
+  if(!s){ if(c)c.textContent=''; return; }
+  if(c){ c.textContent=(s.total>s.shown)?(T('seeing')+' '+s.shown+'/'+s.total):''; c.title=T('why_h'); }
+  const nn=$('#ntnote');
+  if(nn){ const show=(DATA.isAdmin||DATA.isSuper)&&s.untyped>0;
+    nn.style.display=show?'':'none';
+    if(show)nn.textContent='⚠ '+s.untyped+' '+T('nt_note'); }
+}
+function openInfo(){
+  const s=DATA.stats||{};
+  $('#info-h').textContent=T('why_h');
+  $('#info-p').textContent=T('why_p');
+  let st='📊 '+T('seeing')+' <b>'+(s.shown??'—')+'</b> '+T('of')+' <b>'+(s.total??'—')+'</b>';
+  if(s.type_filter)st+='<br>🏷 '+T('why_filter')+': <b>'+esc(s.type_filter)+'</b>';
+  if(s.untyped>0)st+='<br><span class="nt">⚠ '+s.untyped+' '+T('nt_note')+'</span>';
+  $('#info-stats').innerHTML=st;
+  $('#info-close').textContent=T('close');
+  $('#infowrap').classList.add('on');
+}
+$('#whyinfo').addEventListener('click',openInfo);
+$('#cnt').addEventListener('click',openInfo);
+$('#info-close').addEventListener('click',()=>$('#infowrap').classList.remove('on'));
 // panel "Requieren atención": contraído muestra el número, expandido el detalle
 function attSet(open){
   $('#att-panel').classList.toggle('open',open);
@@ -1009,6 +1052,7 @@ function renderResumen(){
   renderActive();
   stateLegend($('#tl-legend'));
   $('#timeline').innerHTML=''; $('#timeline').appendChild(timelineAll());
+  updWhy();
 }
 function renderActive(){
   const q=ACT.q.toLowerCase();
@@ -1081,9 +1125,10 @@ function renderExpl(){
   const g=$('#grid'); g.innerHTML='';
   list.forEach(p=>{
     const c=el('div','pcard'+(SEL===p.id?' sel':'')); c.style.setProperty('--sc',p.color||'#888');
+    const ntChip=p.nt?`<span class="chip" style="color:#c88c00;border-color:rgba(200,140,0,.4)">${T('untyped')}</span>`:'';
     c.innerHTML=`<h3>${esc(p.n)}</h3><div class="pmeta">
       <span class="pill" style="background:${p.color}22;color:${p.color}">${esc(p.estado)}</span>
-      <span class="chip">${esc(p.area)}</span><span class="pctn">${p.pct}%</span></div>
+      <span class="chip">${esc(p.area)}</span>${ntChip}<span class="pctn">${p.pct}%</span></div>
       <div class="bar"><i style="width:${p.pct}%;background:${p.color}"></i></div>`;
     c.addEventListener('click',()=>{SEL=p.id;renderExpl();detail(p);$('#detail').scrollIntoView({behavior:'smooth',block:'start'});});
     g.appendChild(c);
@@ -1178,11 +1223,11 @@ function renderMapa(){
     const h=el('div','bch');
     h.innerHTML=`<span class="cn">${items.length}</span><b>${isNone?esc(T('board_none')):esc(a)}</b>`;
     if(BOARD.canEdit && !isNone){
-      const mk=(txt,cls,fn)=>{ const b=el('button','bcbtn'+(cls||''),txt); b.addEventListener('click',ev=>{ev.stopPropagation();fn();}); return b; };
-      h.appendChild(mk('◀',' grow',()=>{ if(idx>0){ const t=BOARD.areas[idx-1]; BOARD.areas[idx-1]=a; BOARD.areas[idx]=t; saveBoard(); renderMapa(); } }));
-      h.appendChild(mk('▶','',()=>{ if(idx<BOARD.areas.length-1){ const t=BOARD.areas[idx+1]; BOARD.areas[idx+1]=a; BOARD.areas[idx]=t; saveBoard(); renderMapa(); } }));
-      h.appendChild(mk('✎','',()=>{ const nn=prompt(T('board_rename'),a); if(nn&&nn.trim()&&nn.trim()!==a&&!BOARD.areas.includes(nn.trim())){ const old=a,nu=nn.trim(); BOARD.areas=BOARD.areas.map(x=>x===old?nu:x); Object.keys(BOARD.assign).forEach(k=>{if(BOARD.assign[k]===old)BOARD.assign[k]=nu;}); saveBoard(); renderMapa(); } }));
-      h.appendChild(mk('🗑','',()=>{ if(confirm(T('board_delc')+' "'+a+'"?')){ BOARD.areas=BOARD.areas.filter(x=>x!==a); Object.keys(BOARD.assign).forEach(k=>{if(BOARD.assign[k]===a)delete BOARD.assign[k];}); saveBoard(); renderMapa(); } }));
+      const mk=(txt,cls,tip,fn)=>{ const b=el('button','bcbtn'+(cls||''),txt); b.title=tip; b.addEventListener('click',ev=>{ev.stopPropagation();fn();}); return b; };
+      h.appendChild(mk('◀',' grow',T('board_move'),()=>{ if(idx>0){ const t=BOARD.areas[idx-1]; BOARD.areas[idx-1]=a; BOARD.areas[idx]=t; saveBoard(); renderMapa(); } }));
+      h.appendChild(mk('▶','',T('board_move'),()=>{ if(idx<BOARD.areas.length-1){ const t=BOARD.areas[idx+1]; BOARD.areas[idx+1]=a; BOARD.areas[idx]=t; saveBoard(); renderMapa(); } }));
+      h.appendChild(mk('✎','',T('board_rename'),()=>{ const nn=prompt(T('board_rename'),a); if(nn&&nn.trim()&&nn.trim()!==a&&!BOARD.areas.includes(nn.trim())){ const old=a,nu=nn.trim(); BOARD.areas=BOARD.areas.map(x=>x===old?nu:x); Object.keys(BOARD.assign).forEach(k=>{if(BOARD.assign[k]===old)BOARD.assign[k]=nu;}); saveBoard(); renderMapa(); } }));
+      h.appendChild(mk('🗑',' del',T('board_del'),()=>{ if(confirm(T('board_delc')+' "'+a+'"?')){ BOARD.areas=BOARD.areas.filter(x=>x!==a); Object.keys(BOARD.assign).forEach(k=>{if(BOARD.assign[k]===a)delete BOARD.assign[k];}); saveBoard(); renderMapa(); } }));
     }
     col.appendChild(h);
     items.sort((x,y)=>y.pct-x.pct).forEach(p=>{
