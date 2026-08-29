@@ -272,7 +272,7 @@ main{padding-top:20px;padding-bottom:60px}
 .bcbtn:hover{border-color:var(--accent);color:var(--accent)}
 .bcbtn.del{color:#e2506e;border-color:rgba(226,80,110,.4);margin-left:7px} /* separado y en rojo: es destructivo */
 .bcbtn.del:hover{border-color:#e2506e;color:#fff;background:#e2506e}
-.bcbtn.grow{margin-left:auto}
+.bcbtn.bspace{margin-left:auto}
 .bcard{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 11px;margin-bottom:8px;cursor:pointer}
 .bcard:hover{border-color:var(--accent)}
 .bcard.drag{opacity:.45}
@@ -1231,7 +1231,7 @@ function renderMapa(){
         del:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>'
       };
       const mk=(ic,cls,tip,fn)=>{ const b=el('button','bcbtn'+(cls||''),ic); b.title=tip; b.addEventListener('click',ev=>{ev.stopPropagation();fn();}); return b; };
-      h.appendChild(mk(IC.left,' grow',T('board_move'),()=>{ if(idx>0){ const t=BOARD.areas[idx-1]; BOARD.areas[idx-1]=a; BOARD.areas[idx]=t; saveBoard(); renderMapa(); } }));
+      h.appendChild(mk(IC.left,' bspace',T('board_move'),()=>{ if(idx>0){ const t=BOARD.areas[idx-1]; BOARD.areas[idx-1]=a; BOARD.areas[idx]=t; saveBoard(); renderMapa(); } }));
       h.appendChild(mk(IC.right,'',T('board_move'),()=>{ if(idx<BOARD.areas.length-1){ const t=BOARD.areas[idx+1]; BOARD.areas[idx+1]=a; BOARD.areas[idx]=t; saveBoard(); renderMapa(); } }));
       h.appendChild(mk(IC.edit,'',T('board_rename'),()=>{ const nn=prompt(T('board_rename'),a); if(nn&&nn.trim()&&nn.trim()!==a&&!BOARD.areas.includes(nn.trim())){ const old=a,nu=nn.trim(); BOARD.areas=BOARD.areas.map(x=>x===old?nu:x); Object.keys(BOARD.assign).forEach(k=>{if(BOARD.assign[k]===old)BOARD.assign[k]=nu;}); saveBoard(); renderMapa(); } }));
       h.appendChild(mk(IC.del,' del',T('board_del'),()=>{ if(confirm(T('board_delc')+' "'+a+'"?')){ BOARD.areas=BOARD.areas.filter(x=>x!==a); Object.keys(BOARD.assign).forEach(k=>{if(BOARD.assign[k]===a)delete BOARD.assign[k];}); saveBoard(); renderMapa(); } }));
