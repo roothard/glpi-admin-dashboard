@@ -90,9 +90,13 @@ class DashboardGenerator
         $onlyLeaf = ($groupBy === 'parent') || (bool)($this->cfg['include_only_leaf'] ?? false);
         $stripPre = (string)($this->cfg['area_strip_prefix'] ?? '');
 
-        $leaves = array_filter($all, function ($p) use ($typeId, $onlyLeaf) {
+        // With a type filter, untyped projects are still shown (flagged `nt`)
+        // unless include_untyped is off — hiding them silently confuses users.
+        $incUntyped = (bool)($this->cfg['include_untyped'] ?? true);
+        $leaves = array_filter($all, function ($p) use ($typeId, $onlyLeaf, $incUntyped) {
             if (!empty($p['is_deleted']) || !empty($p['is_template'])) return false;
-            if ($typeId && (int)($p['projecttypes_id'] ?? 0) !== $typeId) return false;
+            $tid = (int)($p['projecttypes_id'] ?? 0);
+            if ($typeId && $tid !== $typeId && !($tid === 0 && $incUntyped)) return false;
             if ($onlyLeaf && (int)($p['projects_id'] ?? 0) <= 0) return false;
             return true;
         });
@@ -174,6 +178,7 @@ class DashboardGenerator
                 'done'        => array_map(fn($t) => ['t' => $t['t'], 'doc' => null], $done),
                 'pend'        => array_map(fn($t) => $t['t'], $pend),
                 'kb'          => $kb,
+                'nt'          => ((int)($p['projecttypes_id'] ?? 0) === 0) ? 1 : 0, // sin tipo en GLPI
             ];
         }
 

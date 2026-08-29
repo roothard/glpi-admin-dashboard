@@ -73,6 +73,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    if ($action === 'types') { // list GLPI project types (with usage counts) for the setup dropdown
+        $url  = trim($in['glpi_url'] ?? $cfg['glpi']['url']);
+        $app  = trim($in['glpi_app_token'] ?? '') ?: $cfg['glpi']['app_token'];
+        $user = trim($in['glpi_user_token'] ?? '') ?: $cfg['glpi']['user_token'];
+        try {
+            $c = new GlpiClient([
+                'url' => $url, 'app_token' => $app, 'user_token' => $user,
+                'tokens_in_query' => !empty($in['glpi_tokens_in_query']),
+                'profile_id' => (int)($in['glpi_profile_id'] ?? $cfg['glpi']['profile_id']),
+                'insecure' => !empty($in['glpi_insecure']),
+            ]);
+            $c->initSession();
+            $types = [];
+            foreach ($c->getAll('ProjectType') as $t) {
+                $types[(int)$t['id']] = ['id' => (int)$t['id'], 'name' => (string)($t['name'] ?? ''), 'count' => 0];
+            }
+            $untyped = 0; $total = 0;
+            foreach ($c->getAll('Project') as $p) {
+                if (!empty($p['is_deleted']) || !empty($p['is_template'])) continue;
+                $total++;
+                $tid = (int)($p['projecttypes_id'] ?? 0);
+                if ($tid > 0 && isset($types[$tid])) { $types[$tid]['count']++; } else { $untyped++; }
+            }
+            $c->killSession();
+            echo json_encode(['ok' => true, 'types' => array_values($types), 'untyped' => $untyped, 'total' => $total], JSON_UNESCAPED_UNICODE);
+        } catch (\Throwable $e) {
+            echo json_encode(['ok' => false, 'msg' => $e->getMessage()]);
+        }
+        exit;
+    }
+
     $keepSecret = fn($new, $old) => (trim((string)$new) === '') ? $old : trim((string)$new);
     $csv = fn($s) => array_values(array_filter(array_map('trim', explode(',', (string)$s))));
 
@@ -86,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cfg['glpi']['resolve_ip']      = trim($in['glpi_resolve_ip'] ?? '');
 
     $cfg['projects']['project_type']      = trim($in['project_type'] ?? '');
+    $cfg['projects']['include_untyped']   = !empty($in['include_untyped']);
     $cfg['projects']['group_by']          = in_array(($in['group_by'] ?? 'parent'), ['parent', 'entity', 'type'], true) ? $in['group_by'] : 'parent';
     $cfg['projects']['include_only_leaf'] = !empty($in['include_only_leaf']);
     $cfg['projects']['area_strip_prefix'] = trim($in['area_strip_prefix'] ?? '');
@@ -239,8 +271,14 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
   <summary><span data-i="s2">2 · Proyectos</span> <span class="opt" data-i="s2opt">— opcional</span></summary>
   <div class="body">
     <div class="field"><label data-i="l_ptype">Tipo de proyecto</label>
-      <input type="text" name="project_type" value="<?= $h($p['project_type']) ?>" placeholder="">
+      <div style="display:flex;gap:8px">
+        <input type="text" name="project_type" id="ptype" value="<?= $h($p['project_type']) ?>" placeholder="" style="flex:1">
+        <button type="button" class="act test" id="loadtypes" data-i="b_types" style="white-space:nowrap;padding:9px 13px">Elegir de GLPI</button>
+      </div>
       <p class="help" data-i="h_ptype"></p></div>
+    <div class="field chk2"><input type="checkbox" name="include_untyped" id="incu" <?= !empty($p['include_untyped'] ?? true) ? 'checked' : '' ?>>
+      <label for="incu" style="margin:0"><span data-i="l_untyped">Mostrar también proyectos sin tipo</span>
+        <span class="help" style="display:block" data-i="h_untyped"></span></label></div>
     <div class="field"><label data-i="l_group">Agrupar zonas por</label>
       <select name="group_by"><option value="parent"<?= $p['group_by']==='parent'?' selected':'' ?> data-i="g_parent">Proyecto padre</option><option value="entity"<?= $p['group_by']==='entity'?' selected':'' ?> data-i="g_entity">Entidad</option><option value="type"<?= $p['group_by']==='type'?' selected':'' ?> data-i="g_type">Tipo</option></select>
       <p class="help" data-i="h_group"></p></div>
@@ -394,6 +432,11 @@ const I18N={
   l_dbhost:'Host do BD',l_dbname:'Nome do BD',l_dbuser:'Usuário do BD',l_dbpass:'Senha do BD',adv2:'Avançado',l_tz:'Fuso horário',h_tz:'ex: <code>America/Argentina/Buenos_Aires</code>. Para o carimbo «Atualizado».',
   b_test:'Testar conexão',b_save:'Salvar e instalar',m_testing:'Testando…',m_saving:'Salvando e sincronizando…',m_ok:'✓ Conectado · {n} estados visíveis',m_saved:'✓ Salvo · {n} projetos',m_savefail:'Falha ao salvar',m_reqfail:'Falha na solicitação',m_syncfail:'Salvo, mas a sincronização falhou: '}
 };
+Object.assign(I18N.es,{b_types:'Elegir de GLPI',opt_alltypes:'— Todos los proyectos —',l_untyped:'Mostrar también proyectos sin tipo',h_untyped:'Si filtrás por tipo, los proyectos SIN tipo se muestran igual con un aviso «Sin tipo» (recomendado: así ninguno queda invisible por accidente). Destildá para excluirlos.',m_typesload:'Leyendo tipos de GLPI…',m_types:'✓ {n} tipos · {u} proyectos sin tipo'});
+Object.assign(I18N.en,{b_types:'Pick from GLPI',opt_alltypes:'— All projects —',l_untyped:'Also show untyped projects',h_untyped:'With a type filter set, projects WITHOUT a type are still shown with an “Untyped” notice (recommended: nothing goes invisible by accident). Untick to exclude them.',m_typesload:'Reading GLPI types…',m_types:'✓ {n} types · {u} untyped projects'});
+Object.assign(I18N.fr,{b_types:'Choisir depuis GLPI',opt_alltypes:'— Tous les projets —',l_untyped:'Afficher aussi les projets sans type',h_untyped:'Avec un filtre par type, les projets SANS type restent affichés avec la mention « Sans type » (recommandé : rien ne devient invisible par accident). Décochez pour les exclure.',m_typesload:'Lecture des types GLPI…',m_types:'✓ {n} types · {u} projets sans type'});
+Object.assign(I18N.de,{b_types:'Aus GLPI wählen',opt_alltypes:'— Alle Projekte —',l_untyped:'Auch Projekte ohne Typ anzeigen',h_untyped:'Bei aktivem Typ-Filter werden Projekte OHNE Typ weiterhin mit dem Hinweis „Ohne Typ“ angezeigt (empfohlen: nichts wird versehentlich unsichtbar). Abwählen, um sie auszuschließen.',m_typesload:'GLPI-Typen werden gelesen…',m_types:'✓ {n} Typen · {u} Projekte ohne Typ'});
+Object.assign(I18N.pt,{b_types:'Escolher do GLPI',opt_alltypes:'— Todos os projetos —',l_untyped:'Mostrar também projetos sem tipo',h_untyped:'Com filtro por tipo, os projetos SEM tipo continuam aparecendo com o aviso «Sem tipo» (recomendado: nada fica invisível por acidente). Desmarque para excluí-los.',m_typesload:'Lendo tipos do GLPI…',m_types:'✓ {n} tipos · {u} projetos sem tipo'});
 Object.assign(I18N.es,{b_fetchent:'Traer de GLPI',m_fetching:'Consultando GLPI…',m_fetched:'✓ Nombre traído de GLPI',m_fetchnone:'No se pudo leer la entidad raíz de GLPI'});
 Object.assign(I18N.en,{b_fetchent:'Fetch from GLPI',m_fetching:'Querying GLPI…',m_fetched:'✓ Name fetched from GLPI',m_fetchnone:'Could not read the GLPI root entity'});
 Object.assign(I18N.fr,{b_fetchent:'Depuis GLPI',m_fetching:'Interrogation de GLPI…',m_fetched:'✓ Nom récupéré depuis GLPI',m_fetchnone:'Impossible de lire l’entité racine GLPI'});
@@ -423,10 +466,21 @@ updTheme(); applyI18n();
 // form
 const f=$('#f'), msg=$('#msg');
 const data=()=>{const o={};new FormData(f).forEach((v,k)=>o[k]=v);
-  ['glpi_tokens_in_query','glpi_insecure','include_only_leaf','gps_enabled'].forEach(k=>o[k]=f.elements[k].checked?1:'');return o;};
+  ['glpi_tokens_in_query','glpi_insecure','include_only_leaf','include_untyped','gps_enabled'].forEach(k=>o[k]=f.elements[k].checked?1:'');return o;};
 const post=pl=>fetch('setup.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pl)}).then(r=>r.json());
 $('#test').onclick=()=>{msg.style.color='var(--mu)';msg.textContent=T('m_testing');
   post(Object.assign(data(),{action:'test'})).then(j=>{msg.style.color=j.ok?'#1f9d55':'#d33';msg.textContent=j.ok?T('m_ok').replace('{n}',j.n):('✕ '+j.msg);}).catch(()=>{msg.style.color='#d33';msg.textContent=T('m_reqfail');});};
+$('#loadtypes').onclick=()=>{msg.style.color='var(--mu)';msg.textContent=T('m_typesload');
+  post(Object.assign(data(),{action:'types'})).then(j=>{
+    if(!j.ok){msg.style.color='#d33';msg.textContent='✕ '+(j.msg||T('m_reqfail'));return;}
+    const cur=(document.getElementById('ptype').value||'').toLowerCase();
+    const s=document.createElement('select');s.name='project_type';s.id='ptype';
+    const o0=document.createElement('option');o0.value='';o0.textContent=T('opt_alltypes')+' ('+j.total+')';s.appendChild(o0);
+    j.types.forEach(t=>{const o=document.createElement('option');o.value=t.name;o.textContent=t.name+' ('+t.count+')';
+      if(t.name.toLowerCase()===cur)o.selected=true;s.appendChild(o);});
+    document.getElementById('ptype').replaceWith(s);
+    msg.style.color='#1f9d55';msg.textContent=T('m_types').replace('{n}',j.types.length).replace('{u}',j.untyped);
+  }).catch(()=>{msg.style.color='#d33';msg.textContent=T('m_reqfail');});};
 $('#fetchent').onclick=()=>{msg.style.color='var(--mu)';msg.textContent=T('m_fetching');
   post(Object.assign(data(),{action:'entity'})).then(j=>{
     if(j.ok&&j.name){f.elements['app_name'].value=j.name;msg.style.color='#1f9d55';msg.textContent=T('m_fetched');}

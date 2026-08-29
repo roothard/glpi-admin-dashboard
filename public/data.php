@@ -16,21 +16,32 @@ list($c, $list) = glpi_fetch('/Project', ['range' => '0-500', 'expand_dropdowns'
 if ($c === 401 || $c === 403) { $_SESSION = []; http_response_code(401); echo json_encode(['auth' => false]); exit; }
 
 $type = trim((string)(cfg()['projects']['project_type'] ?? '')); // empty = all types
+$incU = (bool)(cfg()['projects']['include_untyped'] ?? true);    // show untyped (flagged) even with a filter
 $vis = [];
 if (is_array($list)) {
     foreach ($list as $p) {
         if ($type !== '') {
-            $t = $p['projecttypes_id'] ?? '';
-            if (strcasecmp((string)$t, $type) !== 0) { continue; }
+            $t = trim((string)($p['projecttypes_id'] ?? ''));
+            $untyped = ($t === '' || $t === '0' || $t === '&nbsp;');
+            if (strcasecmp($t, $type) !== 0 && !($untyped && $incU)) { continue; }
         }
         $vis[(int)$p['id']] = true;
     }
 }
 
 $cache = json_decode(@file_get_contents(dirname(__DIR__) . '/data-cache.json'), true) ?: ['projects' => [], 'states' => []];
+$total = count($cache['projects']);
 $cache['projects'] = array_values(array_filter($cache['projects'], fn($p) => isset($vis[$p['id']])));
 $cache['user']    = $_SESSION['user'];
 $cache['isAdmin'] = $_SESSION['isAdmin'] ?? false;
 $cache['isSuper'] = $_SESSION['isSuper'] ?? false;
+// Honest visibility stats: what this user sees vs. everything on the board,
+// plus how many shown projects have no type set in GLPI (flagged in the UI).
+$cache['stats'] = [
+    'shown'       => count($cache['projects']),
+    'total'       => $total,
+    'untyped'     => count(array_filter($cache['projects'], fn($p) => !empty($p['nt']))),
+    'type_filter' => $type,
+];
 
 echo json_encode($cache, JSON_UNESCAPED_UNICODE);
