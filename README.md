@@ -38,6 +38,8 @@ timeline and linked knowledge-base articles.
 
 <p align="center"><img src="docs/shots/tickets-hours.png" width="85%" alt="Hours worked by client, by technician and tickets per month"></p>
 
+<p align="center"><img src="docs/shots/gps-checkins.png" width="85%" alt="GPS check-ins — team presence at a glance and live locations on an OpenStreetMap map"></p>
+
 <p align="center"><img src="docs/shots/login.png" width="70%" alt="Login — your company name drawn in interactive particles"></p>
 <p align="center"><sub>The login draws <b>your company name</b> in ~2,000 interactive particles (hover scatters them; click &amp; drag swirls them).</sub></p>
 

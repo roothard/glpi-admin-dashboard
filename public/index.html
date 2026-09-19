@@ -791,7 +791,7 @@ function renderMap(list){
   if(!FMAP){
     box.innerHTML='';
     FMAP=L.map(box,{scrollWheelZoom:false}).setView([+pts[0].lat,+pts[0].lon],14);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap © CARTO'}).addTo(FMAP);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(FMAP);
     FLAYER=L.layerGroup().addTo(FMAP);
   }
   FLAYER.clearLayers();
