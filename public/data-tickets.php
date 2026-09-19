@@ -114,6 +114,63 @@ foreach (array_merge($openRows, $oldRows) as $r) {
     ];
 }
 
+// ---- resolver IDs → nombres (la búsqueda devuelve ids numéricos para usuarios/grupos) ----
+function collectIds(array $tickets, string $k): array
+{
+    $ids = [];
+    foreach ($tickets as $t) {
+        foreach (explode(',', (string)($t[$k] ?? '')) as $v) {
+            $v = trim($v);
+            if ($v !== '' && ctype_digit($v)) { $ids[(int)$v] = 1; }
+        }
+    }
+    return array_keys($ids);
+}
+function nameMap(string $type, array $ids, string $tok): array
+{
+    if (!$ids) return [];
+    $map = []; $start = 0; $page = 250; $bulkOk = false;
+    do {
+        [$c, $b] = glpi_fetch('/' . $type, ['range' => $start . '-' . ($start + $page - 1)], $tok);
+        if ($c >= 400 || !is_array($b)) break;
+        $bulkOk = true;
+        $rows = (isset($b[0]) || $b === []) ? $b : [$b];
+        foreach ($rows as $u) {
+            if (!is_array($u) || !isset($u['id'])) continue;
+            $n = $type === 'User' ? trim(($u['firstname'] ?? '') . ' ' . ($u['realname'] ?? '')) : '';
+            $map[(int)$u['id']] = $n !== '' ? $n : (string)($u['completename'] ?? $u['name'] ?? $u['id']);
+        }
+        $got = count($rows); $start += $got;
+    } while ($got === $page && $start < 2000);
+    if (!$bulkOk) { // el perfil no puede listar: resolver solo los ids necesarios, uno a uno
+        foreach (array_slice($ids, 0, 100) as $id) {
+            [$c, $u] = glpi_fetch('/' . $type . '/' . $id, [], $tok);
+            if ($c === 200 && is_array($u)) {
+                $n = $type === 'User' ? trim(($u['firstname'] ?? '') . ' ' . ($u['realname'] ?? '')) : '';
+                $map[$id] = $n !== '' ? $n : (string)($u['completename'] ?? $u['name'] ?? $id);
+            }
+        }
+    }
+    return $map;
+}
+$umap = nameMap('User', array_unique(array_merge(collectIds($tickets, 'req'), collectIds($tickets, 'tech'))), $tok);
+$gmap = nameMap('Group', collectIds($tickets, 'grp'), $tok);
+$fix = function ($v, $map) {
+    if ($v === null) return null;
+    $out = [];
+    foreach (explode(',', (string)$v) as $p) {
+        $p = trim($p); if ($p === '') continue;
+        $out[] = (ctype_digit($p) && isset($map[(int)$p])) ? $map[(int)$p] : $p;
+    }
+    return $out ? implode(', ', $out) : null;
+};
+foreach ($tickets as &$t) {
+    $t['req']  = $fix($t['req'],  $umap);
+    $t['tech'] = $fix($t['tech'], $umap);
+    $t['grp']  = $fix($t['grp'],  $gmap);
+}
+unset($t);
+
 // Open first (nearest TTR deadline first), then recent solved
 usort($tickets, function ($a, $b) {
     $ao = $a['s'] < 5; $bo = $b['s'] < 5;
