@@ -15,6 +15,10 @@ timeline and linked knowledge-base articles.
   your own state names (any language), custom branding.
 - **Custom Map board** — group projects into your own drag-and-drop areas
   (defined in the dashboard, independent of GLPI; shared, admin-editable).
+- **Tickets app** — live queue with SLA traffic lights (assignment &
+  resolution deadlines), an analytics tab (SLA gauges, entity × month
+  compliance matrix) and a worked-hours tab (hours by client, technician and
+  month), all scoped to what each user can see in GLPI.
 - **Multilingual** — UI in ES/EN/FR/DE/PT with a light/dark theme.
 - **Optional GPS check-ins module** — field-technician presence from
   "site visit" tickets (example add-on module).
@@ -27,6 +31,12 @@ timeline and linked knowledge-base articles.
 | Custom drag-and-drop area board | Dark theme (Explorer) |
 |---|---|
 | ![Map board](docs/shots/map-board.png) | ![Dark theme](docs/shots/dark.png) |
+
+| Tickets — live queue with SLA | Tickets — analytics |
+|---|---|
+| ![Tickets queue](docs/shots/tickets-queue.png) | ![Tickets analytics](docs/shots/tickets-analytics.png) |
+
+<p align="center"><img src="docs/shots/tickets-hours.png" width="85%" alt="Hours worked by client, by technician and tickets per month"></p>
 
 <p align="center"><img src="docs/shots/login.png" width="70%" alt="Login — your company name drawn in interactive particles"></p>
 <p align="center"><sub>The login draws <b>your company name</b> in ~2,000 interactive particles (hover scatters them; click &amp; drag swirls them).</sub></p>
