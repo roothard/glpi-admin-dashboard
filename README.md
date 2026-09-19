@@ -19,6 +19,11 @@ timeline and linked knowledge-base articles.
   resolution deadlines), an analytics tab (SLA gauges, entity × month
   compliance matrix) and a worked-hours tab (hours by client, technician and
   month), all scoped to what each user can see in GLPI.
+- **Compliance app** — a governance panel made for management meetings:
+  define the critical processes that must happen every N days/weeks/months
+  (backup checks, restore tests, patch reviews…) and the panel verifies them
+  against **real GLPI tickets**. It doesn't check your backups — it checks
+  that *somebody checked them*, with a 12-cycle history bar per process.
 - **Multilingual** — UI in ES/EN/FR/DE/PT with a light/dark theme.
 - **Optional GPS check-ins module** — field-technician presence from
   "site visit" tickets (example add-on module).
@@ -39,6 +44,8 @@ timeline and linked knowledge-base articles.
 <p align="center"><img src="docs/shots/tickets-hours.png" width="85%" alt="Hours worked by client, by technician and tickets per month"></p>
 
 <p align="center"><img src="docs/shots/gps-checkins.png" width="85%" alt="GPS check-ins — team presence at a glance and live locations on an OpenStreetMap map"></p>
+
+<p align="center"><img src="docs/shots/compliance.png" width="85%" alt="Compliance — critical processes verified against real GLPI tickets, with a 12-cycle history bar"></p>
 
 <p align="center"><img src="docs/shots/login.png" width="70%" alt="Login — your company name drawn in interactive particles"></p>
 <p align="center"><sub>The login draws <b>your company name</b> in ~2,000 interactive particles (hover scatters them; click &amp; drag swirls them).</sub></p>
@@ -103,6 +110,7 @@ your-install/
     ├── index.html  setup.php  config.php
     ├── login.php   logout.php  data.php
     ├── board.php   profile.php               (Map areas + profile switch)
+    ├── data-cumplimiento.php  processes.php   (Compliance app)
     ├── data-fichadas.php  license-key.php     (optional GPS module)
     └── vendor/leaflet/
 ```
