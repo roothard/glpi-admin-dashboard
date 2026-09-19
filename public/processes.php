@@ -20,29 +20,54 @@ $load = function () use ($file) {
 
 $m = $_SERVER['REQUEST_METHOD'];
 
+// Perfiles cuyos usuarios pueden ser "responsable (persona)" de un proceso.
+const OWNER_PROFILES = ['Super-Admin', 'Supervisor'];
+
 if ($m === 'GET') {
     $out = ['processes' => $load(), 'canEdit' => !empty($_SESSION['isAdmin'])];
     if (isset($_GET['lists'])) {
-        // Para el editor: categorías y entidades REALES de GLPI (las que ve el usuario)
+        // Para el editor: categorías, entidades, grupos y responsables REALES de GLPI.
         $tok = $_SESSION['glpi_token'];
-        $fetchAll = function (string $type) use ($tok) {
+        $fetchAll = function (string $type, array $params = []) use ($tok) {
             $acc = []; $start = 0; $page = 250;
             do {
-                [$c, $b] = glpi_fetch('/' . $type, ['range' => $start . '-' . ($start + $page - 1)], $tok);
+                [$c, $b] = glpi_fetch('/' . $type, $params + ['range' => $start . '-' . ($start + $page - 1)], $tok);
                 if ($c >= 400 || !is_array($b)) { break; }
                 $rows = (isset($b[0]) || $b === []) ? $b : [$b];
-                foreach ($rows as $r) {
-                    if (is_array($r) && isset($r['id'])) {
-                        $acc[] = ['id' => (int)$r['id'], 'name' => (string)($r['completename'] ?? $r['name'] ?? $r['id'])];
-                    }
-                }
+                foreach ($rows as $r) { if (is_array($r)) { $acc[] = $r; } }
                 $got = count($rows); $start += $got;
-            } while ($got === $page && $start < 2000);
-            usort($acc, fn($a, $b) => strcasecmp($a['name'], $b['name']));
+            } while ($got === $page && $start < 3000);
             return $acc;
         };
-        $out['cats'] = $fetchAll('ITILCategory');
-        $out['ents'] = $fetchAll('Entity');
+        $named = function (array $rows) {
+            $o = [];
+            foreach ($rows as $r) {
+                if (isset($r['id'])) { $o[] = ['id' => (int)$r['id'], 'name' => (string)($r['completename'] ?? $r['name'] ?? $r['id'])]; }
+            }
+            usort($o, fn($a, $b) => strcasecmp($a['name'], $b['name']));
+            return $o;
+        };
+        $out['cats'] = $named($fetchAll('ITILCategory'));
+        $out['ents'] = $named($fetchAll('Entity'));
+        $out['groups'] = $named($fetchAll('Group'));
+
+        // Responsables (persona): usuarios cuyo perfil está en OWNER_PROFILES.
+        $wantIds = [];
+        foreach ($fetchAll('Profile_User', ['expand_dropdowns' => 'true']) as $pu) {
+            if (in_array((string)($pu['profiles_id'] ?? ''), OWNER_PROFILES, true)) {
+                $uid = (int)($pu['users_id'] ?? 0); if ($uid > 0) { $wantIds[$uid] = 1; }
+            }
+        }
+        $owners = [];
+        foreach ($fetchAll('User') as $u) {
+            $uid = (int)($u['id'] ?? 0);
+            if ($uid > 0 && isset($wantIds[$uid]) && empty($u['is_deleted'])) {
+                $n = trim(($u['firstname'] ?? '') . ' ' . ($u['realname'] ?? ''));
+                $owners[] = ['id' => $uid, 'name' => $n !== '' ? $n : (string)($u['name'] ?? $uid)];
+            }
+        }
+        usort($owners, fn($a, $b) => strcasecmp($a['name'], $b['name']));
+        $out['owners'] = $owners;
     }
     echo json_encode($out, JSON_UNESCAPED_UNICODE);
     exit;
@@ -66,16 +91,24 @@ if ($m === 'POST') {
         }
         while (isset($seen[$id])) { $id .= 'x'; }
         $seen[$id] = 1;
-        $eid = max(0, (int)($p['entities_id'] ?? 0));
+        // entidades donde aplica el proceso (multi-selección); [] = todas las que ve el usuario
+        $entities = [];
+        foreach (array_slice((array)($p['entities'] ?? []), 0, 60) as $e) {
+            if (!is_array($e)) continue;
+            $eid = (int)($e['id'] ?? -1);
+            if ($eid >= 0) { $entities[] = ['id' => $eid, 'name' => mb_substr(trim((string)($e['name'] ?? '')), 0, 120)]; }
+        }
         $out[] = [
-            'id'          => $id,
-            'name'        => mb_substr($name, 0, 120),
-            'every'       => in_array($p['every'] ?? '', $valid, true) ? $p['every'] : 'monthly',
-            'owner'       => mb_substr(trim((string)($p['owner'] ?? '')), 0, 80),
-            'match'       => ['by' => $by, 'value' => $val],
-            'grace_days'  => max(0, min(30, (int)($p['grace_days'] ?? 0))),
-            'entities_id' => $eid, // 0 = todas las entidades
-            'entity_name' => $eid ? mb_substr(trim((string)($p['entity_name'] ?? '')), 0, 120) : '',
+            'id'         => $id,
+            'name'       => mb_substr($name, 0, 120),
+            'every'      => in_array($p['every'] ?? '', $valid, true) ? $p['every'] : 'monthly',
+            'match'      => ['by' => $by, 'value' => $val],
+            'grace_days' => max(0, min(30, (int)($p['grace_days'] ?? 0))),
+            'users_id'   => max(0, (int)($p['users_id'] ?? 0)),   // responsable (persona)
+            'owner_name' => mb_substr(trim((string)($p['owner_name'] ?? '')), 0, 120),
+            'groups_id'  => max(0, (int)($p['groups_id'] ?? 0)),  // grupo responsable
+            'group_name' => mb_substr(trim((string)($p['group_name'] ?? '')), 0, 120),
+            'entities'   => $entities,
         ];
     }
     $dir = dirname($file);

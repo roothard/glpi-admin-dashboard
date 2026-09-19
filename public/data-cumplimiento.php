@@ -55,17 +55,20 @@ function cv($row, $f) { $v = $row[(string)CF[$f]] ?? ($row[CF[$f]] ?? null);
 $now = time();
 $result = []; $techIds = [];
 
-foreach ($procs as $p) {
+// Evalúa un proceso para UN alcance de entidad (o global si $entId === null).
+// Devuelve una fila del panel + acumula los ids de técnico a resolver.
+function evalProc(array $p, ?int $entId, string $entName, int $now, array &$techIds): array
+{
     $P     = (PERIODS[$p['every']] ?? 30) * 86400;
     $grace = (int)($p['grace_days'] ?? 0) * 86400;
     $base = [($p['match']['by'] ?? 'category') === 'title'
         ? ['field' => CF['title'], 'searchtype' => 'contains', 'value' => (string)$p['match']['value']]
         : ['field' => CF['cat'], 'searchtype' => 'equals', 'value' => (int)$p['match']['value']]];
-    if (!empty($p['entities_id'])) { // proceso acotado a una entidad (cliente)
-        $base[] = ['link' => 'AND', 'field' => CF['ent'], 'searchtype' => 'equals', 'value' => (int)$p['entities_id']];
+    if ($entId !== null && $entId > 0) {
+        $base[] = ['link' => 'AND', 'field' => CF['ent'], 'searchtype' => 'equals', 'value' => $entId];
     }
 
-    // Evidence: closed/solved inside the history window, plus anything open.
+    global $tok;
     $since = date('Y-m-d H:i:s', $now - CYCLES * $P);
     $old = cmpSearch(array_merge($base, [
         ['link' => 'AND', 'field' => CF['status'], 'searchtype' => 'equals', 'value' => 'old'],
@@ -75,7 +78,6 @@ foreach ($procs as $p) {
         ['link' => 'AND', 'field' => CF['status'], 'searchtype' => 'equals', 'value' => 'notold'],
     ]), $tok);
 
-    // done[] = completion timestamps (solve date, falling back to close date)
     $done = [];
     foreach ($old as $r) {
         $d = cv($r, 'solve') ?: cv($r, 'close') ?: cv($r, 'date');
@@ -85,15 +87,13 @@ foreach ($procs as $p) {
     rsort($done);
     $lastDone = $done[0] ?? null;
 
-    // State (rolling): due = last completion + period + grace
     $due = $lastDone ? $lastDone + $P + $grace : null;
     if ($lastDone === null && !$open) { $state = 'nodata'; }
-    elseif ($lastDone === null)       { $state = 'run'; }   // started but never completed
+    elseif ($lastDone === null)       { $state = 'run'; }
     elseif ($now > $due)              { $state = 'late'; }
     elseif ($open)                    { $state = 'run'; }
     else                              { $state = 'ok'; }
 
-    // History bar: CYCLES rolling windows of length P, oldest first.
     $cycles = [];
     for ($i = CYCLES - 1; $i >= 0; $i--) {
         $from = $now - ($i + 1) * $P; $to = $now - $i * $P;
@@ -102,7 +102,6 @@ foreach ($procs as $p) {
         $cycles[] = $hit ? 1 : 0;
     }
 
-    // Evidence detail: the most recent tickets backing this process.
     $ev = [];
     foreach (array_merge($open, array_slice($old, 0, 10)) as $r) {
         if (count($ev) >= 12) break;
@@ -115,17 +114,29 @@ foreach ($procs as $p) {
         ];
     }
 
-    $result[] = [
-        'id' => $p['id'], 'name' => $p['name'], 'every' => $p['every'],
-        'owner' => $p['owner'] ?? '', 'grace' => (int)($p['grace_days'] ?? 0),
-        'ent' => !empty($p['entities_id']) ? (string)($p['entity_name'] ?? '') : '',
+    return [
+        'id'    => $p['id'] . ($entId ? '@' . $entId : ''),
+        'name'  => $p['name'], 'every' => $p['every'], 'grace' => (int)($p['grace_days'] ?? 0),
+        'ent'   => $entName,
+        'owner' => (string)($p['owner_name'] ?? ''), 'grp' => (string)($p['group_name'] ?? ''),
         'state' => $state,
         'last'  => $lastDone ? date('Y-m-d H:i', $lastDone) : null,
         'days'  => $lastDone ? (int)floor(($now - $lastDone) / 86400) : null,
-        'dueIn' => $due ? (int)ceil(($due - $now) / 86400) : null, // negative = overdue days
+        'dueIn' => $due ? (int)ceil(($due - $now) / 86400) : null,
         'cycles' => $cycles,
         'ev'     => $ev,
     ];
+}
+
+foreach ($procs as $p) {
+    $ents = $p['entities'] ?? [];
+    if ($ents) { // una fila por entidad donde aplica el proceso
+        foreach ($ents as $e) {
+            $result[] = evalProc($p, (int)$e['id'], (string)($e['name'] ?? ''), $now, $techIds);
+        }
+    } else {     // sin entidades: evaluación global (todo lo que ve el usuario)
+        $result[] = evalProc($p, null, '', $now, $techIds);
+    }
 }
 
 // Resolve technician ids -> names (search returns numeric actor ids)
