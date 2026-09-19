@@ -803,7 +803,7 @@ function appsList(){
   if(DATA.isAdmin||DATA.isSuper) list.push({k:'cumplimiento',t:T('app_cmp')});
   const _gps=(CONFIG.modules&&CONFIG.modules.gps)||{};
   if((DATA.isAdmin||DATA.isSuper)&&_gps.enabled) list.push({k:'fichadas',t:_gps.label||T('app_fich')});
-  return list;
+  return list.sort((a,b)=>a.t.localeCompare(b.t,LANG,{sensitivity:'base'})); // cubos en orden alfabético
 }
 function renderHub(){
   const d=$('#dock'); if(!d)return; d.innerHTML='';
