@@ -120,12 +120,20 @@ for Docker. See [`config/settings.example.json`](config/settings.example.json).
 
 ## Security
 
+- **Hardened login** — credentials are sent to GLPI in an `Authorization: Basic`
+  header, never as URL parameters, so they can't end up in web-server access
+  logs. The session id is regenerated on every successful login (anti
+  session-fixation, with `session.use_strict_mode`), and a per-IP throttle
+  blocks brute force: 10 failed attempts → 15-minute lockout (HTTP 429).
+  If your GLPI sits behind a proxy that strips the `Authorization` header,
+  enable *tokens in query* in the setup panel (mind your GLPI access logs).
 - `config/settings.json`, `lib.php` and `data-cache.json` stay **out of the
   docroot** (only `public/` is web-served); `settings.json` is git-ignored and
   written `chmod 600`.
 - Secrets (tokens, DB password) never reach the browser — `config.php` exposes
   only branding + module flags.
 - The generator is **read-only**; login mode uses each user's own GLPI rights.
+- Session cookies are `HttpOnly` + `SameSite=Lax` (+ `Secure` on HTTPS).
 - `public/.htaccess` ships CSP + hardening for Apache; adapt for Nginx.
 
 ## Notes & limitations
