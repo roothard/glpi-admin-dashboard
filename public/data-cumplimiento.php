@@ -19,7 +19,7 @@ header('Content-Type: application/json; charset=utf-8');
 if (empty($_SESSION['glpi_token'])) { http_response_code(401); echo json_encode(['auth' => false]); exit; }
 $tok = $_SESSION['glpi_token'];
 
-const CF      = ['id' => 2, 'title' => 1, 'status' => 12, 'date' => 15, 'close' => 16, 'solve' => 17, 'cat' => 7, 'tech' => 5];
+const CF      = ['id' => 2, 'title' => 1, 'status' => 12, 'date' => 15, 'close' => 16, 'solve' => 17, 'cat' => 7, 'tech' => 5, 'ent' => 80];
 const PERIODS = ['daily' => 1, 'weekly' => 7, 'monthly' => 30, 'quarterly' => 91, 'yearly' => 365];
 const CYCLES  = 12; // segments in the history bar
 
@@ -58,19 +58,22 @@ $result = []; $techIds = [];
 foreach ($procs as $p) {
     $P     = (PERIODS[$p['every']] ?? 30) * 86400;
     $grace = (int)($p['grace_days'] ?? 0) * 86400;
-    $match = ($p['match']['by'] ?? 'category') === 'title'
+    $base = [($p['match']['by'] ?? 'category') === 'title'
         ? ['field' => CF['title'], 'searchtype' => 'contains', 'value' => (string)$p['match']['value']]
-        : ['field' => CF['cat'], 'searchtype' => 'equals', 'value' => (int)$p['match']['value']];
+        : ['field' => CF['cat'], 'searchtype' => 'equals', 'value' => (int)$p['match']['value']]];
+    if (!empty($p['entities_id'])) { // proceso acotado a una entidad (cliente)
+        $base[] = ['link' => 'AND', 'field' => CF['ent'], 'searchtype' => 'equals', 'value' => (int)$p['entities_id']];
+    }
 
     // Evidence: closed/solved inside the history window, plus anything open.
     $since = date('Y-m-d H:i:s', $now - CYCLES * $P);
-    $old = cmpSearch([$match,
+    $old = cmpSearch(array_merge($base, [
         ['link' => 'AND', 'field' => CF['status'], 'searchtype' => 'equals', 'value' => 'old'],
         ['link' => 'AND', 'field' => CF['date'], 'searchtype' => 'morethan', 'value' => $since],
-    ], $tok);
-    $open = cmpSearch([$match,
+    ]), $tok);
+    $open = cmpSearch(array_merge($base, [
         ['link' => 'AND', 'field' => CF['status'], 'searchtype' => 'equals', 'value' => 'notold'],
-    ], $tok);
+    ]), $tok);
 
     // done[] = completion timestamps (solve date, falling back to close date)
     $done = [];
@@ -115,6 +118,7 @@ foreach ($procs as $p) {
     $result[] = [
         'id' => $p['id'], 'name' => $p['name'], 'every' => $p['every'],
         'owner' => $p['owner'] ?? '', 'grace' => (int)($p['grace_days'] ?? 0),
+        'ent' => !empty($p['entities_id']) ? (string)($p['entity_name'] ?? '') : '',
         'state' => $state,
         'last'  => $lastDone ? date('Y-m-d H:i', $lastDone) : null,
         'days'  => $lastDone ? (int)floor(($now - $lastDone) / 86400) : null,

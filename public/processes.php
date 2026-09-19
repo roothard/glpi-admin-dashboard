@@ -21,7 +21,30 @@ $load = function () use ($file) {
 $m = $_SERVER['REQUEST_METHOD'];
 
 if ($m === 'GET') {
-    echo json_encode(['processes' => $load(), 'canEdit' => !empty($_SESSION['isAdmin'])], JSON_UNESCAPED_UNICODE);
+    $out = ['processes' => $load(), 'canEdit' => !empty($_SESSION['isAdmin'])];
+    if (isset($_GET['lists'])) {
+        // Para el editor: categorías y entidades REALES de GLPI (las que ve el usuario)
+        $tok = $_SESSION['glpi_token'];
+        $fetchAll = function (string $type) use ($tok) {
+            $acc = []; $start = 0; $page = 250;
+            do {
+                [$c, $b] = glpi_fetch('/' . $type, ['range' => $start . '-' . ($start + $page - 1)], $tok);
+                if ($c >= 400 || !is_array($b)) { break; }
+                $rows = (isset($b[0]) || $b === []) ? $b : [$b];
+                foreach ($rows as $r) {
+                    if (is_array($r) && isset($r['id'])) {
+                        $acc[] = ['id' => (int)$r['id'], 'name' => (string)($r['completename'] ?? $r['name'] ?? $r['id'])];
+                    }
+                }
+                $got = count($rows); $start += $got;
+            } while ($got === $page && $start < 2000);
+            usort($acc, fn($a, $b) => strcasecmp($a['name'], $b['name']));
+            return $acc;
+        };
+        $out['cats'] = $fetchAll('ITILCategory');
+        $out['ents'] = $fetchAll('Entity');
+    }
+    echo json_encode($out, JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -43,13 +66,16 @@ if ($m === 'POST') {
         }
         while (isset($seen[$id])) { $id .= 'x'; }
         $seen[$id] = 1;
+        $eid = max(0, (int)($p['entities_id'] ?? 0));
         $out[] = [
-            'id'         => $id,
-            'name'       => mb_substr($name, 0, 120),
-            'every'      => in_array($p['every'] ?? '', $valid, true) ? $p['every'] : 'monthly',
-            'owner'      => mb_substr(trim((string)($p['owner'] ?? '')), 0, 80),
-            'match'      => ['by' => $by, 'value' => $val],
-            'grace_days' => max(0, min(30, (int)($p['grace_days'] ?? 0))),
+            'id'          => $id,
+            'name'        => mb_substr($name, 0, 120),
+            'every'       => in_array($p['every'] ?? '', $valid, true) ? $p['every'] : 'monthly',
+            'owner'       => mb_substr(trim((string)($p['owner'] ?? '')), 0, 80),
+            'match'       => ['by' => $by, 'value' => $val],
+            'grace_days'  => max(0, min(30, (int)($p['grace_days'] ?? 0))),
+            'entities_id' => $eid, // 0 = todas las entidades
+            'entity_name' => $eid ? mb_substr(trim((string)($p['entity_name'] ?? '')), 0, 120) : '',
         ];
     }
     $dir = dirname($file);
