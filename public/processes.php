@@ -51,7 +51,7 @@ if ($m === 'GET') {
 if ($m === 'POST') {
     if (empty($_SESSION['isAdmin'])) { http_response_code(403); echo json_encode(['ok' => false, 'error' => 'admin only']); exit; }
     $in = json_decode(file_get_contents('php://input'), true) ?: [];
-    $valid = ['daily', 'weekly', 'monthly', 'quarterly', 'yearly'];
+    $valid = ['daily', 'weekly', 'monthly', 'quarterly', 'halfyearly', 'yearly'];
     $out = []; $seen = [];
     foreach (array_slice((array)($in['processes'] ?? []), 0, 50) as $p) {
         if (!is_array($p)) continue;

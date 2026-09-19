@@ -20,7 +20,7 @@ if (empty($_SESSION['glpi_token'])) { http_response_code(401); echo json_encode(
 $tok = $_SESSION['glpi_token'];
 
 const CF      = ['id' => 2, 'title' => 1, 'status' => 12, 'date' => 15, 'close' => 16, 'solve' => 17, 'cat' => 7, 'tech' => 5, 'ent' => 80];
-const PERIODS = ['daily' => 1, 'weekly' => 7, 'monthly' => 30, 'quarterly' => 91, 'yearly' => 365];
+const PERIODS = ['daily' => 1, 'weekly' => 7, 'monthly' => 30, 'quarterly' => 91, 'halfyearly' => 182, 'yearly' => 365];
 const CYCLES  = 12; // segments in the history bar
 
 $pfile = dirname(__DIR__) . '/config/processes.json';
