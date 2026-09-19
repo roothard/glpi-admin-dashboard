@@ -31,6 +31,10 @@ timeline and linked knowledge-base articles.
 > Status: **working** — REST generator, web setup wizard, and login-gated
 > portal are all in use. A Docker image is on the roadmap (see below).
 
+> 📖 **User manual & changelog:** [`docs/`](docs/index.html) (Spanish) — how each
+> app works, compliance best practices, recommended GLPI categories, and the full
+> version history. See also [CHANGELOG.md](CHANGELOG.md).
+
 ![Overview — light theme](docs/shots/overview.png)
 
 | Custom drag-and-drop area board | Dark theme (Explorer) |

@@ -173,6 +173,9 @@ main{padding-top:20px;padding-bottom:60px}
 .l-logo{width:30px;height:30px;border-radius:9px;background:#141416;display:grid;place-items:center;color:#fff;font:700 13px var(--disp)}
 .l-top small{font:600 11px var(--disp);letter-spacing:.2em;color:#6f7178;text-transform:uppercase}
 .l-hint{position:absolute;left:26px;bottom:22px;z-index:5;font:600 11px var(--disp);letter-spacing:.22em;color:#6f7178;text-transform:uppercase}
+.l-links{position:absolute;left:50%;transform:translateX(-50%);bottom:22px;z-index:5;display:flex;gap:8px;align-items:center;font:600 12px var(--sans);color:#8f9199}
+.l-links a{color:#8f9199;text-decoration:none;transition:color .15s}
+.l-links a:hover{color:var(--accent,#405cde)}
 .l-hint::before{content:"— ";color:var(--accent)}
 .l-corner{position:absolute;right:26px;bottom:22px;z-index:5;font:600 11px var(--disp);letter-spacing:.14em;color:#6f7178}
 .lctrls{position:absolute;top:18px;right:18px;display:flex;gap:8px;align-items:center;z-index:6}
@@ -608,6 +611,11 @@ body.dockon .wrap{padding-left:104px}
 </form>
   <div class="l-hint">Click &amp; drag</div>
   <div class="l-corner" id="l-corner"></div>
+  <div class="l-links">
+    <a id="l-doc" href="doc.html" target="_blank" rel="noopener">Documentación</a>
+    <span>·</span>
+    <a href="https://github.com/roothard/glpi-admin-dashboard" target="_blank" rel="noopener">GitHub</a>
+  </div>
 </div>
 
 <div id="infowrap"><div class="profcard">
@@ -640,7 +648,7 @@ const I18N={
   p_gantt:'Gantt · Cronograma de tareas',p_kanban:'Kanban · Tareas por estado',p_det:'Detalles',p_kb:'Base de Conocimiento',
   d_area:'Área',d_ent:'Entidad',d_resp:'Responsable',d_prog:'Avance',d_plan:'Planificado',d_done:'hechas',d_pend:'pendientes',
   close:'Cerrar',noDesc:'Sin descripción',noKb:'Sin artículos vinculados a este proyecto en GLPI.',noDates:'Sin fechas.',noTaskDates:'Sin fechas de tareas.',today:'hoy',noData:'No se pudieron cargar los datos',
-  l_sub:'Ingresá con tu cuenta de GLPI',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Acceder',l_err:'Usuario o contraseña incorrectos',l_503:'Login no configurado (falta App-Token)',l_429:'Demasiados intentos — esperá 15 minutos',logout:'Salir',
+  l_sub:'Ingresá con tu cuenta de GLPI',l_doc:'Documentación',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Acceder',l_err:'Usuario o contraseña incorrectos',l_503:'Login no configurado (falta App-Token)',l_429:'Demasiados intentos — esperá 15 minutos',logout:'Salir',
   apps:'Apps',hub_h:'Bienvenido',hub_sub:'Elegí una aplicación',app_proj:'Panel de Proyectos',app_proj_d:'Portfolio, avances y cronograma',app_fich:'Fichadas GPS',app_fich_d:'Presencia de técnicos en campo',
   filtrar:'Filtrar',allTec:'Todos los técnicos',f_total:'Fichadas',f_tec:'Técnicos',f_hours:'Horas',f_tecnico:'Técnico',f_cliente:'Cliente',f_entrada:'Entrada',f_salida:'Salida',f_dur:'Duración',scope_admin:'Todos los técnicos',scope_supervisor:'Mi equipo',scope_tecnico:'Mis fichadas',f_csv:'Exportar CSV',f_map:'Ubicaciones',f_nogps:'Sin coordenadas GPS',f_mapnote:'Distribución por ubicación GPS (clic en un punto = Google Maps).',lic_h:'Licencia GPS',lic_note:'La app leerá esta clave desde GLPI — los usuarios no la cargan a mano.',lic_key:'Clave de licencia',lic_save:'Guardar en GLPI',lic_active:'Activado',lic_inactive:'Sin licencia',lic_activate:'Activar',lic_change:'Cambiar',lic_saving:'guardando…',lic_saved:'guardada en GLPI',lic_error:'error al guardar',app_link:'Ver app'},
  en:{tit:'GLPI Administration Center',upd:'Updated',t_res:'Summary',t_exp:'Explorer',t_map:'Map',
@@ -650,7 +658,7 @@ const I18N={
   p_gantt:'Gantt · Task schedule',p_kanban:'Kanban · Tasks by state',p_det:'Details',p_kb:'Knowledge Base',
   d_area:'Area',d_ent:'Entity',d_resp:'Owner',d_prog:'Progress',d_plan:'Planned',d_done:'done',d_pend:'pending',
   close:'Close',noDesc:'No description',noKb:'No articles linked to this project in GLPI.',noDates:'No dates.',noTaskDates:'No task dates.',today:'today',noData:'Could not load data',
-  l_sub:'Sign in with your GLPI account',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err:'Wrong username or password',l_503:'Login not configured (App-Token missing)',l_429:'Too many attempts — wait 15 minutes',logout:'Sign out',
+  l_sub:'Sign in with your GLPI account',l_doc:'Documentation',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err:'Wrong username or password',l_503:'Login not configured (App-Token missing)',l_429:'Too many attempts — wait 15 minutes',logout:'Sign out',
   apps:'Apps',hub_h:'Welcome',hub_sub:'Choose an app',app_proj:'Projects Panel',app_proj_d:'Portfolio, progress and schedule',app_fich:'GPS Check-ins',app_fich_d:'Field technician presence',
   filtrar:'Filter',allTec:'All technicians',f_total:'Check-ins',f_tec:'Technicians',f_hours:'Hours',f_tecnico:'Technician',f_cliente:'Client',f_entrada:'In',f_salida:'Out',f_dur:'Duration',scope_admin:'All technicians',scope_supervisor:'My team',scope_tecnico:'My check-ins',f_csv:'Export CSV',f_map:'Locations',f_nogps:'No GPS coordinates',f_mapnote:'Distribution by GPS location (click a point = Google Maps).',lic_h:'GPS License',lic_note:'The app reads this key from GLPI — users no longer enter it manually.',lic_key:'License key',lic_save:'Save to GLPI',lic_active:'Activated',lic_inactive:'No license',lic_activate:'Activate',lic_change:'Change',lic_saving:'saving…',lic_saved:'saved to GLPI',lic_error:'save error',app_link:'Open app'},
  fr:{tit:'Centre d’administration GLPI',upd:'Mis à jour',t_res:'Résumé',t_exp:'Explorateur',t_map:'Carte',
@@ -660,7 +668,7 @@ const I18N={
   p_gantt:'Gantt · Calendrier des tâches',p_kanban:'Kanban · Tâches par état',p_det:'Détails',p_kb:'Base de connaissances',
   d_area:'Zone',d_ent:'Entité',d_resp:'Responsable',d_prog:'Avancement',d_plan:'Planifié',d_done:'terminées',d_pend:'en attente',
   close:'Fermer',noDesc:'Sans description',noKb:'Aucun article lié à ce projet dans GLPI.',noDates:'Aucune date.',noTaskDates:'Aucune date de tâche.',today:"aujourd'hui",noData:'Impossible de charger les données',
-  l_sub:'Connectez-vous avec votre compte GLPI',l_user:'Utilisateur',l_pass:'Mot de passe',l_btn:'Se connecter',l_err:'Utilisateur ou mot de passe incorrect',l_503:'Connexion non configurée (App-Token manquant)',l_429:'Trop de tentatives — attendez 15 minutes',logout:'Déconnexion',
+  l_sub:'Connectez-vous avec votre compte GLPI',l_doc:'Documentation',l_user:'Utilisateur',l_pass:'Mot de passe',l_btn:'Se connecter',l_err:'Utilisateur ou mot de passe incorrect',l_503:'Connexion non configurée (App-Token manquant)',l_429:'Trop de tentatives — attendez 15 minutes',logout:'Déconnexion',
   apps:'Apps',hub_h:'Bienvenue',hub_sub:'Choisissez une application',app_proj:'Panneau de projets',app_proj_d:'Portfolio, avancement et calendrier',app_fich:'Pointages GPS',app_fich_d:'Présence des techniciens sur le terrain',
   filtrar:'Filtrer',allTec:'Tous les techniciens',f_total:'Pointages',f_tec:'Techniciens',f_hours:'Heures',f_tecnico:'Technicien',f_cliente:'Client',f_entrada:'Entrée',f_salida:'Sortie',f_dur:'Durée',scope_admin:'Tous les techniciens',scope_supervisor:'Mon équipe',scope_tecnico:'Mes pointages',f_csv:'Exporter CSV',f_map:'Emplacements',f_nogps:'Pas de coordonnées GPS',f_mapnote:'Répartition par emplacement GPS (clic sur un point = Google Maps).',lic_h:'Licence GPS',lic_note:"L'app lit cette clé depuis GLPI — les utilisateurs ne la saisissent plus.",lic_key:'Clé de licence',lic_save:'Enregistrer dans GLPI',lic_active:'Activé',lic_inactive:'Sans licence',lic_activate:'Activer',lic_change:'Changer',lic_saving:'enregistrement…',lic_saved:'enregistrée dans GLPI',lic_error:'erreur',app_link:"Voir l'app"},
  de:{tit:'GLPI-Verwaltungszentrum',upd:'Aktualisiert',t_res:'Übersicht',t_exp:'Explorer',t_map:'Karte',
@@ -670,7 +678,7 @@ const I18N={
   p_gantt:'Gantt · Aufgabenplan',p_kanban:'Kanban · Aufgaben nach Status',p_det:'Details',p_kb:'Wissensdatenbank',
   d_area:'Bereich',d_ent:'Entität',d_resp:'Verantwortlich',d_prog:'Fortschritt',d_plan:'Geplant',d_done:'erledigt',d_pend:'offen',
   close:'Schließen',noDesc:'Keine Beschreibung',noKb:'Keine Artikel mit diesem Projekt in GLPI verknüpft.',noDates:'Keine Daten.',noTaskDates:'Keine Aufgaben-Daten.',today:'heute',noData:'Daten konnten nicht geladen werden',
-  l_sub:'Mit Ihrem GLPI-Konto anmelden',l_user:'Benutzer',l_pass:'Passwort',l_btn:'Anmelden',l_err:'Falscher Benutzer oder Passwort',l_503:'Login nicht konfiguriert (App-Token fehlt)',l_429:'Zu viele Versuche — 15 Minuten warten',logout:'Abmelden',
+  l_sub:'Mit Ihrem GLPI-Konto anmelden',l_doc:'Dokumentation',l_user:'Benutzer',l_pass:'Passwort',l_btn:'Anmelden',l_err:'Falscher Benutzer oder Passwort',l_503:'Login nicht konfiguriert (App-Token fehlt)',l_429:'Zu viele Versuche — 15 Minuten warten',logout:'Abmelden',
   apps:'Apps',hub_h:'Willkommen',hub_sub:'Wählen Sie eine App',app_proj:'Projekt-Panel',app_proj_d:'Portfolio, Fortschritt und Zeitplan',app_fich:'GPS-Check-ins',app_fich_d:'Anwesenheit der Außendiensttechniker',
   filtrar:'Filtern',allTec:'Alle Techniker',f_total:'Check-ins',f_tec:'Techniker',f_hours:'Stunden',f_tecnico:'Techniker',f_cliente:'Kunde',f_entrada:'Eingang',f_salida:'Ausgang',f_dur:'Dauer',scope_admin:'Alle Techniker',scope_supervisor:'Mein Team',scope_tecnico:'Meine Check-ins',f_csv:'CSV exportieren',f_map:'Standorte',f_nogps:'Keine GPS-Koordinaten',f_mapnote:'Verteilung nach GPS-Standort (Klick auf einen Punkt = Google Maps).',lic_h:'GPS-Lizenz',lic_note:'Die App liest diesen Schlüssel aus GLPI — Benutzer geben ihn nicht mehr ein.',lic_key:'Lizenzschlüssel',lic_save:'In GLPI speichern',lic_active:'Aktiviert',lic_inactive:'Keine Lizenz',lic_activate:'Aktivieren',lic_change:'Ändern',lic_saving:'speichern…',lic_saved:'in GLPI gespeichert',lic_error:'Fehler',app_link:'App öffnen'},
  pt:{tit:'Centro de Administração GLPI',upd:'Atualizado',t_res:'Resumo',t_exp:'Explorador',t_map:'Mapa',
@@ -680,7 +688,7 @@ const I18N={
   p_gantt:'Gantt · Cronograma de tarefas',p_kanban:'Kanban · Tarefas por estado',p_det:'Detalhes',p_kb:'Base de conhecimento',
   d_area:'Área',d_ent:'Entidade',d_resp:'Responsável',d_prog:'Progresso',d_plan:'Planejado',d_done:'concluídas',d_pend:'pendentes',
   close:'Fechar',noDesc:'Sem descrição',noKb:'Nenhum artigo vinculado a este projeto no GLPI.',noDates:'Sem datas.',noTaskDates:'Sem datas de tarefas.',today:'hoje',noData:'Não foi possível carregar os dados',
-  l_sub:'Entre com sua conta GLPI',l_user:'Usuário',l_pass:'Senha',l_btn:'Entrar',l_err:'Usuário ou senha incorretos',l_503:'Login não configurado (App-Token ausente)',l_429:'Muitas tentativas — aguarde 15 minutos',logout:'Sair',
+  l_sub:'Entre com sua conta GLPI',l_doc:'Documentação',l_user:'Usuário',l_pass:'Senha',l_btn:'Entrar',l_err:'Usuário ou senha incorretos',l_503:'Login não configurado (App-Token ausente)',l_429:'Muitas tentativas — aguarde 15 minutos',logout:'Sair',
   apps:'Apps',hub_h:'Bem-vindo',hub_sub:'Escolha um aplicativo',app_proj:'Painel de Projetos',app_proj_d:'Portfólio, progresso e cronograma',app_fich:'Registros GPS',app_fich_d:'Presença de técnicos em campo',
   filtrar:'Filtrar',allTec:'Todos os técnicos',f_total:'Registros',f_tec:'Técnicos',f_hours:'Horas',f_tecnico:'Técnico',f_cliente:'Cliente',f_entrada:'Entrada',f_salida:'Saída',f_dur:'Duração',scope_admin:'Todos os técnicos',scope_supervisor:'Minha equipe',scope_tecnico:'Meus registros',f_csv:'Exportar CSV',f_map:'Localizações',f_nogps:'Sem coordenadas GPS',f_mapnote:'Distribuição por localização GPS (clique num ponto = Google Maps).',lic_h:'Licença GPS',lic_note:'O app lê esta chave do GLPI — os usuários não a inserem manualmente.',lic_key:'Chave de licença',lic_save:'Salvar no GLPI',lic_active:'Ativado',lic_inactive:'Sem licença',lic_activate:'Ativar',lic_change:'Alterar',lic_saving:'salvando…',lic_saved:'salva no GLPI',lic_error:'erro',app_link:'Ver app'}
 };
@@ -759,6 +767,7 @@ function applyStatic(){
   const _lb=$('#l-brandsub'); if(_lb)_lb.textContent=T('tit');
   const _lc=$('#l-corner'); if(_lc)_lc.textContent=(_bn?_bn+' · ':'')+new Date().getFullYear();
   $('#l-user').placeholder=T('l_user'); $('#l-pass').placeholder=T('l_pass');
+  { const _ld=$('#l-doc'); if(_ld)_ld.textContent=T('l_doc'); }
   $('#l-btn').textContent=T('l_btn'); $('#logout').title=T('logout');
   $('#btnhome').textContent='⌂ '+T('apps');
   $('#fi-go').textContent=T('filtrar'); $('#fi-tec').options[0].text=T('allTec');
