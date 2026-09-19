@@ -308,6 +308,16 @@ main{padding-top:20px;padding-bottom:60px}
 .mx-g{background:rgba(47,166,113,.15);color:#2fa671}.mx-y{background:rgba(200,140,0,.15);color:#c88c00}
 .mx-r{background:rgba(226,80,110,.14);color:#e2506e}.mx-n{background:var(--surface2);color:var(--dim)}
 #tk-filters input[type=date]{font:500 13px var(--sans);color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;outline:none}
+/* columnas apiladas (horas por entidad, tickets por mes×entidad) */
+.legrow{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 12px}
+.legrow div{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+.legrow i{width:9px;height:9px;border-radius:3px;flex:none}
+.svbars{display:flex;align-items:flex-end;gap:12px;height:200px;padding:4px 2px 0}
+.svcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;min-width:0}
+.svcol b{font:700 10.5px var(--mono)}
+.svstack{width:100%;max-width:54px;display:flex;flex-direction:column;border-radius:6px 6px 0 0;overflow:hidden}
+.svseg{width:100%}
+.svcol span{font:600 9.5px var(--mono);color:var(--dim);text-transform:uppercase;white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
 /* ---- app Tickets ---- */
 .kpis.k6{grid-template-columns:repeat(6,1fr)}
 @media(max-width:1100px){.kpis.k6{grid-template-columns:repeat(3,1fr)}}
@@ -492,6 +502,7 @@ body.dockon .wrap{padding-left:104px}
     <div class="freports" id="tk-tabs">
       <button class="on" data-tv="cola"></button>
       <button data-tv="analisis"></button>
+      <button data-tv="horas"></button>
     </div>
     <div class="perbar" id="tk-per"></div>
     <div class="kpis k6" id="tk-kpis"></div>
@@ -525,6 +536,14 @@ body.dockon .wrap{padding-left:104px}
         <div class="panel anpanel"><h4 id="an-cat-t"></h4><div id="an-cat"></div></div>
       </div>
       <div class="panel anpanel"><h4 id="an-mx-t"></h4><div style="overflow-x:auto"><table class="ftable" id="an-matrix"></table></div></div>
+    </div>
+    <div id="tk-view-horas" style="display:none">
+      <div class="kpis" id="hs-kpis" style="grid-template-columns:repeat(2,1fr)"></div>
+      <div class="panel anpanel"><h4 id="hs-ent-t"></h4><div id="hs-ent"></div></div>
+      <div class="angrid2">
+        <div class="panel anpanel"><h4 id="hs-mes-t"></h4><div id="hs-mes"></div></div>
+        <div class="panel anpanel"><h4 id="hs-tech-t"></h4><div id="hs-tech"></div></div>
+      </div>
     </div>
   </section>
 </main>
@@ -648,11 +667,11 @@ Object.assign(I18N.en,{app_tk:'Tickets',tk_open:'Open',tk_work:'In progress',tk_
 Object.assign(I18N.fr,{app_tk:'Tickets',tk_open:'Ouverts',tk_work:'En cours',tk_wait:'En attente',tk_solved:'Résolus (période)',tk_breach:'SLA dépassés',tk_slapct:'Respect des SLA',tk_allst:'Statut : tous',tk_allprio:'Priorité : toutes',tk_alltech:'Technicien : tous',tk_allcat:'Catégorie : toutes',tk_allsla:'SLA : tous',tk_one:'ticket',tk_many:'tickets',tk_c_title:'Titre',tk_c_req:'Demandeur',tk_c_tech:'Technicien',tk_c_st:'Statut',tk_c_prio:'Priorité',tk_c_open:'Créé',days_l:'jours',sla_ok:'À temps',sla_in:'échéance dans',sla_ago:'dépassé depuis',sla_f_late:'Dépassé',sla_f_warn:'Bientôt dû',sla_f_run:'Dans les temps (ouvert)',sla_f_ok:'Respecté',st1:'Nouveau',st2:'En cours (attr.)',st3:'En cours (plan.)',st4:'En attente',st5:'Résolu',st6:'Clos',p1:'Très basse',p2:'Basse',p3:'Moyenne',p4:'Haute',p5:'Très haute',p6:'Majeure'});
 Object.assign(I18N.de,{app_tk:'Tickets',tk_open:'Offen',tk_work:'In Bearbeitung',tk_wait:'Wartend',tk_solved:'Gelöst (Zeitraum)',tk_breach:'SLA verletzt',tk_slapct:'SLA-Einhaltung',tk_allst:'Status: alle',tk_allprio:'Priorität: alle',tk_alltech:'Techniker: alle',tk_allcat:'Kategorie: alle',tk_allsla:'SLA: alle',tk_one:'Ticket',tk_many:'Tickets',tk_c_title:'Titel',tk_c_req:'Anfragender',tk_c_tech:'Techniker',tk_c_st:'Status',tk_c_prio:'Priorität',tk_c_open:'Erstellt',days_l:'Tage',sla_ok:'Pünktlich',sla_in:'fällig in',sla_ago:'überfällig seit',sla_f_late:'Verletzt',sla_f_warn:'Bald fällig',sla_f_run:'Im Plan (offen)',sla_f_ok:'Erfüllt',st1:'Neu',st2:'In Bearbeitung (zugew.)',st3:'In Bearbeitung (gepl.)',st4:'Wartend',st5:'Gelöst',st6:'Geschlossen',p1:'Sehr niedrig',p2:'Niedrig',p3:'Mittel',p4:'Hoch',p5:'Sehr hoch',p6:'Kritisch'});
 Object.assign(I18N.pt,{app_tk:'Tickets',tk_open:'Abertos',tk_work:'Em andamento',tk_wait:'Em espera',tk_solved:'Resolvidos (período)',tk_breach:'SLA estourados',tk_slapct:'Cumprimento de SLA',tk_allst:'Status: todos',tk_allprio:'Prioridade: todas',tk_alltech:'Técnico: todos',tk_allcat:'Categoria: todas',tk_allsla:'SLA: todos',tk_one:'ticket',tk_many:'tickets',tk_c_title:'Título',tk_c_req:'Solicitante',tk_c_tech:'Técnico',tk_c_st:'Status',tk_c_prio:'Prioridade',tk_c_open:'Criado',days_l:'dias',sla_ok:'No prazo',sla_in:'vence em',sla_ago:'venceu há',sla_f_late:'Estourado',sla_f_warn:'Por vencer',sla_f_run:'No prazo (aberto)',sla_f_ok:'Cumprido',st1:'Novo',st2:'Em andamento (atrib.)',st3:'Em andamento (plan.)',st4:'Em espera',st5:'Resolvido',st6:'Fechado',p1:'Muito baixa',p2:'Baixa',p3:'Média',p4:'Alta',p5:'Muito alta',p6:'Crítica'});
-Object.assign(I18N.es,{tk_tab_queue:'Cola',tk_tab_an:'Análisis',ty1:'Incidencia',ty2:'Solicitud',tk_allty:'Tipo: todos',an_g_tto:'SLA Asignación',an_g_ttr:'SLA Resolución',an_avg:'Tiempo promedio',an_state:'Tickets por estado',an_month:'Tickets por mes',an_cat:'Tickets por categoría',an_matrix:'Cumplimiento SLA por entidad y mes (A = asignación · R = resolución)',an_others:'Otras',an_total:'Total',an_insla:'en SLA'});
-Object.assign(I18N.en,{tk_tab_queue:'Queue',tk_tab_an:'Analytics',ty1:'Incident',ty2:'Request',tk_allty:'Type: all',an_g_tto:'SLA Assignment',an_g_ttr:'SLA Resolution',an_avg:'Average time',an_state:'Tickets by status',an_month:'Tickets by month',an_cat:'Tickets by category',an_matrix:'SLA compliance by entity and month (A = assignment · R = resolution)',an_others:'Others',an_total:'Total',an_insla:'within SLA'});
-Object.assign(I18N.fr,{tk_tab_queue:'File',tk_tab_an:'Analyse',ty1:'Incident',ty2:'Demande',tk_allty:'Type : tous',an_g_tto:'SLA Attribution',an_g_ttr:'SLA Résolution',an_avg:'Temps moyen',an_state:'Tickets par statut',an_month:'Tickets par mois',an_cat:'Tickets par catégorie',an_matrix:'Respect des SLA par entité et mois (A = attribution · R = résolution)',an_others:'Autres',an_total:'Total',an_insla:'dans le SLA'});
-Object.assign(I18N.de,{tk_tab_queue:'Warteschlange',tk_tab_an:'Analyse',ty1:'Störung',ty2:'Anfrage',tk_allty:'Typ: alle',an_g_tto:'SLA Zuweisung',an_g_ttr:'SLA Lösung',an_avg:'Durchschnittszeit',an_state:'Tickets nach Status',an_month:'Tickets nach Monat',an_cat:'Tickets nach Kategorie',an_matrix:'SLA-Einhaltung nach Entität und Monat (A = Zuweisung · R = Lösung)',an_others:'Andere',an_total:'Gesamt',an_insla:'im SLA'});
-Object.assign(I18N.pt,{tk_tab_queue:'Fila',tk_tab_an:'Análise',ty1:'Incidente',ty2:'Solicitação',tk_allty:'Tipo: todos',an_g_tto:'SLA Atribuição',an_g_ttr:'SLA Resolução',an_avg:'Tempo médio',an_state:'Tickets por status',an_month:'Tickets por mês',an_cat:'Tickets por categoria',an_matrix:'Cumprimento de SLA por entidade e mês (A = atribuição · R = resolução)',an_others:'Outras',an_total:'Total',an_insla:'no SLA'});
+Object.assign(I18N.es,{tk_tab_queue:'Cola',tk_tab_an:'Análisis',ty1:'Incidencia',ty2:'Solicitud',tk_allty:'Tipo: todos',an_g_tto:'SLA Asignación',an_g_ttr:'SLA Resolución',an_avg:'Tiempo promedio',an_state:'Tickets por estado',an_month:'Tickets por mes',an_cat:'Tickets por categoría',an_matrix:'Cumplimiento SLA por entidad y mes (A = asignación · R = resolución)',an_others:'Otras',an_total:'Total',an_insla:'en SLA',tk_tab_hs:'Horas',hs_total:'Horas trabajadas',hs_ent:'Horas trabajadas por cliente',hs_tech:'Horas por técnico',hs_mes:'Tickets por mes y entidad'});
+Object.assign(I18N.en,{tk_tab_queue:'Queue',tk_tab_an:'Analytics',ty1:'Incident',ty2:'Request',tk_allty:'Type: all',an_g_tto:'SLA Assignment',an_g_ttr:'SLA Resolution',an_avg:'Average time',an_state:'Tickets by status',an_month:'Tickets by month',an_cat:'Tickets by category',an_matrix:'SLA compliance by entity and month (A = assignment · R = resolution)',an_others:'Others',an_total:'Total',an_insla:'within SLA',tk_tab_hs:'Hours',hs_total:'Hours worked',hs_ent:'Hours worked by client',hs_tech:'Hours by technician',hs_mes:'Tickets by month and entity'});
+Object.assign(I18N.fr,{tk_tab_queue:'File',tk_tab_an:'Analyse',ty1:'Incident',ty2:'Demande',tk_allty:'Type : tous',an_g_tto:'SLA Attribution',an_g_ttr:'SLA Résolution',an_avg:'Temps moyen',an_state:'Tickets par statut',an_month:'Tickets par mois',an_cat:'Tickets par catégorie',an_matrix:'Respect des SLA par entité et mois (A = attribution · R = résolution)',an_others:'Autres',an_total:'Total',an_insla:'dans le SLA',tk_tab_hs:'Heures',hs_total:'Heures travaillées',hs_ent:'Heures travaillées par client',hs_tech:'Heures par technicien',hs_mes:'Tickets par mois et entité'});
+Object.assign(I18N.de,{tk_tab_queue:'Warteschlange',tk_tab_an:'Analyse',ty1:'Störung',ty2:'Anfrage',tk_allty:'Typ: alle',an_g_tto:'SLA Zuweisung',an_g_ttr:'SLA Lösung',an_avg:'Durchschnittszeit',an_state:'Tickets nach Status',an_month:'Tickets nach Monat',an_cat:'Tickets nach Kategorie',an_matrix:'SLA-Einhaltung nach Entität und Monat (A = Zuweisung · R = Lösung)',an_others:'Andere',an_total:'Gesamt',an_insla:'im SLA',tk_tab_hs:'Stunden',hs_total:'Gearbeitete Stunden',hs_ent:'Stunden je Kunde',hs_tech:'Stunden je Techniker',hs_mes:'Tickets nach Monat und Entität'});
+Object.assign(I18N.pt,{tk_tab_queue:'Fila',tk_tab_an:'Análise',ty1:'Incidente',ty2:'Solicitação',tk_allty:'Tipo: todos',an_g_tto:'SLA Atribuição',an_g_ttr:'SLA Resolução',an_avg:'Tempo médio',an_state:'Tickets por status',an_month:'Tickets por mês',an_cat:'Tickets por categoria',an_matrix:'Cumprimento de SLA por entidade e mês (A = atribuição · R = resolução)',an_others:'Outras',an_total:'Total',an_insla:'no SLA',tk_tab_hs:'Horas',hs_total:'Horas trabalhadas',hs_ent:'Horas trabalhadas por cliente',hs_tech:'Horas por técnico',hs_mes:'Tickets por mês e entidade'});
 Object.assign(I18N.es,{seeing:'Viendo',of:'de',why_h:'¿Qué proyectos veo?',why_p:'Ves los proyectos que tu usuario puede ver en GLPI, según tu perfil y tu entidad activa. El administrador puede además filtrar el tablero por tipo de proyecto. Si esperás un proyecto y no aparece, revisá esas tres cosas en GLPI: permisos del perfil, entidad y tipo.',why_filter:'Filtro de tipo',untyped:'Sin tipo',nt_note:'proyecto(s) sin tipo en GLPI — se muestran con el aviso «Sin tipo»'});
 Object.assign(I18N.en,{seeing:'Showing',of:'of',why_h:'Which projects do I see?',why_p:'You see the projects your user can see in GLPI, based on your profile and active entity. The administrator can also filter the board by project type. If a project you expect is missing, check those three things in GLPI: profile permissions, entity and type.',why_filter:'Type filter',untyped:'Untyped',nt_note:'project(s) with no type in GLPI — shown with an “Untyped” notice'});
 Object.assign(I18N.fr,{seeing:'Affichage',of:'sur',why_h:'Quels projets est-ce que je vois ?',why_p:'Vous voyez les projets que votre utilisateur peut voir dans GLPI, selon votre profil et votre entité active. L\'administrateur peut aussi filtrer le tableau par type de projet. S\'il manque un projet attendu, vérifiez ces trois points dans GLPI : permissions du profil, entité et type.',why_filter:'Filtre de type',untyped:'Sans type',nt_note:'projet(s) sans type dans GLPI — affichés avec la mention « Sans type »'});
@@ -1085,11 +1104,12 @@ function renderTickets(){
   const d=TK.data; if(!d)return;
   // sub-pestañas Cola / Análisis
   document.querySelectorAll('#tk-tabs button').forEach(b=>{
-    b.textContent=T(b.dataset.tv==='cola'?'tk_tab_queue':'tk_tab_an');
+    b.textContent=T({cola:'tk_tab_queue',analisis:'tk_tab_an',horas:'tk_tab_hs'}[b.dataset.tv]);
     b.classList.toggle('on',b.dataset.tv===TK.tv);
   });
   $('#tk-view-cola').style.display=TK.tv==='cola'?'':'none';
   $('#tk-view-analisis').style.display=TK.tv==='analisis'?'':'none';
+  $('#tk-view-horas').style.display=TK.tv==='horas'?'':'none';
   // presets de ventana (los abiertos vienen SIEMPRE; esto acota resueltos/cerrados)
   const per=[['7','7 '+T('days_l')],['30','30 '+T('days_l')],['90','90 '+T('days_l')],['0',T('per_all')]];
   const pb=$('#tk-per'); pb.innerHTML='';
@@ -1112,6 +1132,7 @@ function renderTickets(){
   const list=tkFiltered();
   $('#tk-count').textContent=list.length+' '+T(list.length===1?'tk_one':'tk_many');
   if(TK.tv==='analisis'){ renderAnalisis(list); return; }
+  if(TK.tv==='horas'){ renderHoras(list); return; }
   // tabla (Cola)
   $('#tk-head').innerHTML=['#',T('tk_c_title'),T('tk_c_req'),T('tk_c_tech'),T('tk_c_st'),T('tk_c_prio'),T('tk_c_open'),'TTO','TTR']
     .map(h=>'<th>'+h+'</th>').join('');
@@ -1218,6 +1239,69 @@ function renderAnalisis(list){
   if(ents.length>1) html+=row(T('an_total'),list,true);
   html+='</tbody>';
   $('#an-matrix').innerHTML=html;
+}
+// ---- vista Horas: tiempo trabajado (tareas) por entidad/técnico + volumen mensual ----
+const TKPAL=['#405cde','#2fa671','#c88c00','#e2506e','#6a83f2','#9a55f2','#1fa87c','#8f9199'];
+function tkHM(s){ const h=Math.floor(s/3600), m=Math.round((s%3600)/60); return h+':'+String(m).padStart(2,'0'); }
+// agrupa una lista en top-7 claves + "Otras" (por valor acumulado)
+function tkTopKeys(totals){
+  let ks=Object.entries(totals).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+  if(ks.length<=8)return [ks,null];
+  return [ks.slice(0,7),T('an_others')];
+}
+// columnas apiladas: cols=[{lbl,tot,vals:{seg:valor}}], segs=orden de segmentos
+function tkStacked(cols,segs,fmtTot,fmtSeg){
+  const max=Math.max(1,...cols.map(c=>c.tot)), H=170;
+  let html='<div class="legrow">'+segs.map((s,i)=>`<div><i style="background:${TKPAL[i%8]}"></i>${esc(s)}</div>`).join('')+'</div>';
+  html+='<div class="svbars">'+cols.map(c=>{
+    const hpx=Math.max(3,Math.round(H*c.tot/max));
+    let inner='';
+    segs.forEach((s,i)=>{ const v=c.vals[s]||0; if(!v)return;
+      inner+=`<div class="svseg" style="height:${Math.max(2,Math.round(hpx*v/c.tot))}px;background:${TKPAL[i%8]}" title="${esc(s)}: ${fmtSeg(v)}"></div>`; });
+    return `<div class="svcol"><b>${fmtTot(c.tot)}</b><div class="svstack">${inner}</div><span title="${esc(c.lbl)}">${esc(c.lbl)}</span></div>`;
+  }).join('')+'</div>';
+  return html;
+}
+function renderHoras(list){
+  const loc=TKLOC[LANG]||'es-AR';
+  const withW=list.filter(t=>t.work>0);
+  const totalW=withW.reduce((a,t)=>a+t.work,0);
+  // KPIs: total de horas trabajadas (hh:mm) + tickets en el filtro
+  $('#hs-kpis').innerHTML=`<div class="kpi"><b>${tkHM(totalW)}</b><span>${T('hs_total')}</span></div>`
+    +`<div class="kpi"><b>${list.length}</b><span>${T(list.length===1?'tk_one':'tk_many')}</span></div>`;
+  // 1) horas por entidad, apiladas por categoría
+  $('#hs-ent-t').textContent=T('hs_ent');
+  const catTot={}; withW.forEach(t=>{const c=t.cat||'—';catTot[c]=(catTot[c]||0)+t.work;});
+  const [topC,othC]=tkTopKeys(catTot);
+  const segC=othC?topC.concat([othC]):topC;
+  const keyC=c=>{c=c||'—';return (othC&&!topC.includes(c))?othC:c;};
+  const entMap={};
+  withW.forEach(t=>{const e=t.ent||'—';const m=entMap[e]=entMap[e]||{tot:0,vals:{}};const c=keyC(t.cat);m.vals[c]=(m.vals[c]||0)+t.work;m.tot+=t.work;});
+  const colsE=Object.keys(entMap).sort((a,b)=>entMap[b].tot-entMap[a].tot).map(e=>({lbl:e,tot:entMap[e].tot,vals:entMap[e].vals}));
+  $('#hs-ent').innerHTML=colsE.length?tkStacked(colsE,segC,tkHM,tkHM):'<div class="empty">'+T('noData')+'</div>';
+  // 2) tickets por mes, apilados por entidad
+  $('#hs-mes-t').textContent=T('hs_mes');
+  const entTot={}; list.forEach(t=>{const e=t.ent||'—';entTot[e]=(entTot[e]||0)+1;});
+  const [topE,othE]=tkTopKeys(entTot);
+  const segE=othE?topE.concat([othE]):topE;
+  const keyE=e=>{e=e||'—';return (othE&&!topE.includes(e))?othE:e;};
+  const mesMap={};
+  list.forEach(t=>{ if(!t.date)return; const m=t.date.substring(0,7);
+    const o=mesMap[m]=mesMap[m]||{tot:0,vals:{}}; const e=keyE(t.ent); o.vals[e]=(o.vals[e]||0)+1; o.tot++; });
+  const meses=Object.keys(mesMap).sort();
+  const mLbl=m=>{const dt=new Date(+m.substring(0,4),+m.substring(5,7)-1,1);return dt.toLocaleString(loc,{month:'short',year:'2-digit'});};
+  const colsM=meses.map(m=>({lbl:mLbl(m),tot:mesMap[m].tot,vals:mesMap[m].vals}));
+  $('#hs-mes').innerHTML=colsM.length?tkStacked(colsM,segE,v=>v,v=>v):'<div class="empty">'+T('noData')+'</div>';
+  // 3) horas por técnico (el trabajo se reparte en partes iguales si hay varios)
+  $('#hs-tech-t').textContent=T('hs_tech');
+  const techH={};
+  withW.forEach(t=>{const ts=(t.tech||'—').split(',').map(x=>x.trim()).filter(Boolean);
+    if(!ts.length)ts.push('—'); const share=t.work/ts.length; ts.forEach(x=>techH[x]=(techH[x]||0)+share);});
+  const techs=Object.entries(techH).sort((a,b)=>b[1]-a[1]);
+  const mxT=Math.max(1,...techs.map(t=>t[1]));
+  $('#hs-tech').innerHTML=techs.map(t=>
+    `<div class="hbar"><span class="hn" title="${esc(t[0])}">${esc(t[0])}</span><span class="ht"><i style="width:${Math.round(100*t[1]/mxT)}%;background:#405cde"></i></span><span class="hv">${tkHM(t[1])}</span></div>`
+  ).join('')||'<div class="empty">'+T('noData')+'</div>';
 }
 $('#tk-q').addEventListener('input',()=>{TK.q=$('#tk-q').value;renderTickets();});
 [['#tk-ty','ty'],['#tk-st','st'],['#tk-prio','prio'],['#tk-tech','tech'],['#tk-ent','ent'],['#tk-cat','cat'],['#tk-sla','sla']]

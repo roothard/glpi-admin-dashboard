@@ -22,6 +22,7 @@ const F = [
     'solve' => 17, 'close' => 16, 'ttr' => 18, 'tto' => 155, 'cat' => 7, 'ent' => 80,
     'req' => 4, 'tech' => 5, 'grp' => 8, 'took' => 150, // 150 = take-into-account delay (s)
     'type' => 14, // 1 = incidencia, 2 = solicitud
+    'work' => 45, // actiontime: duración total trabajada (s)
 ];
 
 /** Run one /search/Ticket query (criteria array), following pagination. */
@@ -108,6 +109,7 @@ foreach (array_merge($openRows, $oldRows) as $r) {
         'cat' => sv($r, 'cat'), 'ent' => sv($r, 'ent'),
         'date' => $opened, 'solved' => $solved,
         'took' => ($tookRaw !== null && is_numeric($tookRaw)) ? (int)$tookRaw : null, // s hasta la toma
+        'work' => (int)(is_numeric(sv($r, 'work')) ? sv($r, 'work') : 0), // s trabajados (tareas)
         'rsec' => ($tOpen && $tSolve) ? max(0, $tSolve - $tOpen) : null,              // s hasta resolver
         'ttr' => $sla(sv($r, 'ttr'), $tSolve),
         'tto' => $tto,
