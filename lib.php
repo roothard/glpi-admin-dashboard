@@ -50,11 +50,11 @@ function glpi_app_token()
 }
 
 /** GET a GLPI REST path. Returns [httpCode, decodedBody]. */
-function glpi_fetch($path, $params = [], $sessionToken = null)
+function glpi_fetch($path, $params = [], $sessionToken = null, array $extraHeaders = [])
 {
     $url = glpi_api_base() . $path;
     if ($params) { $url .= '?' . http_build_query($params); }
-    $h = ['App-Token: ' . glpi_app_token(), 'Accept: application/json'];
+    $h = array_merge(['App-Token: ' . glpi_app_token(), 'Accept: application/json'], $extraHeaders);
     if ($sessionToken) { $h[] = 'Session-Token: ' . $sessionToken; }
     $ch = curl_init($url);
     curl_setopt_array($ch, glpi_curl_opts() + [CURLOPT_HTTPHEADER => $h]);
@@ -86,6 +86,7 @@ function glpi_write($path, $method, $body, $sessionToken)
 function panel_session()
 {
     $https = !empty($_SERVER['HTTPS']) || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    ini_set('session.use_strict_mode', '1'); // reject attacker-supplied session ids
     session_set_cookie_params([
         'lifetime' => 0, 'path' => '/', 'secure' => $https,
         'httponly' => true, 'samesite' => 'Lax',

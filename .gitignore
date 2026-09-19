@@ -20,3 +20,4 @@ Thumbs.db
 *.swp
 config/settings.json
 .gstack/
+config/login-throttle.json
