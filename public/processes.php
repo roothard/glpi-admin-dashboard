@@ -21,7 +21,8 @@ $load = function () use ($file) {
 $m = $_SERVER['REQUEST_METHOD'];
 
 // Perfiles cuyos usuarios pueden ser "responsable (persona)" de un proceso.
-const OWNER_PROFILES = ['Super-Admin', 'Supervisor'];
+// Ids de GLPI: 4 = Super-Admin, 7 = Supervisor.
+const OWNER_PROFILE_IDS = [4, 7];
 
 if ($m === 'GET') {
     $out = ['processes' => $load(), 'canEdit' => !empty($_SESSION['isAdmin'])];
@@ -51,10 +52,12 @@ if ($m === 'GET') {
         $out['ents'] = $named($fetchAll('Entity'));
         $out['groups'] = $named($fetchAll('Group'));
 
-        // Responsables (persona): usuarios cuyo perfil está en OWNER_PROFILES.
+        // Responsables (persona): usuarios cuyo perfil está en OWNER_PROFILE_IDS.
+        // Sin expand_dropdowns: así users_id/profiles_id llegan como enteros
+        // (con expand, users_id vendría como el login y profiles_id como el nombre).
         $wantIds = [];
-        foreach ($fetchAll('Profile_User', ['expand_dropdowns' => 'true']) as $pu) {
-            if (in_array((string)($pu['profiles_id'] ?? ''), OWNER_PROFILES, true)) {
+        foreach ($fetchAll('Profile_User') as $pu) {
+            if (in_array((int)($pu['profiles_id'] ?? 0), OWNER_PROFILE_IDS, true)) {
                 $uid = (int)($pu['users_id'] ?? 0); if ($uid > 0) { $wantIds[$uid] = 1; }
             }
         }
