@@ -281,6 +281,33 @@ main{padding-top:20px;padding-bottom:60px}
 .bcard .bci{min-width:0}
 .bcard b{font-size:13px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bcard small{color:var(--muted);font-size:11px}
+/* ---- app Tickets: análisis (gráficos SVG propios) ---- */
+.angrid{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:14px}
+.angrid2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+@media(max-width:1000px){.angrid,.angrid2{grid-template-columns:1fr}}
+.anpanel h4{margin-bottom:12px}
+.gaugewrap{text-align:center;padding:4px 0 2px}
+.gauge-pct{font:300 34px var(--disp);letter-spacing:-.02em}
+.avgline{color:var(--muted);font:600 12px var(--mono);margin-top:6px}
+.hbar{display:grid;grid-template-columns:130px 1fr 44px;gap:10px;align-items:center;margin:7px 0;font-size:12.5px}
+.hbar .hn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.hbar .ht{height:14px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.hbar .ht i{display:block;height:100%;border-radius:4px}
+.hbar .hv{font:700 11.5px var(--mono);color:var(--muted);text-align:right}
+.vbars{display:flex;align-items:flex-end;gap:8px;height:150px;padding:6px 2px 0}
+.vbar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.vbar i{width:100%;max-width:44px;background:var(--accent);border-radius:5px 5px 0 0;display:block}
+.vbar b{font:700 11px var(--mono)}
+.vbar span{font:600 9.5px var(--mono);color:var(--dim);text-transform:uppercase;white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
+.donutrow{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.donutleg{flex:1;min-width:170px}
+.donutleg div{display:flex;align-items:center;gap:7px;font-size:12px;margin:4px 0}
+.donutleg i{width:10px;height:10px;border-radius:3px;flex:none}
+.donutleg small{color:var(--dim);margin-left:auto;font:700 11px var(--mono)}
+.mxcell{font:700 10.5px var(--mono);padding:3px 8px;border-radius:6px;display:inline-block;min-width:44px;text-align:center}
+.mx-g{background:rgba(47,166,113,.15);color:#2fa671}.mx-y{background:rgba(200,140,0,.15);color:#c88c00}
+.mx-r{background:rgba(226,80,110,.14);color:#e2506e}.mx-n{background:var(--surface2);color:var(--dim)}
+#tk-filters input[type=date]{font:500 13px var(--sans);color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;outline:none}
 /* ---- app Tickets ---- */
 .kpis.k6{grid-template-columns:repeat(6,1fr)}
 @media(max-width:1100px){.kpis.k6{grid-template-columns:repeat(3,1fr)}}
@@ -462,22 +489,42 @@ body.dockon .wrap{padding-left:104px}
   </section>
   <!-- APP: TICKETS -->
   <section id="v-tickets" class="appview">
+    <div class="freports" id="tk-tabs">
+      <button class="on" data-tv="cola"></button>
+      <button data-tv="analisis"></button>
+    </div>
     <div class="perbar" id="tk-per"></div>
     <div class="kpis k6" id="tk-kpis"></div>
     <div class="filters" id="tk-filters">
       <input id="tk-q" type="search" autocomplete="off">
+      <select id="tk-ty"><option value=""></option></select>
       <select id="tk-st"><option value=""></option></select>
       <select id="tk-prio"><option value=""></option></select>
       <select id="tk-tech"><option value=""></option></select>
       <select id="tk-ent"><option value=""></option></select>
       <select id="tk-cat"><option value=""></option></select>
       <select id="tk-sla"><option value=""></option></select>
+      <input id="tk-from" type="date" title="Desde"><input id="tk-to" type="date" title="Hasta">
       <button class="clr" id="tk-clr"></button>
     </div>
     <div class="count" id="tk-count"></div>
-    <div class="panel" style="padding:10px 14px">
-      <table class="ftable" id="tk-table"><thead><tr id="tk-head"></tr></thead><tbody id="tk-body"></tbody></table>
-      <div class="empty" id="tk-empty" style="display:none"></div>
+    <div id="tk-view-cola">
+      <div class="panel" style="padding:10px 14px">
+        <table class="ftable" id="tk-table"><thead><tr id="tk-head"></tr></thead><tbody id="tk-body"></tbody></table>
+        <div class="empty" id="tk-empty" style="display:none"></div>
+      </div>
+    </div>
+    <div id="tk-view-analisis" style="display:none">
+      <div class="angrid">
+        <div class="panel anpanel"><h4 id="an-g1-t"></h4><div class="gaugewrap"><div id="an-g1"></div><div class="avgline" id="an-avg1"></div></div></div>
+        <div class="panel anpanel"><h4 id="an-g2-t"></h4><div class="gaugewrap"><div id="an-g2"></div><div class="avgline" id="an-avg2"></div></div></div>
+        <div class="panel anpanel"><h4 id="an-st-t"></h4><div id="an-state"></div></div>
+      </div>
+      <div class="angrid2">
+        <div class="panel anpanel"><h4 id="an-mes-t"></h4><div id="an-month"></div></div>
+        <div class="panel anpanel"><h4 id="an-cat-t"></h4><div id="an-cat"></div></div>
+      </div>
+      <div class="panel anpanel"><h4 id="an-mx-t"></h4><div style="overflow-x:auto"><table class="ftable" id="an-matrix"></table></div></div>
     </div>
   </section>
 </main>
@@ -601,6 +648,11 @@ Object.assign(I18N.en,{app_tk:'Tickets',tk_open:'Open',tk_work:'In progress',tk_
 Object.assign(I18N.fr,{app_tk:'Tickets',tk_open:'Ouverts',tk_work:'En cours',tk_wait:'En attente',tk_solved:'Résolus (période)',tk_breach:'SLA dépassés',tk_slapct:'Respect des SLA',tk_allst:'Statut : tous',tk_allprio:'Priorité : toutes',tk_alltech:'Technicien : tous',tk_allcat:'Catégorie : toutes',tk_allsla:'SLA : tous',tk_one:'ticket',tk_many:'tickets',tk_c_title:'Titre',tk_c_req:'Demandeur',tk_c_tech:'Technicien',tk_c_st:'Statut',tk_c_prio:'Priorité',tk_c_open:'Créé',days_l:'jours',sla_ok:'À temps',sla_in:'échéance dans',sla_ago:'dépassé depuis',sla_f_late:'Dépassé',sla_f_warn:'Bientôt dû',sla_f_run:'Dans les temps (ouvert)',sla_f_ok:'Respecté',st1:'Nouveau',st2:'En cours (attr.)',st3:'En cours (plan.)',st4:'En attente',st5:'Résolu',st6:'Clos',p1:'Très basse',p2:'Basse',p3:'Moyenne',p4:'Haute',p5:'Très haute',p6:'Majeure'});
 Object.assign(I18N.de,{app_tk:'Tickets',tk_open:'Offen',tk_work:'In Bearbeitung',tk_wait:'Wartend',tk_solved:'Gelöst (Zeitraum)',tk_breach:'SLA verletzt',tk_slapct:'SLA-Einhaltung',tk_allst:'Status: alle',tk_allprio:'Priorität: alle',tk_alltech:'Techniker: alle',tk_allcat:'Kategorie: alle',tk_allsla:'SLA: alle',tk_one:'Ticket',tk_many:'Tickets',tk_c_title:'Titel',tk_c_req:'Anfragender',tk_c_tech:'Techniker',tk_c_st:'Status',tk_c_prio:'Priorität',tk_c_open:'Erstellt',days_l:'Tage',sla_ok:'Pünktlich',sla_in:'fällig in',sla_ago:'überfällig seit',sla_f_late:'Verletzt',sla_f_warn:'Bald fällig',sla_f_run:'Im Plan (offen)',sla_f_ok:'Erfüllt',st1:'Neu',st2:'In Bearbeitung (zugew.)',st3:'In Bearbeitung (gepl.)',st4:'Wartend',st5:'Gelöst',st6:'Geschlossen',p1:'Sehr niedrig',p2:'Niedrig',p3:'Mittel',p4:'Hoch',p5:'Sehr hoch',p6:'Kritisch'});
 Object.assign(I18N.pt,{app_tk:'Tickets',tk_open:'Abertos',tk_work:'Em andamento',tk_wait:'Em espera',tk_solved:'Resolvidos (período)',tk_breach:'SLA estourados',tk_slapct:'Cumprimento de SLA',tk_allst:'Status: todos',tk_allprio:'Prioridade: todas',tk_alltech:'Técnico: todos',tk_allcat:'Categoria: todas',tk_allsla:'SLA: todos',tk_one:'ticket',tk_many:'tickets',tk_c_title:'Título',tk_c_req:'Solicitante',tk_c_tech:'Técnico',tk_c_st:'Status',tk_c_prio:'Prioridade',tk_c_open:'Criado',days_l:'dias',sla_ok:'No prazo',sla_in:'vence em',sla_ago:'venceu há',sla_f_late:'Estourado',sla_f_warn:'Por vencer',sla_f_run:'No prazo (aberto)',sla_f_ok:'Cumprido',st1:'Novo',st2:'Em andamento (atrib.)',st3:'Em andamento (plan.)',st4:'Em espera',st5:'Resolvido',st6:'Fechado',p1:'Muito baixa',p2:'Baixa',p3:'Média',p4:'Alta',p5:'Muito alta',p6:'Crítica'});
+Object.assign(I18N.es,{tk_tab_queue:'Cola',tk_tab_an:'Análisis',ty1:'Incidencia',ty2:'Solicitud',tk_allty:'Tipo: todos',an_g_tto:'SLA Asignación',an_g_ttr:'SLA Resolución',an_avg:'Tiempo promedio',an_state:'Tickets por estado',an_month:'Tickets por mes',an_cat:'Tickets por categoría',an_matrix:'Cumplimiento SLA por entidad y mes (A = asignación · R = resolución)',an_others:'Otras'});
+Object.assign(I18N.en,{tk_tab_queue:'Queue',tk_tab_an:'Analytics',ty1:'Incident',ty2:'Request',tk_allty:'Type: all',an_g_tto:'SLA Assignment',an_g_ttr:'SLA Resolution',an_avg:'Average time',an_state:'Tickets by status',an_month:'Tickets by month',an_cat:'Tickets by category',an_matrix:'SLA compliance by entity and month (A = assignment · R = resolution)',an_others:'Others'});
+Object.assign(I18N.fr,{tk_tab_queue:'File',tk_tab_an:'Analyse',ty1:'Incident',ty2:'Demande',tk_allty:'Type : tous',an_g_tto:'SLA Attribution',an_g_ttr:'SLA Résolution',an_avg:'Temps moyen',an_state:'Tickets par statut',an_month:'Tickets par mois',an_cat:'Tickets par catégorie',an_matrix:'Respect des SLA par entité et mois (A = attribution · R = résolution)',an_others:'Autres'});
+Object.assign(I18N.de,{tk_tab_queue:'Warteschlange',tk_tab_an:'Analyse',ty1:'Störung',ty2:'Anfrage',tk_allty:'Typ: alle',an_g_tto:'SLA Zuweisung',an_g_ttr:'SLA Lösung',an_avg:'Durchschnittszeit',an_state:'Tickets nach Status',an_month:'Tickets nach Monat',an_cat:'Tickets nach Kategorie',an_matrix:'SLA-Einhaltung nach Entität und Monat (A = Zuweisung · R = Lösung)',an_others:'Andere'});
+Object.assign(I18N.pt,{tk_tab_queue:'Fila',tk_tab_an:'Análise',ty1:'Incidente',ty2:'Solicitação',tk_allty:'Tipo: todos',an_g_tto:'SLA Atribuição',an_g_ttr:'SLA Resolução',an_avg:'Tempo médio',an_state:'Tickets por status',an_month:'Tickets por mês',an_cat:'Tickets por categoria',an_matrix:'Cumprimento de SLA por entidade e mês (A = atribuição · R = resolução)',an_others:'Outras'});
 Object.assign(I18N.es,{seeing:'Viendo',of:'de',why_h:'¿Qué proyectos veo?',why_p:'Ves los proyectos que tu usuario puede ver en GLPI, según tu perfil y tu entidad activa. El administrador puede además filtrar el tablero por tipo de proyecto. Si esperás un proyecto y no aparece, revisá esas tres cosas en GLPI: permisos del perfil, entidad y tipo.',why_filter:'Filtro de tipo',untyped:'Sin tipo',nt_note:'proyecto(s) sin tipo en GLPI — se muestran con el aviso «Sin tipo»'});
 Object.assign(I18N.en,{seeing:'Showing',of:'of',why_h:'Which projects do I see?',why_p:'You see the projects your user can see in GLPI, based on your profile and active entity. The administrator can also filter the board by project type. If a project you expect is missing, check those three things in GLPI: profile permissions, entity and type.',why_filter:'Type filter',untyped:'Untyped',nt_note:'project(s) with no type in GLPI — shown with an “Untyped” notice'});
 Object.assign(I18N.fr,{seeing:'Affichage',of:'sur',why_h:'Quels projets est-ce que je vois ?',why_p:'Vous voyez les projets que votre utilisateur peut voir dans GLPI, selon votre profil et votre entité active. L\'administrateur peut aussi filtrer le tableau par type de projet. S\'il manque un projet attendu, vérifiez ces trois points dans GLPI : permissions du profil, entité et type.',why_filter:'Filtre de type',untyped:'Sans type',nt_note:'projet(s) sans type dans GLPI — affichés avec la mention « Sans type »'});
@@ -988,11 +1040,13 @@ function renderTeamList(cats){
 loadConfig().then(loadData);
 
 // ================= TICKETS (SLA) =================
-let TK={data:null,days:30,q:'',st:'',prio:'',tech:'',ent:'',cat:'',sla:''};
+let TK={data:null,days:30,from:'',to:'',tv:'cola',q:'',ty:'',st:'',prio:'',tech:'',ent:'',cat:'',sla:''};
 const TKST={1:['st1','#8f9199'],2:['st2','#405cde'],3:['st3','#6a83f2'],4:['st4','#c88c00'],5:['st5','#2fa671'],6:['st6','#6f7178']};
 function fetchTickets(){
   $('#tk-body').innerHTML=''; $('#tk-empty').style.display=''; $('#tk-empty').textContent='…';
-  fetch('data-tickets.php?days='+TK.days+'&_='+Date.now(),{credentials:'same-origin'})
+  let qs='days='+TK.days;
+  if(TK.from||TK.to) qs='days=0'+(TK.from?'&from='+TK.from:'')+(TK.to?'&to='+TK.to:'');
+  fetch('data-tickets.php?'+qs+'&_='+Date.now(),{credentials:'same-origin'})
     .then(r=>{ if(r.status===401){showLogin();return null;} return r.json(); })
     .then(d=>{ if(!d)return; TK.data=d; renderTickets(); })
     .catch(()=>{ $('#tk-empty').textContent=T('noData'); });
@@ -1013,30 +1067,11 @@ function tkFillSel(sel,pairs,allKey){
   pairs.forEach(p=>{ const o=el('option'); o.value=p[0]; o.textContent=p[1]; s.appendChild(o); });
   s.value=cur;
 }
-function renderTickets(){
-  const d=TK.data; if(!d)return;
-  // presets de ventana (los abiertos vienen SIEMPRE; esto acota resueltos/cerrados)
-  const per=[['7','7 '+T('days_l')],['30','30 '+T('days_l')],['90','90 '+T('days_l')],['0',T('per_all')]];
-  const pb=$('#tk-per'); pb.innerHTML='';
-  per.forEach(p=>{ const b=el('button',null,p[1]); if(String(TK.days)===p[0])b.classList.add('on');
-    b.addEventListener('click',()=>{TK.days=parseInt(p[0],10);fetchTickets();}); pb.appendChild(b); });
-  // KPIs
-  const k=d.kpis||{};
-  const kk=[[k.open,T('tk_open')],[k.working,T('tk_work')],[k.waiting,T('tk_wait')],[k.solved,T('tk_solved')],[k.breach,T('tk_breach')],[k.slapct==null?'—':k.slapct+'%',T('tk_slapct')]];
-  $('#tk-kpis').innerHTML=kk.map(x=>`<div class="kpi"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('');
-  // filtros
-  $('#tk-q').placeholder=T('search'); $('#tk-clr').textContent=T('clear');
-  const vals=f=>uniq(d.tickets.map(t=>t[f]));
-  tkFillSel('#tk-st',[1,2,3,4,5,6].map(n=>[String(n),T('st'+n)]),'tk_allst');
-  tkFillSel('#tk-prio',[6,5,4,3,2,1].map(n=>[String(n),T('p'+n)]),'tk_allprio');
-  tkFillSel('#tk-tech',vals('tech').map(v=>[v,v]),'tk_alltech');
-  tkFillSel('#tk-ent',vals('ent').map(v=>[v,v]),'allEnts');
-  tkFillSel('#tk-cat',vals('cat').map(v=>[v,v]),'tk_allcat');
-  tkFillSel('#tk-sla',['late','warn','run','ok'].map(v=>[v,T('sla_f_'+v)]),'tk_allsla');
-  // lista filtrada
-  const q=TK.q.toLowerCase();
-  const list=d.tickets.filter(t=>{
+function tkFiltered(){
+  const d=TK.data, q=TK.q.toLowerCase();
+  return d.tickets.filter(t=>{
     if(q && !((t.t+' '+(t.req||'')+' '+(t.tech||'')+' '+t.id).toLowerCase().includes(q)))return false;
+    if(TK.ty && String(t.ty)!==TK.ty)return false;
     if(TK.st && String(t.s)!==TK.st)return false;
     if(TK.prio && String(t.prio)!==TK.prio)return false;
     if(TK.tech && t.tech!==TK.tech)return false;
@@ -1045,8 +1080,39 @@ function renderTickets(){
     if(TK.sla){ const a=t.ttr&&t.ttr.st, b=t.tto&&t.tto.st; if(a!==TK.sla&&b!==TK.sla)return false; }
     return true;
   });
+}
+function renderTickets(){
+  const d=TK.data; if(!d)return;
+  // sub-pestañas Cola / Análisis
+  document.querySelectorAll('#tk-tabs button').forEach(b=>{
+    b.textContent=T(b.dataset.tv==='cola'?'tk_tab_queue':'tk_tab_an');
+    b.classList.toggle('on',b.dataset.tv===TK.tv);
+  });
+  $('#tk-view-cola').style.display=TK.tv==='cola'?'':'none';
+  $('#tk-view-analisis').style.display=TK.tv==='analisis'?'':'none';
+  // presets de ventana (los abiertos vienen SIEMPRE; esto acota resueltos/cerrados)
+  const per=[['7','7 '+T('days_l')],['30','30 '+T('days_l')],['90','90 '+T('days_l')],['0',T('per_all')]];
+  const pb=$('#tk-per'); pb.innerHTML='';
+  per.forEach(p=>{ const b=el('button',null,p[1]); if(String(TK.days)===p[0]&&!TK.from&&!TK.to)b.classList.add('on');
+    b.addEventListener('click',()=>{TK.days=parseInt(p[0],10);TK.from=TK.to='';$('#tk-from').value='';$('#tk-to').value='';fetchTickets();}); pb.appendChild(b); });
+  // KPIs
+  const k=d.kpis||{};
+  const kk=[[k.open,T('tk_open')],[k.working,T('tk_work')],[k.waiting,T('tk_wait')],[k.solved,T('tk_solved')],[k.breach,T('tk_breach')],[k.slapct==null?'—':k.slapct+'%',T('tk_slapct')]];
+  $('#tk-kpis').innerHTML=kk.map(x=>`<div class="kpi"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('');
+  // filtros
+  $('#tk-q').placeholder=T('search'); $('#tk-clr').textContent=T('clear');
+  const vals=f=>uniq(d.tickets.map(t=>t[f]));
+  tkFillSel('#tk-ty',[['1',T('ty1')],['2',T('ty2')]],'tk_allty');
+  tkFillSel('#tk-st',[1,2,3,4,5,6].map(n=>[String(n),T('st'+n)]),'tk_allst');
+  tkFillSel('#tk-prio',[6,5,4,3,2,1].map(n=>[String(n),T('p'+n)]),'tk_allprio');
+  tkFillSel('#tk-tech',vals('tech').map(v=>[v,v]),'tk_alltech');
+  tkFillSel('#tk-ent',vals('ent').map(v=>[v,v]),'allEnts');
+  tkFillSel('#tk-cat',vals('cat').map(v=>[v,v]),'tk_allcat');
+  tkFillSel('#tk-sla',['late','warn','run','ok'].map(v=>[v,T('sla_f_'+v)]),'tk_allsla');
+  const list=tkFiltered();
   $('#tk-count').textContent=list.length+' '+T(list.length===1?'tk_one':'tk_many');
-  // tabla
+  if(TK.tv==='analisis'){ renderAnalisis(list); return; }
+  // tabla (Cola)
   $('#tk-head').innerHTML=['#',T('tk_c_title'),T('tk_c_req'),T('tk_c_tech'),T('tk_c_st'),T('tk_c_prio'),T('tk_c_open'),'TTO','TTR']
     .map(h=>'<th>'+h+'</th>').join('');
   const tb=$('#tk-body'); tb.innerHTML='';
@@ -1064,11 +1130,97 @@ function renderTickets(){
   $('#tk-empty').style.display=list.length?'none':'';
   if(!list.length)$('#tk-empty').textContent=T('noData');
 }
+// ---- vista Análisis: gauges + gráficos SVG propios + matriz entidad×mes ----
+const TKLOC={es:'es-AR',en:'en-US',fr:'fr-FR',de:'de-DE',pt:'pt-BR'};
+function tkGauge(box,pct){
+  const b=$(box);
+  if(pct==null){ b.innerHTML='<div class="gauge-pct" style="color:var(--dim)">—</div>'; return; }
+  const L=188.5, off=L*(1-pct/100);
+  const col=pct>=90?'#2fa671':(pct>=75?'#c88c00':'#e2506e');
+  b.innerHTML=`<svg width="150" height="86" viewBox="0 0 140 78">
+    <path d="M10 70 A60 60 0 0 1 130 70" fill="none" stroke="var(--surface2)" stroke-width="12" stroke-linecap="round"/>
+    <path d="M10 70 A60 60 0 0 1 130 70" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round"
+      stroke-dasharray="${L}" stroke-dashoffset="${off.toFixed(1)}"/>
+  </svg><div class="gauge-pct" style="color:${col};margin-top:-38px">${pct}%</div>`;
+}
+function tkAvg(secs){ if(!secs.length)return '—';
+  const a=Math.round(secs.reduce((x,y)=>x+y,0)/secs.length);
+  const h=Math.floor(a/3600),m=Math.round(a%3600/60);
+  return (h?h+'h ':'')+m+'m'; }
+function tkPct(pair){ const [ok,tot]=pair; return tot?Math.round(100*ok/tot):null; }
+function tkSlaPair(list,key){ let ok=0,tot=0;
+  list.forEach(t=>{ const s=t[key]&&t[key].st; if(s==='ok'){ok++;tot++;} else if(s==='late'){tot++;} });
+  return [ok,tot]; }
+function renderAnalisis(list){
+  const loc=TKLOC[LANG]||'es-AR';
+  // gauges + promedios
+  $('#an-g1-t').textContent=T('an_g_tto'); $('#an-g2-t').textContent=T('an_g_ttr');
+  tkGauge('#an-g1',tkPct(tkSlaPair(list,'tto'))); tkGauge('#an-g2',tkPct(tkSlaPair(list,'ttr')));
+  $('#an-avg1').textContent=T('an_avg')+': '+tkAvg(list.filter(t=>t.took>0).map(t=>t.took));
+  $('#an-avg2').textContent=T('an_avg')+': '+tkAvg(list.filter(t=>t.rsec>0).map(t=>t.rsec));
+  // barras por estado
+  $('#an-st-t').textContent=T('an_state');
+  const byS={}; list.forEach(t=>byS[t.s]=(byS[t.s]||0)+1);
+  const mx=Math.max(1,...Object.values(byS));
+  $('#an-state').innerHTML=[1,2,3,4,5,6].filter(s=>byS[s]).map(s=>{
+    const st=TKST[s];
+    return `<div class="hbar"><span class="hn">${T(st[0])}</span><span class="ht"><i style="width:${Math.round(100*byS[s]/mx)}%;background:${st[1]}"></i></span><span class="hv">${byS[s]}</span></div>`;
+  }).join('')||'<div class="empty">'+T('noData')+'</div>';
+  // barras por mes (fecha de creación)
+  $('#an-mes-t').textContent=T('an_month');
+  const byM={}; list.forEach(t=>{ if(t.date)byM[t.date.substring(0,7)]=(byM[t.date.substring(0,7)]||0)+1; });
+  const meses=Object.keys(byM).sort();
+  const mm=Math.max(1,...Object.values(byM));
+  $('#an-month').innerHTML='<div class="vbars">'+meses.map(m=>{
+    const dt=new Date(+m.substring(0,4),+m.substring(5,7)-1,1);
+    const lbl=dt.toLocaleString(loc,{month:'short'})+(meses.length&&meses[0].substring(0,4)!==meses[meses.length-1].substring(0,4)?' '+m.substring(2,4):'');
+    return `<div class="vbar"><b>${byM[m]}</b><i style="height:${Math.max(4,Math.round(120*byM[m]/mm))}px"></i><span>${lbl}</span></div>`;
+  }).join('')+'</div>'||'';
+  // dona por categoría
+  $('#an-cat-t').textContent=T('an_cat');
+  const byC={}; list.forEach(t=>{ const c=t.cat||'—'; byC[c]=(byC[c]||0)+1; });
+  let cats=Object.entries(byC).sort((a,b)=>b[1]-a[1]);
+  if(cats.length>7){ const top=cats.slice(0,7), resto=cats.slice(7).reduce((a,c)=>a+c[1],0); top.push([T('an_others'),resto]); cats=top; }
+  const PAL=['#405cde','#2fa671','#c88c00','#e2506e','#6a83f2','#9a55f2','#1fa87c','#8f9199'];
+  const tot=cats.reduce((a,c)=>a+c[1],0)||1;
+  let accum=0, segs='';
+  const R=42,C=2*Math.PI*R;
+  cats.forEach((c,i)=>{ const frac=c[1]/tot;
+    segs+=`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${PAL[i%8]}" stroke-width="16"
+      stroke-dasharray="${(frac*C).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-accum*C).toFixed(1)}" transform="rotate(-90 60 60)"/>`;
+    accum+=frac; });
+  $('#an-cat').innerHTML=`<div class="donutrow"><svg width="120" height="120" viewBox="0 0 120 120">${segs}</svg>
+    <div class="donutleg">${cats.map((c,i)=>`<div><i style="background:${PAL[i%8]}"></i><span>${esc(c[0])}</span><small>${c[1]} (${Math.round(100*c[1]/tot)}%)</small></div>`).join('')}</div></div>`;
+  // matriz entidad × mes (A = asignación TTO, R = resolución TTR)
+  $('#an-mx-t').textContent=T('an_matrix');
+  const ents=uniq(list.map(t=>t.ent));
+  const cell=p=>{ if(p==null)return '<span class="mxcell mx-n">—</span>';
+    const c=p>=90?'mx-g':(p>=75?'mx-y':'mx-r'); return `<span class="mxcell ${c}">${p}%</span>`; };
+  let html='<thead><tr><th></th>'+meses.map(m=>{const dt=new Date(+m.substring(0,4),+m.substring(5,7)-1,1);
+    return '<th colspan="2" style="text-align:center">'+dt.toLocaleString(loc,{month:'short',year:'2-digit'})+'</th>';}).join('')+'</tr>'
+    +'<tr><th></th>'+meses.map(()=>'<th>A</th><th>R</th>').join('')+'</tr></thead><tbody>';
+  ents.forEach(e=>{
+    html+='<tr><td style="font-weight:600">'+esc(e)+'</td>';
+    meses.forEach(m=>{
+      const sub=list.filter(t=>t.ent===e&&t.date&&t.date.substring(0,7)===m);
+      html+='<td>'+cell(tkPct(tkSlaPair(sub,'tto')))+'</td><td>'+cell(tkPct(tkSlaPair(sub,'ttr')))+'</td>';
+    });
+    html+='</tr>';
+  });
+  html+='</tbody>';
+  $('#an-matrix').innerHTML=html;
+}
 $('#tk-q').addEventListener('input',()=>{TK.q=$('#tk-q').value;renderTickets();});
-[['#tk-st','st'],['#tk-prio','prio'],['#tk-tech','tech'],['#tk-ent','ent'],['#tk-cat','cat'],['#tk-sla','sla']]
+[['#tk-ty','ty'],['#tk-st','st'],['#tk-prio','prio'],['#tk-tech','tech'],['#tk-ent','ent'],['#tk-cat','cat'],['#tk-sla','sla']]
   .forEach(p=>$(p[0]).addEventListener('change',()=>{TK[p[1]]=$(p[0]).value;renderTickets();}));
-$('#tk-clr').addEventListener('click',()=>{TK.q=TK.st=TK.prio=TK.tech=TK.ent=TK.cat=TK.sla='';
-  $('#tk-q').value='';['#tk-st','#tk-prio','#tk-tech','#tk-ent','#tk-cat','#tk-sla'].forEach(s=>$(s).value='');renderTickets();});
+[['#tk-from','from'],['#tk-to','to']].forEach(p=>$(p[0]).addEventListener('change',()=>{TK[p[1]]=$(p[0]).value;fetchTickets();}));
+document.querySelectorAll('#tk-tabs button').forEach(b=>b.addEventListener('click',()=>{TK.tv=b.dataset.tv;renderTickets();}));
+$('#tk-clr').addEventListener('click',()=>{
+  const teniaRango=!!(TK.from||TK.to);
+  TK.q=TK.ty=TK.st=TK.prio=TK.tech=TK.ent=TK.cat=TK.sla=TK.from=TK.to='';
+  $('#tk-q').value='';$('#tk-from').value='';$('#tk-to').value='';
+  ['#tk-ty','#tk-st','#tk-prio','#tk-tech','#tk-ent','#tk-cat','#tk-sla'].forEach(s=>$(s).value='');
+  teniaRango?fetchTickets():renderTickets();});
 
 // ---- navegación: apps (hub/proyectos/fichadas) + tabs de proyectos ----
 // recordar dónde estaba el usuario (app y pestaña) para que recargar no lo mueva

@@ -21,6 +21,7 @@ const F = [
     'id' => 2, 'title' => 1, 'status' => 12, 'prio' => 3, 'date' => 15, 'mod' => 19,
     'solve' => 17, 'close' => 16, 'ttr' => 18, 'tto' => 155, 'cat' => 7, 'ent' => 80,
     'req' => 4, 'tech' => 5, 'grp' => 8, 'took' => 150, // 150 = take-into-account delay (s)
+    'type' => 14, // 1 = incidencia, 2 = solicitud
 ];
 
 /** Run one /search/Ticket query (criteria array), following pagination. */
@@ -49,11 +50,15 @@ $openRows = searchTickets([
     ['field' => F['status'], 'searchtype' => 'equals', 'value' => 'notold'],
 ], $tok);
 
+// Ventana para resueltos/cerrados: por presets (?days) o rango explícito (?from/?to, por fecha de creación)
+$from = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['from'] ?? '') ? $_GET['from'] : null;
+$to   = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['to']   ?? '') ? $_GET['to']   : null;
 $oldCriteria = [['field' => F['status'], 'searchtype' => 'equals', 'value' => 'old']];
-$cutoff = null;
-if ($days > 0) {
-    $cutoff = date('Y-m-d H:i:s', time() - $days * 86400);
-    $oldCriteria[] = ['link' => 'AND', 'field' => F['mod'], 'searchtype' => 'morethan', 'value' => $cutoff];
+if ($from || $to) {
+    if ($from) $oldCriteria[] = ['link' => 'AND', 'field' => F['date'], 'searchtype' => 'morethan', 'value' => $from . ' 00:00:00'];
+    if ($to)   $oldCriteria[] = ['link' => 'AND', 'field' => F['date'], 'searchtype' => 'lessthan', 'value' => $to . ' 23:59:59'];
+} elseif ($days > 0) {
+    $oldCriteria[] = ['link' => 'AND', 'field' => F['mod'], 'searchtype' => 'morethan', 'value' => date('Y-m-d H:i:s', time() - $days * 86400)];
 }
 $oldRows = searchTickets($oldCriteria, $tok);
 
@@ -98,10 +103,12 @@ foreach (array_merge($openRows, $oldRows) as $r) {
 
     $tickets[] = [
         'id' => $id, 't' => (string)sv($r, 'title'), 's' => $s,
-        'prio' => (int)sv($r, 'prio'),
+        'prio' => (int)sv($r, 'prio'), 'ty' => (int)(sv($r, 'type') ?? 0),
         'req' => sv($r, 'req'), 'tech' => sv($r, 'tech'), 'grp' => sv($r, 'grp'),
         'cat' => sv($r, 'cat'), 'ent' => sv($r, 'ent'),
         'date' => $opened, 'solved' => $solved,
+        'took' => ($tookRaw !== null && is_numeric($tookRaw)) ? (int)$tookRaw : null, // s hasta la toma
+        'rsec' => ($tOpen && $tSolve) ? max(0, $tSolve - $tOpen) : null,              // s hasta resolver
         'ttr' => $sla(sv($r, 'ttr'), $tSolve),
         'tto' => $tto,
     ];
@@ -125,7 +132,7 @@ $withTtr = array_filter($oldT, fn($t) => $t['ttr'] !== null);
 $metTtr  = array_filter($withTtr, fn($t) => $t['ttr']['st'] === 'ok');
 
 echo json_encode([
-    'days'     => $days,
+    'days'     => $days, 'from' => $from, 'to' => $to,
     'glpi_url' => rtrim((string)(cfg()['glpi']['url'] ?? ''), '/'),
     'user'     => $_SESSION['user'] ?? '',
     'tickets'  => array_values($tickets),
