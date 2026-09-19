@@ -281,6 +281,22 @@ main{padding-top:20px;padding-bottom:60px}
 .bcard .bci{min-width:0}
 .bcard b{font-size:13px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bcard small{color:var(--muted);font-size:11px}
+/* ---- app Tickets ---- */
+.kpis.k6{grid-template-columns:repeat(6,1fr)}
+@media(max-width:1100px){.kpis.k6{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){.kpis.k6{grid-template-columns:repeat(2,1fr)}}
+.kpis.k6 .kpi b{font-size:34px}
+.sladot{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--mono);white-space:nowrap}
+.sladot i{width:9px;height:9px;border-radius:50%;flex:none}
+.sla-ok i{background:#2fa671}.sla-ok{color:#2fa671}
+.sla-run i{background:var(--accent)}.sla-run{color:var(--muted)}
+.sla-warn i{background:#c88c00}.sla-warn{color:#c88c00}
+.sla-late i{background:#e2506e}.sla-late{color:#e2506e}
+.sla-na i{background:var(--border2)}.sla-na{color:var(--dim)}
+.tkst{font:600 10.5px var(--mono);padding:3px 9px;border-radius:99px;white-space:nowrap}
+.tk-row{cursor:pointer}
+.tk-title{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+#tk-table td{white-space:nowrap}
 /* ---- dock de cubos 3D (apps) ---- */
 #dock{position:fixed;left:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:40;perspective:600px;width:84px;align-items:center}
 .dcap{font:600 9.5px var(--disp);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);padding-bottom:6px;border-bottom:1px solid var(--border2);margin-bottom:10px;width:64px;text-align:center}
@@ -444,6 +460,26 @@ body.dockon .wrap{padding-left:104px}
       <div class="panel"><h4 id="fi-ah"></h4><div id="fi-anom"></div></div>
     </div>
   </section>
+  <!-- APP: TICKETS -->
+  <section id="v-tickets" class="appview">
+    <div class="perbar" id="tk-per"></div>
+    <div class="kpis k6" id="tk-kpis"></div>
+    <div class="filters" id="tk-filters">
+      <input id="tk-q" type="search" autocomplete="off">
+      <select id="tk-st"><option value=""></option></select>
+      <select id="tk-prio"><option value=""></option></select>
+      <select id="tk-tech"><option value=""></option></select>
+      <select id="tk-ent"><option value=""></option></select>
+      <select id="tk-cat"><option value=""></option></select>
+      <select id="tk-sla"><option value=""></option></select>
+      <button class="clr" id="tk-clr"></button>
+    </div>
+    <div class="count" id="tk-count"></div>
+    <div class="panel" style="padding:10px 14px">
+      <table class="ftable" id="tk-table"><thead><tr id="tk-head"></tr></thead><tbody id="tk-body"></tbody></table>
+      <div class="empty" id="tk-empty" style="display:none"></div>
+    </div>
+  </section>
 </main>
 
 <div id="loginwrap">
@@ -560,6 +596,11 @@ Object.assign(I18N.es,{board_none:'Sin asignar',board_add:'+ Área',board_addnam
 Object.assign(I18N.en,{board_none:'Unassigned',board_add:'+ Area',board_addname:'Area name',board_rename:'Rename area',board_del:'Delete',board_delc:'Delete area',board_saved:'Saved',board_move:'Move'});
 Object.assign(I18N.fr,{board_none:'Non assignés',board_add:'+ Zone',board_addname:'Nom de la zone',board_rename:'Renommer la zone',board_del:'Supprimer',board_delc:'Supprimer la zone',board_saved:'Enregistré',board_move:'Déplacer'});
 Object.assign(I18N.de,{board_none:'Nicht zugeordnet',board_add:'+ Bereich',board_addname:'Bereichsname',board_rename:'Bereich umbenennen',board_del:'Löschen',board_delc:'Bereich löschen',board_saved:'Gespeichert',board_move:'Verschieben'});
+Object.assign(I18N.es,{app_tk:'Tickets',tk_open:'Abiertos',tk_work:'En curso',tk_wait:'En espera',tk_solved:'Resueltos (período)',tk_breach:'SLA vencidos',tk_slapct:'Cumplimiento SLA',tk_allst:'Estado: todos',tk_allprio:'Prioridad: todas',tk_alltech:'Técnico: todos',tk_allcat:'Categoría: todas',tk_allsla:'SLA: todos',tk_one:'ticket',tk_many:'tickets',tk_c_title:'Título',tk_c_req:'Solicitante',tk_c_tech:'Técnico',tk_c_st:'Estado',tk_c_prio:'Prioridad',tk_c_open:'Creado',days_l:'días',sla_ok:'En tiempo',sla_in:'vence en',sla_ago:'venció hace',sla_f_late:'Vencido',sla_f_warn:'Por vencer',sla_f_run:'En tiempo (abierto)',sla_f_ok:'Cumplido',st1:'Nuevo',st2:'En curso (asig.)',st3:'En curso (plan.)',st4:'En espera',st5:'Resuelto',st6:'Cerrado',p1:'Muy baja',p2:'Baja',p3:'Media',p4:'Alta',p5:'Muy alta',p6:'Mayor'});
+Object.assign(I18N.en,{app_tk:'Tickets',tk_open:'Open',tk_work:'In progress',tk_wait:'Pending',tk_solved:'Solved (period)',tk_breach:'SLA breached',tk_slapct:'SLA compliance',tk_allst:'Status: all',tk_allprio:'Priority: all',tk_alltech:'Technician: all',tk_allcat:'Category: all',tk_allsla:'SLA: all',tk_one:'ticket',tk_many:'tickets',tk_c_title:'Title',tk_c_req:'Requester',tk_c_tech:'Technician',tk_c_st:'Status',tk_c_prio:'Priority',tk_c_open:'Opened',days_l:'days',sla_ok:'On time',sla_in:'due in',sla_ago:'breached',sla_f_late:'Breached',sla_f_warn:'Due soon',sla_f_run:'On track (open)',sla_f_ok:'Met',st1:'New',st2:'In progress (assig.)',st3:'In progress (plan.)',st4:'Pending',st5:'Solved',st6:'Closed',p1:'Very low',p2:'Low',p3:'Medium',p4:'High',p5:'Very high',p6:'Major'});
+Object.assign(I18N.fr,{app_tk:'Tickets',tk_open:'Ouverts',tk_work:'En cours',tk_wait:'En attente',tk_solved:'Résolus (période)',tk_breach:'SLA dépassés',tk_slapct:'Respect des SLA',tk_allst:'Statut : tous',tk_allprio:'Priorité : toutes',tk_alltech:'Technicien : tous',tk_allcat:'Catégorie : toutes',tk_allsla:'SLA : tous',tk_one:'ticket',tk_many:'tickets',tk_c_title:'Titre',tk_c_req:'Demandeur',tk_c_tech:'Technicien',tk_c_st:'Statut',tk_c_prio:'Priorité',tk_c_open:'Créé',days_l:'jours',sla_ok:'À temps',sla_in:'échéance dans',sla_ago:'dépassé depuis',sla_f_late:'Dépassé',sla_f_warn:'Bientôt dû',sla_f_run:'Dans les temps (ouvert)',sla_f_ok:'Respecté',st1:'Nouveau',st2:'En cours (attr.)',st3:'En cours (plan.)',st4:'En attente',st5:'Résolu',st6:'Clos',p1:'Très basse',p2:'Basse',p3:'Moyenne',p4:'Haute',p5:'Très haute',p6:'Majeure'});
+Object.assign(I18N.de,{app_tk:'Tickets',tk_open:'Offen',tk_work:'In Bearbeitung',tk_wait:'Wartend',tk_solved:'Gelöst (Zeitraum)',tk_breach:'SLA verletzt',tk_slapct:'SLA-Einhaltung',tk_allst:'Status: alle',tk_allprio:'Priorität: alle',tk_alltech:'Techniker: alle',tk_allcat:'Kategorie: alle',tk_allsla:'SLA: alle',tk_one:'Ticket',tk_many:'Tickets',tk_c_title:'Titel',tk_c_req:'Anfragender',tk_c_tech:'Techniker',tk_c_st:'Status',tk_c_prio:'Priorität',tk_c_open:'Erstellt',days_l:'Tage',sla_ok:'Pünktlich',sla_in:'fällig in',sla_ago:'überfällig seit',sla_f_late:'Verletzt',sla_f_warn:'Bald fällig',sla_f_run:'Im Plan (offen)',sla_f_ok:'Erfüllt',st1:'Neu',st2:'In Bearbeitung (zugew.)',st3:'In Bearbeitung (gepl.)',st4:'Wartend',st5:'Gelöst',st6:'Geschlossen',p1:'Sehr niedrig',p2:'Niedrig',p3:'Mittel',p4:'Hoch',p5:'Sehr hoch',p6:'Kritisch'});
+Object.assign(I18N.pt,{app_tk:'Tickets',tk_open:'Abertos',tk_work:'Em andamento',tk_wait:'Em espera',tk_solved:'Resolvidos (período)',tk_breach:'SLA estourados',tk_slapct:'Cumprimento de SLA',tk_allst:'Status: todos',tk_allprio:'Prioridade: todas',tk_alltech:'Técnico: todos',tk_allcat:'Categoria: todas',tk_allsla:'SLA: todos',tk_one:'ticket',tk_many:'tickets',tk_c_title:'Título',tk_c_req:'Solicitante',tk_c_tech:'Técnico',tk_c_st:'Status',tk_c_prio:'Prioridade',tk_c_open:'Criado',days_l:'dias',sla_ok:'No prazo',sla_in:'vence em',sla_ago:'venceu há',sla_f_late:'Estourado',sla_f_warn:'Por vencer',sla_f_run:'No prazo (aberto)',sla_f_ok:'Cumprido',st1:'Novo',st2:'Em andamento (atrib.)',st3:'Em andamento (plan.)',st4:'Em espera',st5:'Resolvido',st6:'Fechado',p1:'Muito baixa',p2:'Baixa',p3:'Média',p4:'Alta',p5:'Muito alta',p6:'Crítica'});
 Object.assign(I18N.es,{seeing:'Viendo',of:'de',why_h:'¿Qué proyectos veo?',why_p:'Ves los proyectos que tu usuario puede ver en GLPI, según tu perfil y tu entidad activa. El administrador puede además filtrar el tablero por tipo de proyecto. Si esperás un proyecto y no aparece, revisá esas tres cosas en GLPI: permisos del perfil, entidad y tipo.',why_filter:'Filtro de tipo',untyped:'Sin tipo',nt_note:'proyecto(s) sin tipo en GLPI — se muestran con el aviso «Sin tipo»'});
 Object.assign(I18N.en,{seeing:'Showing',of:'of',why_h:'Which projects do I see?',why_p:'You see the projects your user can see in GLPI, based on your profile and active entity. The administrator can also filter the board by project type. If a project you expect is missing, check those three things in GLPI: profile permissions, entity and type.',why_filter:'Type filter',untyped:'Untyped',nt_note:'project(s) with no type in GLPI — shown with an “Untyped” notice'});
 Object.assign(I18N.fr,{seeing:'Affichage',of:'sur',why_h:'Quels projets est-ce que je vois ?',why_p:'Vous voyez les projets que votre utilisateur peut voir dans GLPI, selon votre profil et votre entité active. L\'administrateur peut aussi filtrer le tableau par type de projet. S\'il manque un projet attendu, vérifiez ces trois points dans GLPI : permissions du profil, entité et type.',why_filter:'Filtre de type',untyped:'Sans type',nt_note:'projet(s) sans type dans GLPI — affichés avec la mention « Sans type »'});
@@ -580,7 +621,7 @@ updThemeIcon();
 
 // ---- idioma (sincroniza header + login) ----
 const $lang=$('#lang'), $llang=$('#l-lang'); $lang.value=LANG; if($llang)$llang.value=LANG;
-function setLang(v){LANG=v;localStorage.setItem('rh-lang',LANG);$lang.value=LANG;if($llang)$llang.value=LANG;applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();}
+function setLang(v){LANG=v;localStorage.setItem('rh-lang',LANG);$lang.value=LANG;if($llang)$llang.value=LANG;applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();if(TK.data)renderTickets();}
 $lang.addEventListener('change',()=>setLang($lang.value));
 if($llang)$llang.addEventListener('change',()=>setLang($llang.value));
 function applyStatic(){
@@ -630,9 +671,9 @@ function loadData(){
   }).catch(()=>{$('#kpis').innerHTML='<div class="empty">'+T('noData')+'</div>';});
 }
 // el "hub" ahora es un dock de cubos 3D en escala de grises (uno por app inactiva)
-const APP_META={proyectos:{c:'#4a4a52',c2:'#37373e',c3:'#26262c',fc:'#fff'},fichadas:{c:'#8b8b94',c2:'#71717a',c3:'#585860',fc:'#fff'}};
+const APP_META={proyectos:{c:'#4a4a52',c2:'#37373e',c3:'#26262c',fc:'#fff'},fichadas:{c:'#8b8b94',c2:'#71717a',c3:'#585860',fc:'#fff'},tickets:{c:'#c2c2c9',c2:'#a6a6ae',c3:'#88888f',fc:'#1b1b1f'}};
 function appsList(){
-  const list=[{k:'proyectos',t:T('app_proj')}];
+  const list=[{k:'proyectos',t:T('app_proj')},{k:'tickets',t:T('app_tk')}];
   const _gps=(CONFIG.modules&&CONFIG.modules.gps)||{};
   if((DATA.isAdmin||DATA.isSuper)&&_gps.enabled) list.push({k:'fichadas',t:_gps.label||T('app_fich')});
   return list;
@@ -946,6 +987,89 @@ function renderTeamList(cats){
 }
 loadConfig().then(loadData);
 
+// ================= TICKETS (SLA) =================
+let TK={data:null,days:30,q:'',st:'',prio:'',tech:'',ent:'',cat:'',sla:''};
+const TKST={1:['st1','#8f9199'],2:['st2','#405cde'],3:['st3','#6a83f2'],4:['st4','#c88c00'],5:['st5','#2fa671'],6:['st6','#6f7178']};
+function fetchTickets(){
+  $('#tk-body').innerHTML=''; $('#tk-empty').style.display=''; $('#tk-empty').textContent='…';
+  fetch('data-tickets.php?days='+TK.days+'&_='+Date.now(),{credentials:'same-origin'})
+    .then(r=>{ if(r.status===401){showLogin();return null;} return r.json(); })
+    .then(d=>{ if(!d)return; TK.data=d; renderTickets(); })
+    .catch(()=>{ $('#tk-empty').textContent=T('noData'); });
+}
+function tkLeft(sec){ sec=Math.max(0,Math.round(sec)); const dd=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.round(sec%3600/60);
+  if(dd)return dd+'d '+h+'h'; if(h)return h+'h '+m+'m'; return m+'m'; }
+function slaCell(s){
+  if(!s||s.st==='na') return '<span class="sladot sla-na"><i></i>—</span>';
+  let lbl;
+  if(s.st==='ok') lbl=T('sla_ok');
+  else if(s.st==='late') lbl=T('sla_ago')+' '+tkLeft(-s.left);
+  else lbl=T('sla_in')+' '+tkLeft(s.left);
+  return `<span class="sladot sla-${s.st}" title="${esc(s.dl||'')}"><i></i>${lbl}</span>`;
+}
+function tkFillSel(sel,pairs,allKey){
+  const s=$(sel), cur=s.value; while(s.options.length>1)s.remove(1);
+  s.options[0].text=T(allKey);
+  pairs.forEach(p=>{ const o=el('option'); o.value=p[0]; o.textContent=p[1]; s.appendChild(o); });
+  s.value=cur;
+}
+function renderTickets(){
+  const d=TK.data; if(!d)return;
+  // presets de ventana (los abiertos vienen SIEMPRE; esto acota resueltos/cerrados)
+  const per=[['7','7 '+T('days_l')],['30','30 '+T('days_l')],['90','90 '+T('days_l')],['0',T('per_all')]];
+  const pb=$('#tk-per'); pb.innerHTML='';
+  per.forEach(p=>{ const b=el('button',null,p[1]); if(String(TK.days)===p[0])b.classList.add('on');
+    b.addEventListener('click',()=>{TK.days=parseInt(p[0],10);fetchTickets();}); pb.appendChild(b); });
+  // KPIs
+  const k=d.kpis||{};
+  const kk=[[k.open,T('tk_open')],[k.working,T('tk_work')],[k.waiting,T('tk_wait')],[k.solved,T('tk_solved')],[k.breach,T('tk_breach')],[k.slapct==null?'—':k.slapct+'%',T('tk_slapct')]];
+  $('#tk-kpis').innerHTML=kk.map(x=>`<div class="kpi"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('');
+  // filtros
+  $('#tk-q').placeholder=T('search'); $('#tk-clr').textContent=T('clear');
+  const vals=f=>uniq(d.tickets.map(t=>t[f]));
+  tkFillSel('#tk-st',[1,2,3,4,5,6].map(n=>[String(n),T('st'+n)]),'tk_allst');
+  tkFillSel('#tk-prio',[6,5,4,3,2,1].map(n=>[String(n),T('p'+n)]),'tk_allprio');
+  tkFillSel('#tk-tech',vals('tech').map(v=>[v,v]),'tk_alltech');
+  tkFillSel('#tk-ent',vals('ent').map(v=>[v,v]),'allEnts');
+  tkFillSel('#tk-cat',vals('cat').map(v=>[v,v]),'tk_allcat');
+  tkFillSel('#tk-sla',['late','warn','run','ok'].map(v=>[v,T('sla_f_'+v)]),'tk_allsla');
+  // lista filtrada
+  const q=TK.q.toLowerCase();
+  const list=d.tickets.filter(t=>{
+    if(q && !((t.t+' '+(t.req||'')+' '+(t.tech||'')+' '+t.id).toLowerCase().includes(q)))return false;
+    if(TK.st && String(t.s)!==TK.st)return false;
+    if(TK.prio && String(t.prio)!==TK.prio)return false;
+    if(TK.tech && t.tech!==TK.tech)return false;
+    if(TK.ent && t.ent!==TK.ent)return false;
+    if(TK.cat && t.cat!==TK.cat)return false;
+    if(TK.sla){ const a=t.ttr&&t.ttr.st, b=t.tto&&t.tto.st; if(a!==TK.sla&&b!==TK.sla)return false; }
+    return true;
+  });
+  $('#tk-count').textContent=list.length+' '+T(list.length===1?'tk_one':'tk_many');
+  // tabla
+  $('#tk-head').innerHTML=['#',T('tk_c_title'),T('tk_c_req'),T('tk_c_tech'),T('tk_c_st'),T('tk_c_prio'),T('tk_c_open'),'TTO','TTR']
+    .map(h=>'<th>'+h+'</th>').join('');
+  const tb=$('#tk-body'); tb.innerHTML='';
+  list.forEach(t=>{
+    const st=TKST[t.s]||['st1','#888'];
+    const tr=el('tr','tk-row');
+    tr.innerHTML=`<td>${t.id}</td><td class="tk-title" title="${esc(t.t)}">${esc(t.t)}</td>
+      <td>${esc(t.req||'—')}</td><td>${esc(t.tech||'—')}</td>
+      <td><span class="tkst" style="background:${st[1]}22;color:${st[1]}">${T(st[0])}</span></td>
+      <td>${T('p'+(t.prio||3))}</td><td>${fmtDT(t.date)}</td>
+      <td>${slaCell(t.tto)}</td><td>${slaCell(t.ttr)}</td>`;
+    if(d.glpi_url) tr.addEventListener('click',()=>window.open(d.glpi_url+'/front/ticket.form.php?id='+t.id,'_blank','noopener'));
+    tb.appendChild(tr);
+  });
+  $('#tk-empty').style.display=list.length?'none':'';
+  if(!list.length)$('#tk-empty').textContent=T('noData');
+}
+$('#tk-q').addEventListener('input',()=>{TK.q=$('#tk-q').value;renderTickets();});
+[['#tk-st','st'],['#tk-prio','prio'],['#tk-tech','tech'],['#tk-ent','ent'],['#tk-cat','cat'],['#tk-sla','sla']]
+  .forEach(p=>$(p[0]).addEventListener('change',()=>{TK[p[1]]=$(p[0]).value;renderTickets();}));
+$('#tk-clr').addEventListener('click',()=>{TK.q=TK.st=TK.prio=TK.tech=TK.ent=TK.cat=TK.sla='';
+  $('#tk-q').value='';['#tk-st','#tk-prio','#tk-tech','#tk-ent','#tk-cat','#tk-sla'].forEach(s=>$(s).value='');renderTickets();});
+
 // ---- navegación: apps (hub/proyectos/fichadas) + tabs de proyectos ----
 // recordar dónde estaba el usuario (app y pestaña) para que recargar no lo mueva
 let APP=localStorage.getItem('rh-app')||'hub', curTab=localStorage.getItem('rh-tab')||'resumen';
@@ -961,12 +1085,13 @@ let BUSYAPP=false;
 function showApp(app,anim){
   APP=app;
   if(app!=='hub')localStorage.setItem('rh-app',app);
-  ['hub','proyectos','fichadas'].forEach(a=>{const s=$('#v-'+a);s.classList.toggle('appon',a===app);s.classList.remove('circ');});
+  ['hub','proyectos','fichadas','tickets'].forEach(a=>{const s=$('#v-'+a);s.classList.toggle('appon',a===app);s.classList.remove('circ');});
   if(anim){const s=$('#v-'+app);void s.offsetWidth;s.classList.add('circ');setTimeout(()=>s.classList.remove('circ'),820);}
   $('#btnhome').style.display='none';
   document.querySelectorAll('.tab.pt').forEach(t=>t.style.display=app==='proyectos'?'flex':'none');
   if(app==='proyectos')setTab(curTab);
   if(app==='fichadas'){ if(!FICH_INIT){FICH_INIT=true;setPeriod('today');} else fetchFichadas(); }
+  if(app==='tickets'){ if(!TK.data)fetchTickets(); else renderTickets(); }
   renderHub();
   window.scrollTo({top:0});
 }

@@ -19,3 +19,4 @@ Thumbs.db
 .vscode/
 *.swp
 config/settings.json
+.gstack/
