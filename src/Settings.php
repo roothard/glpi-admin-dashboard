@@ -20,6 +20,55 @@ class Settings
         return getenv('DASHBOARD_CONFIG') ?: (__DIR__ . '/../config/settings.json');
     }
 
+    /**
+     * Paletas de color pre-establecidas que el panel general ofrece.
+     * Cada una define el accent para claro y oscuro. La UI muestra estas 3;
+     * 'custom' deja elegir un color libre. Agregar una paleta = una entrada acá.
+     */
+    public static function palettes(): array
+    {
+        return [
+            'roothard'  => ['name' => 'Azul RootHard', 'accent' => '#405cde', 'accent_dark' => '#6a83f2'],
+            'esmeralda' => ['name' => 'Esmeralda',     'accent' => '#0d9488', 'accent_dark' => '#2dd4bf'],
+            'violeta'   => ['name' => 'Violeta',        'accent' => '#6d28d9', 'accent_dark' => '#a78bfa'],
+        ];
+    }
+
+    /**
+     * Registro declarativo de SECCIONES de configuración. Es el backbone modular:
+     * cada app del tablero aporta su propia sección de config acá, en vez de
+     * hardcodear todo en un único formulario. 'core' = ajustes del tablero;
+     * 'app' = una app concreta (se puede prender/apagar). El orden es el de la UI.
+     *
+     * Para sumar la config de una app nueva: agregá una entrada 'app' con su id,
+     * su ícono y su clave i18n; el panel la lista y renderiza sus campos.
+     */
+    public static function sections(?array $cfg = null): array
+    {
+        $cfg = $cfg ?? self::load();
+        return [
+            ['id' => 'glpi',     'kind' => 'core', 'icon' => '🔌', 'i18n' => 's1',  'required' => true],
+            ['id' => 'general',  'kind' => 'core', 'icon' => '🎨', 'i18n' => 's3',  'required' => false],
+            ['id' => 'projects', 'kind' => 'app',  'icon' => '📁', 'i18n' => 's2',  'required' => false, 'enabled' => true],
+            ['id' => 'crm',      'kind' => 'app',  'icon' => '💼', 'i18n' => 'scrm', 'required' => false, 'enabled' => (bool)($cfg['crm']['enabled'] ?? false)],
+            ['id' => 'gps',      'kind' => 'app',  'icon' => '📍', 'i18n' => 's4',  'required' => false, 'enabled' => (bool)($cfg['modules']['gps']['enabled'] ?? false)],
+            ['id' => 'contact',  'kind' => 'app',  'icon' => '💬', 'i18n' => 's5c', 'required' => false, 'enabled' => (bool)($cfg['contact']['enabled'] ?? true)],
+            ['id' => 'advanced', 'kind' => 'core', 'icon' => '⚙️', 'i18n' => 'adv2', 'required' => false],
+        ];
+    }
+
+    /** Accent efectivo: color de la paleta elegida, o el 'accent' libre si 'custom'. */
+    public static function accentOf(array $cfg, bool $dark = false): string
+    {
+        $b = $cfg['branding'] ?? [];
+        $pal = $b['palette'] ?? 'roothard';
+        $palettes = self::palettes();
+        if ($pal !== 'custom' && isset($palettes[$pal])) {
+            return $dark ? $palettes[$pal]['accent_dark'] : $palettes[$pal]['accent'];
+        }
+        return preg_match('/^#[0-9a-fA-F]{6}$/', $b['accent'] ?? '') ? $b['accent'] : '#405cde';
+    }
+
     /** Full default schema — also documents every configurable key. */
     public static function defaults(): array
     {
@@ -43,6 +92,14 @@ class Settings
                 'accent'   => '#405cde',
                 'logo_url' => '',
                 'default_lang' => 'es',
+                // Paleta pre-establecida (clave de self::palettes()) o 'custom'
+                // para usar el color 'accent' de arriba.
+                'palette'  => 'roothard',
+                // Marca PROPIA de la pantalla de login (si algo queda vacío,
+                // cae al valor de la app: login_name→app_name, etc.).
+                'login_name'     => '',
+                'login_subtitle' => '',
+                'login_logo_url' => '',
             ],
             'modules' => [
                 'gps' => [
@@ -57,6 +114,22 @@ class Settings
                 'google_chat'  => true,
                 'msg_default'  => 'Hola {nombre}, te contacto desde el panel.',
                 'msg_reminder' => 'Hola {nombre}, ¿podés registrar tu visita de hoy?',
+            ],
+            'crm' => [
+                'enabled' => true,   // muestra el cubo CRM a admin/supervisor
+                // Entidades "empresa/padre" que administran clientes (sus hijas = clientes).
+                // Vacío = autodescubre: cualquier entidad que el usuario ve y que tiene hijas.
+                'parents' => [],
+                'label'   => 'CRM',
+            ],
+            'security' => [
+                'require_2fa'    => false,  // when true, the UI forces enrollment before showing data
+                'throttle_ip_max'   => 10, 'throttle_ip_window'   => 900,
+                'throttle_user_max' => 5,  'throttle_user_window' => 900,
+                'wazuh_syslog'   => true,   // emit each auth event to syslog for the Wazuh agent
+                'email_otp'      => true,   // allow email OTP as a backup second factor
+                'otp_ttl'        => 300,
+                'mail_from'      => '',     // From: for the OTP email (blank → PHP default)
             ],
             'output'   => '',   // defaults to ../data-cache.json
             'timezone' => 'UTC',
@@ -135,8 +208,17 @@ class Settings
     public static function publicConfig(?array $cfg = null): array
     {
         $cfg = $cfg ?? self::load();
+        $b = $cfg['branding'];
+        // La marca del login cae a la de la app cuando está vacía.
+        $b['login_name']     = ($b['login_name'] ?? '')     !== '' ? $b['login_name']     : ($b['app_name'] ?? '');
+        $b['login_subtitle'] = ($b['login_subtitle'] ?? '') !== '' ? $b['login_subtitle'] : ($b['subtitle'] ?? '');
+        $b['login_logo_url'] = ($b['login_logo_url'] ?? '') !== '' ? $b['login_logo_url'] : ($b['logo_url'] ?? '');
+        // Accent efectivo según la paleta elegida (el front lo aplica directo).
+        $b['accent']      = self::accentOf($cfg, false);
+        $b['accent_dark'] = self::accentOf($cfg, true);
         return [
-            'branding' => $cfg['branding'],
+            'branding' => $b,
+            'palettes' => self::palettes(),   // para pintar los swatches del panel
             'modules'  => [
                 'gps' => [
                     'enabled' => (bool)$cfg['modules']['gps']['enabled'],
@@ -145,6 +227,10 @@ class Settings
                 ],
             ],
             'contact'  => $cfg['contact'] ?? [],
+            'crm'      => [
+                'enabled' => (bool)($cfg['crm']['enabled'] ?? false),
+                'label'   => $cfg['crm']['label'] ?? 'CRM',
+            ],
             'configured' => self::isConfigured($cfg),
         ];
     }

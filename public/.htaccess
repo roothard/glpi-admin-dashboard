@@ -4,8 +4,10 @@ Options -Indexes
 <IfModule mod_headers.c>
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
   # Self-contained page; map tiles come from OpenStreetMap. Adjust img-src if you change tile provider.
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
-  Header always set X-Frame-Options "DENY"
+  # frame-ancestors 'self' + X-Frame-Options SAMEORIGIN: el tablero puede incrustar
+  # sus propios módulos (modules/<id>/) en un iframe; sigue bloqueando el framing externo.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-src 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+  Header always set X-Frame-Options "SAMEORIGIN"
   Header always set X-Content-Type-Options "nosniff"
   # strict-origin-when-cross-origin: same-origin gets the full URL, third
   # parties (map tiles) only see the origin. OSM's tile policy blocks sites
@@ -14,6 +16,11 @@ Options -Indexes
   Header always set Permissions-Policy "geolocation=(), camera=(), microphone=()"
   <FilesMatch "\.json$">
     Header always set Cache-Control "no-store"
+  </FilesMatch>
+  # SPA shell: always revalidate so a deploy is picked up on the next load
+  # (avoids serving a stale index.html with old in-memory JS).
+  <FilesMatch "\.html$">
+    Header always set Cache-Control "no-cache, must-revalidate"
   </FilesMatch>
 </IfModule>
 

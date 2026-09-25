@@ -30,6 +30,23 @@ class DashboardGenerator
         }
     }
 
+    /**
+     * Build using an ALREADY-OPEN session (injected via GlpiClient::useSession).
+     * Does not open or close a session — used for the per-session, no-stored-token
+     * model where the logged-in user's own token drives the queries.
+     */
+    public function buildLive(): array
+    {
+        return $this->assemble();
+    }
+
+    /** getAll that degrades to [] when the user's token lacks rights (no throw). */
+    private function getAllSafe(string $itemtype, array $params = []): array
+    {
+        try { return $this->api->getAll($itemtype, $params); }
+        catch (\Throwable $e) { return []; }
+    }
+
     /** Build and write the JSON file; returns [projectCount, kbCount]. */
     public function run(string $outFile): array
     {
@@ -57,12 +74,12 @@ class DashboardGenerator
         }
 
         $ents = [];
-        foreach ($this->api->getAll('Entity') as $e) {
+        foreach ($this->getAllSafe('Entity') as $e) {
             $ents[(int)$e['id']] = ($e['completename'] ?? '') !== '' ? $e['completename'] : ($e['name'] ?? '-');
         }
 
         $users = [];
-        foreach ($this->api->getAll('User') as $u) {
+        foreach ($this->getAllSafe('User') as $u) {
             $full = trim(($u['firstname'] ?? '') . ' ' . ($u['realname'] ?? ''));
             $users[(int)$u['id']] = $full !== '' ? $full : ($u['name'] ?? '-');
         }

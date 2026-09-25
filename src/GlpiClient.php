@@ -81,6 +81,17 @@ class GlpiClient
         throw new RuntimeException("initSession failed ($last)");
     }
 
+    /**
+     * Use an already-open session token (e.g. the logged-in user's), skipping
+     * initSession(). The dashboard can then build data with the USER's own
+     * scope — no service token stored anywhere. Do NOT killSession() on this:
+     * it belongs to the live browser session.
+     */
+    public function useSession(string $token): void
+    {
+        $this->session = $token;
+    }
+
     /** Switch the active profile/entity if configured (some tokens default to a limited profile). */
     private function applyActiveContext(): void
     {

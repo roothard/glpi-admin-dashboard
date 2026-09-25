@@ -1,47 +1,67 @@
 <?php
 /**
- * data.php — serve the cached board, filtered to the projects the LOGGED-IN
- * user can actually see in GLPI (per-user scoping via their session token).
+ * data.php — tablero POR SESIÓN. Construye la data EN VIVO con el token de la
+ * sesión del usuario logueado (su propio alcance en GLPI), la cachea en la
+ * sesión PHP, la refresca cuando envejece, y muere con la sesión.
+ *
+ * No se guarda ningún token de servicio en ningún lado: la data sale de la
+ * credencial que el usuario ya tiene por haber iniciado sesión.
  * @license MIT
  */
-require dirname(__DIR__) . '/lib.php';
+require dirname(__DIR__) . '/lib.php';                       // ya carga Settings (require_once)
+require_once dirname(__DIR__) . '/src/GlpiClient.php';
+require_once dirname(__DIR__) . '/src/DashboardGenerator.php';
 panel_session();
 header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store');
 
 if (empty($_SESSION['glpi_token'])) { http_response_code(401); echo json_encode(['auth' => false]); exit; }
-$tok = $_SESSION['glpi_token'];
 
-// Which projects can this user see? (expand_dropdowns → readable type name)
-list($c, $list) = glpi_fetch('/Project', ['range' => '0-500', 'expand_dropdowns' => 'true'], $tok);
-if ($c === 401 || $c === 403) { $_SESSION = []; http_response_code(401); echo json_encode(['auth' => false]); exit; }
+$ttl   = (int)(cfg()['projects']['live_ttl'] ?? 300);  // refresco mientras la sesión vive (seg)
+$force = isset($_GET['refresh']);
+$now   = time();
+$fromCache = false;
+$buildMs   = 0;
+$data = null;
 
-$type = trim((string)(cfg()['projects']['project_type'] ?? '')); // empty = all types
-$incU = (bool)(cfg()['projects']['include_untyped'] ?? true);    // show untyped (flagged) even with a filter
-$vis = [];
-if (is_array($list)) {
-    foreach ($list as $p) {
-        if ($type !== '') {
-            $t = trim((string)($p['projecttypes_id'] ?? ''));
-            $untyped = ($t === '' || $t === '0' || $t === '&nbsp;');
-            if (strcasecmp($t, $type) !== 0 && !($untyped && $incU)) { continue; }
-        }
-        $vis[(int)$p['id']] = true;
+if (!$force && !empty($_SESSION['board']) && ($now - (int)($_SESSION['board_ts'] ?? 0)) < $ttl) {
+    $data = $_SESSION['board'];                       // cache de sesión aún fresco
+    $fromCache = true;
+} else {
+    try {
+        $flat   = Settings::flat();
+        $client = new GlpiClient($flat);
+        $client->useSession($_SESSION['glpi_token']); // ← la sesión del usuario, sin token de servicio
+        $gen    = new DashboardGenerator($client, $flat);
+        $t0     = microtime(true);
+        $data   = $gen->buildLive();
+        $buildMs = (int)round((microtime(true) - $t0) * 1000);
+        $_SESSION['board']    = $data;
+        $_SESSION['board_ts'] = $now;
+    } catch (\Throwable $e) {
+        // Sesión vencida / sin permisos: servir lo último si hay, si no re-login.
+        if (!empty($_SESSION['board'])) { $data = $_SESSION['board']; $fromCache = true; }
+        else { http_response_code(401); echo json_encode(['auth' => false, 'error' => 'build_failed']); exit; }
     }
 }
 
-$cache = json_decode(@file_get_contents(dirname(__DIR__) . '/data-cache.json'), true) ?: ['projects' => [], 'states' => []];
-$total = count($cache['projects']);
-$cache['projects'] = array_values(array_filter($cache['projects'], fn($p) => isset($vis[$p['id']])));
-$cache['user']    = $_SESSION['user'];
-$cache['isAdmin'] = $_SESSION['isAdmin'] ?? false;
-$cache['isSuper'] = $_SESSION['isSuper'] ?? false;
-// Honest visibility stats: what this user sees vs. everything on the board,
-// plus how many shown projects have no type set in GLPI (flagged in the UI).
-$cache['stats'] = [
-    'shown'       => count($cache['projects']),
-    'total'       => $total,
-    'untyped'     => count(array_filter($cache['projects'], fn($p) => !empty($p['nt']))),
-    'type_filter' => $type,
+$projs = $data['projects'] ?? [];
+$data['user']    = $_SESSION['user'];
+$data['isAdmin'] = $_SESSION['isAdmin'] ?? false;
+$data['isSuper'] = $_SESSION['isSuper'] ?? false;
+$data['isSuperAdmin'] = ($_SESSION['isSuperAdmin'] ?? false) || (strtolower($_SESSION['profile'] ?? '') === 'super-admin');
+$data['stats']   = [
+    // Compatibles con el front. En el modelo por-sesión el usuario construye su
+    // propio universo, así que "total" = "shown" (ve todo lo suyo, no hay un set mayor).
+    'shown'       => count($projs),
+    'total'       => count($projs),
+    'untyped'     => count(array_filter($projs, fn($p) => !empty($p['nt']))),
+    'type_filter' => trim((string)(cfg()['projects']['project_type'] ?? '')),
+    // Diagnóstico del modelo live:
+    'live'        => true,
+    'from_cache'  => $fromCache,
+    'age_s'       => $now - (int)($_SESSION['board_ts'] ?? $now),
+    'ttl_s'       => $ttl,
+    'build_ms'    => $buildMs,
 ];
-
-echo json_encode($cache, JSON_UNESCAPED_UNICODE);
+echo json_encode($data, JSON_UNESCAPED_UNICODE);

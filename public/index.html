@@ -23,6 +23,8 @@
 .ctrls{display:flex;align-items:center;gap:8px;margin-left:auto}
 .iconbtn{width:34px;height:34px;display:grid;place-items:center;font-size:15px;border:1px solid var(--border2);border-radius:9px;background:var(--surface);cursor:pointer;line-height:1}
 .iconbtn:hover{border-color:var(--accent)}
+.iconbtn.nudge{border-color:#c88c00;box-shadow:0 0 0 0 rgba(200,140,0,.5);animation:nudgePulse 2s ease-out infinite}
+@keyframes nudgePulse{0%{box-shadow:0 0 0 0 rgba(200,140,0,.45)}70%{box-shadow:0 0 0 7px rgba(200,140,0,0)}100%{box-shadow:0 0 0 0 rgba(200,140,0,0)}}
 #lang{font:600 12px var(--mono);color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:9px;padding:8px 9px;cursor:pointer}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
@@ -196,6 +198,17 @@ main{padding-top:20px;padding-bottom:60px}
 #who{color:var(--muted);font:600 11px var(--mono);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ---- portal (apps) ---- */
 .appview{display:none}.appview.appon{display:block}
+.crmrow{display:grid;grid-template-columns:2fr 1.6fr .7fr 1.5fr;gap:12px;align-items:center;padding:13px 14px;border-bottom:1px solid var(--border)}
+.crmrow:last-child{border-bottom:0}
+.crmhead{font:600 11.5px var(--sans);color:var(--dim);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);padding-top:6px;padding-bottom:10px}
+.crmname{font:700 14px var(--sans);color:var(--text)}
+.crmnum{font:600 14px var(--sans);color:var(--muted)}
+.crmna{color:var(--dim);font-style:normal;font-size:12px;border:1px solid var(--border2);border-radius:999px;padding:3px 10px;display:inline-block}
+.crmchip{font:600 12.5px var(--mono,var(--sans));border-radius:999px;padding:4px 11px;display:inline-block}
+.crmchip.crmok{background:rgba(47,166,113,.15);color:#2fa671}
+.crmchip.crmsoon{background:rgba(64,92,222,.12);color:#405cde}
+.crmchip.crmwarn{background:rgba(200,140,0,.16);color:#c88c00}
+.crmchip.crmbad{background:rgba(226,80,110,.16);color:#e2506e}
 .hubhead{margin:26px 0 3px;font-size:19px;font-weight:720;letter-spacing:-.02em}
 .hubsub{color:var(--muted);font-size:14px;margin:0 0 4px}
 .hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:22px}
@@ -233,8 +246,21 @@ main{padding-top:20px;padding-bottom:60px}
 .anomrow .aw{color:var(--dim);font:600 11px var(--mono)}
 .anomrow .at{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap}
 /* ---- selector de perfil + equipo ---- */
-#profwrap,#infowrap{position:fixed;inset:0;z-index:110;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 62%,transparent);backdrop-filter:blur(4px)}
-#profwrap.on,#infowrap.on{display:grid}
+#profwrap,#infowrap,#twofawrap{position:fixed;inset:0;z-index:110;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 62%,transparent);backdrop-filter:blur(4px)}
+#profwrap.on,#infowrap.on,#twofawrap.on{display:grid}
+#twofawrap .profcard{width:400px}
+.tw-qr{background:#fff;padding:12px;border-radius:12px;display:flex;justify-content:center;margin:0 0 12px}
+.tw-qr svg{width:186px;height:186px;display:block}
+.tw-secret{font:600 15px var(--mono,monospace);letter-spacing:.12em;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px;text-align:center;word-break:break-all;margin:0 0 12px;cursor:pointer}
+.tw-codes{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:12px 0}
+.tw-codes span{font:600 13px var(--mono,monospace);background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px;text-align:center;letter-spacing:.08em}
+.tw-in{width:100%;box-sizing:border-box;font:600 18px var(--sans);text-align:center;letter-spacing:.25em;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:11px;margin:0 0 10px;color:var(--text)}
+.tw-btn{width:100%;box-sizing:border-box;font:700 13.5px var(--sans);color:#fff;background:var(--accent);border:none;border-radius:10px;padding:12px;cursor:pointer;margin-bottom:8px}
+.tw-btn.ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
+.tw-btn.danger{background:none;color:#e2506e;border:1px solid transparent}
+.tw-note{color:var(--muted);font-size:12px;line-height:1.55;margin:0 0 12px}
+.tw-badge{display:inline-block;font:700 11px var(--sans);padding:3px 9px;border-radius:999px;margin-bottom:10px}
+.tw-badge.on{background:rgba(47,166,113,.15);color:#2fa671}.tw-badge.off{background:rgba(200,140,0,.15);color:#c88c00}
 #info-stats{font:600 13.5px var(--disp);margin:2px 0 10px;line-height:1.8}
 #info-stats .nt{color:#c88c00}
 .profcard{width:360px;max-width:92vw;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:26px 24px;box-shadow:0 20px 45px rgba(0,0,0,.18)}
@@ -418,6 +444,8 @@ body.dockon .wrap{padding-left:104px}
       <button class="iconbtn" id="whyinfo" title="¿Qué proyectos veo?" style="display:none">ℹ️</button>
       <span id="who"></span>
       <button class="iconbtn" id="profsync" title="Perfil" style="display:none">⇄</button>
+      <button class="iconbtn" id="secbtn" title="Seguridad (2FA)" style="display:none">🔒</button>
+      <button class="iconbtn" id="cfgbtn" title="Configuración" style="display:none">⚙️</button>
       <button class="iconbtn" id="theme" title="Tema">🌙</button>
       <select id="lang"><option value="es">ES</option><option value="en">EN</option><option value="fr">FR</option><option value="de">DE</option><option value="pt">PT</option></select>
       <button class="iconbtn" id="logout" title="Salir" style="display:none">⎋</button>
@@ -590,6 +618,18 @@ body.dockon .wrap{padding-left:104px}
       <div class="cmpedbar"><button class="clr" id="cmp-add"></button><button class="clr on" id="cmp-save"></button><span id="cmp-ed-st"></span></div>
     </div>
   </section>
+  <section id="v-crm" class="appview">
+    <div style="display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap">
+      <span id="crm-emp-lbl" style="font:600 13px var(--sans);color:var(--muted)"></span>
+      <select id="crm-sel" style="font:600 14px var(--sans);color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:9px;padding:8px 12px;min-width:220px"></select>
+      <span id="crm-count" style="font:500 12.5px var(--sans);color:var(--dim)"></span>
+    </div>
+    <div class="kpis" id="crm-kpis" style="grid-template-columns:repeat(4,1fr)"></div>
+    <div class="panel anpanel" style="margin-top:16px;overflow:auto"><div id="crm-list"></div></div>
+  </section>
+  <section id="v-module" class="appview">
+    <iframe id="modframe" title="Módulo" loading="lazy" style="width:100%;height:calc(100vh - 150px);min-height:440px;border:0;border-radius:14px;background:var(--surface)"></iframe>
+  </section>
 </main>
 
 <div id="loginwrap">
@@ -608,6 +648,18 @@ body.dockon .wrap{padding-left:104px}
   <input id="l-pass" type="password" placeholder="Contraseña" autocomplete="current-password" required>
   <button type="submit" id="l-btn">Acceder</button>
   <div class="lerr" id="l-err"></div>
+</form>
+  <form class="logincard" id="twofaform" style="display:none">
+  <h2 id="tf-tit">Verificación en dos pasos</h2>
+  <p id="tf-sub">Ingresá el código de tu app autenticadora</p>
+  <input id="tf-code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="10" style="text-align:center;letter-spacing:.3em;font-size:20px">
+  <button type="submit" id="tf-btn">Verificar</button>
+  <div class="lerr" id="tf-err"></div>
+  <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;font-size:12px">
+    <a href="#" id="tf-email" style="display:none;color:var(--accent)">Enviar código por email</a>
+    <a href="#" id="tf-recov" style="color:var(--muted)">Usar un código de recuperación</a>
+    <a href="#" id="tf-back" style="color:var(--muted)">← Volver</a>
+  </div>
 </form>
   <div class="l-hint">Click &amp; drag</div>
   <div class="l-corner" id="l-corner"></div>
@@ -632,6 +684,13 @@ body.dockon .wrap{padding-left:104px}
   <button class="profclose" id="prof-close" type="button">Cerrar</button>
 </div></div>
 
+<div id="twofawrap"><div class="profcard">
+  <h2 id="tw-h">Doble factor (2FA)</h2>
+  <div id="tw-body"><div class="profmsg">…</div></div>
+  <button class="profclose" id="tw-close" type="button">Cerrar</button>
+</div></div>
+
+<script src="qrcode.min.js"></script>
 <script>
 const $=s=>document.querySelector(s), el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
@@ -648,7 +707,9 @@ const I18N={
   p_gantt:'Gantt · Cronograma de tareas',p_kanban:'Kanban · Tareas por estado',p_det:'Detalles',p_kb:'Base de Conocimiento',
   d_area:'Área',d_ent:'Entidad',d_resp:'Responsable',d_prog:'Avance',d_plan:'Planificado',d_done:'hechas',d_pend:'pendientes',
   close:'Cerrar',noDesc:'Sin descripción',noKb:'Sin artículos vinculados a este proyecto en GLPI.',noDates:'Sin fechas.',noTaskDates:'Sin fechas de tareas.',today:'hoy',noData:'No se pudieron cargar los datos',
-  l_sub:'Ingresá con tu cuenta de GLPI',l_doc:'Documentación',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Acceder',l_err:'Usuario o contraseña incorrectos',l_503:'Login no configurado (falta App-Token)',l_429:'Demasiados intentos — esperá 15 minutos',logout:'Salir',
+  l_sub:'Ingresá con tu cuenta de GLPI',l_doc:'Documentación',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Acceder',l_err:'Usuario o contraseña incorrectos',l_503:'Login no configurado (falta App-Token)',l_429:'Demasiados intentos — esperá 15 minutos',logout:'Salir',cfg_title:'Configuración',
+  tf_tit:'Verificación en dos pasos',tf_sub:'Ingresá el código de tu app autenticadora',tf_btn:'Verificar',tf_email:'Enviar código por email',tf_recov:'Usar un código de recuperación',tf_recov_sub:'Ingresá uno de tus códigos de recuperación',tf_back:'← Volver',tf_bad:'Código incorrecto',tf_expired:'La sesión expiró, ingresá de nuevo',tf_email_sent:'Código enviado a tu email',tf_email_err:'No se pudo enviar el email',sec_title:'Seguridad (2FA)',tw_h:'Doble factor (2FA)',tw_off:'Desactivado',tw_on:'Activado',tw_intro:'Sumá un segundo factor: además de tu contraseña de GLPI necesitarás un código de tu app autenticadora para entrar.',tw_start:'Activar 2FA',tw_scan:'Escaneá el código con tu app (Google Authenticator, Aegis…) o ingresá esta clave manualmente:',tw_copy:'Tocá para copiar',tw_openapp:'Abrir en la app autenticadora',tw_confirm:'Confirmar',tw_bad:'Código incorrecto',tw_codes_note:'Guardá estos códigos de recuperación en un lugar seguro. Cada uno sirve una sola vez si perdés el acceso a tu app.',tw_copy_codes:'Copiar códigos',tw_done:'Listo',tw_on_note:'El 2FA está activo. Para regenerar códigos o desactivarlo, ingresá un código actual.',tw_regen:'Regenerar códigos de recuperación',tw_disable:'Desactivar 2FA',
+  app_crm:'CRM',crm_empresa:'Empresa:',crm_clientes:'clientes',crm_vencidos:'contratos vencidos',crm_v30:'vencen en 30 días',crm_v60:'vencen en 60 días',crm_cliente:'Cliente',crm_resp:'Responsable comercial',crm_contratos:'Contratos',crm_renov:'Renovación',crm_sinasignar:'sin asignar',crm_sincontrato:'sin contrato',crm_none:'Esta empresa no tiene clientes (entidades hijas)',crm_forbidden:'Solo para administradores y supervisores',crm_vencido:'vencido',
   apps:'Apps',hub_h:'Bienvenido',hub_sub:'Elegí una aplicación',app_proj:'Panel de Proyectos',app_proj_d:'Portfolio, avances y cronograma',app_fich:'Fichadas GPS',app_fich_d:'Presencia de técnicos en campo',
   filtrar:'Filtrar',allTec:'Todos los técnicos',f_total:'Fichadas',f_tec:'Técnicos',f_hours:'Horas',f_tecnico:'Técnico',f_cliente:'Cliente',f_entrada:'Entrada',f_salida:'Salida',f_dur:'Duración',scope_admin:'Todos los técnicos',scope_supervisor:'Mi equipo',scope_tecnico:'Mis fichadas',f_csv:'Exportar CSV',f_map:'Ubicaciones',f_nogps:'Sin coordenadas GPS',f_mapnote:'Distribución por ubicación GPS (clic en un punto = Google Maps).',lic_h:'Licencia GPS',lic_note:'La app leerá esta clave desde GLPI — los usuarios no la cargan a mano.',lic_key:'Clave de licencia',lic_save:'Guardar en GLPI',lic_active:'Activado',lic_inactive:'Sin licencia',lic_activate:'Activar',lic_change:'Cambiar',lic_saving:'guardando…',lic_saved:'guardada en GLPI',lic_error:'error al guardar',app_link:'Ver app'},
  en:{tit:'GLPI Administration Center',upd:'Updated',t_res:'Summary',t_exp:'Explorer',t_map:'Map',
@@ -658,7 +719,9 @@ const I18N={
   p_gantt:'Gantt · Task schedule',p_kanban:'Kanban · Tasks by state',p_det:'Details',p_kb:'Knowledge Base',
   d_area:'Area',d_ent:'Entity',d_resp:'Owner',d_prog:'Progress',d_plan:'Planned',d_done:'done',d_pend:'pending',
   close:'Close',noDesc:'No description',noKb:'No articles linked to this project in GLPI.',noDates:'No dates.',noTaskDates:'No task dates.',today:'today',noData:'Could not load data',
-  l_sub:'Sign in with your GLPI account',l_doc:'Documentation',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err:'Wrong username or password',l_503:'Login not configured (App-Token missing)',l_429:'Too many attempts — wait 15 minutes',logout:'Sign out',
+  l_sub:'Sign in with your GLPI account',l_doc:'Documentation',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err:'Wrong username or password',l_503:'Login not configured (App-Token missing)',l_429:'Too many attempts — wait 15 minutes',logout:'Sign out',cfg_title:'Settings',
+  tf_tit:'Two-step verification',tf_sub:'Enter the code from your authenticator app',tf_btn:'Verify',tf_email:'Send code by email',tf_recov:'Use a recovery code',tf_recov_sub:'Enter one of your recovery codes',tf_back:'← Back',tf_bad:'Wrong code',tf_expired:'Session expired, sign in again',tf_email_sent:'Code sent to your email',tf_email_err:'Could not send the email',sec_title:'Security (2FA)',tw_h:'Two-factor (2FA)',tw_off:'Disabled',tw_on:'Enabled',tw_intro:'Add a second factor: on top of your GLPI password you will need a code from your authenticator app to sign in.',tw_start:'Enable 2FA',tw_scan:'Scan the code with your app (Google Authenticator, Aegis…) or enter this key manually:',tw_copy:'Tap to copy',tw_openapp:'Open in authenticator app',tw_confirm:'Confirm',tw_bad:'Wrong code',tw_codes_note:'Keep these recovery codes somewhere safe. Each works once if you lose access to your app.',tw_copy_codes:'Copy codes',tw_done:'Done',tw_on_note:'2FA is active. To regenerate codes or disable it, enter a current code.',tw_regen:'Regenerate recovery codes',tw_disable:'Disable 2FA',
+  app_crm:'CRM',crm_empresa:'Company:',crm_clientes:'clients',crm_vencidos:'expired contracts',crm_v30:'expiring in 30 days',crm_v60:'expiring in 60 days',crm_cliente:'Client',crm_resp:'Account manager',crm_contratos:'Contracts',crm_renov:'Renewal',crm_sinasignar:'unassigned',crm_sincontrato:'no contract',crm_none:'This company has no clients (child entities)',crm_forbidden:'Admins and supervisors only',crm_vencido:'expired',
   apps:'Apps',hub_h:'Welcome',hub_sub:'Choose an app',app_proj:'Projects Panel',app_proj_d:'Portfolio, progress and schedule',app_fich:'GPS Check-ins',app_fich_d:'Field technician presence',
   filtrar:'Filter',allTec:'All technicians',f_total:'Check-ins',f_tec:'Technicians',f_hours:'Hours',f_tecnico:'Technician',f_cliente:'Client',f_entrada:'In',f_salida:'Out',f_dur:'Duration',scope_admin:'All technicians',scope_supervisor:'My team',scope_tecnico:'My check-ins',f_csv:'Export CSV',f_map:'Locations',f_nogps:'No GPS coordinates',f_mapnote:'Distribution by GPS location (click a point = Google Maps).',lic_h:'GPS License',lic_note:'The app reads this key from GLPI — users no longer enter it manually.',lic_key:'License key',lic_save:'Save to GLPI',lic_active:'Activated',lic_inactive:'No license',lic_activate:'Activate',lic_change:'Change',lic_saving:'saving…',lic_saved:'saved to GLPI',lic_error:'save error',app_link:'Open app'},
  fr:{tit:'Centre d’administration GLPI',upd:'Mis à jour',t_res:'Résumé',t_exp:'Explorateur',t_map:'Carte',
@@ -668,7 +731,9 @@ const I18N={
   p_gantt:'Gantt · Calendrier des tâches',p_kanban:'Kanban · Tâches par état',p_det:'Détails',p_kb:'Base de connaissances',
   d_area:'Zone',d_ent:'Entité',d_resp:'Responsable',d_prog:'Avancement',d_plan:'Planifié',d_done:'terminées',d_pend:'en attente',
   close:'Fermer',noDesc:'Sans description',noKb:'Aucun article lié à ce projet dans GLPI.',noDates:'Aucune date.',noTaskDates:'Aucune date de tâche.',today:"aujourd'hui",noData:'Impossible de charger les données',
-  l_sub:'Connectez-vous avec votre compte GLPI',l_doc:'Documentation',l_user:'Utilisateur',l_pass:'Mot de passe',l_btn:'Se connecter',l_err:'Utilisateur ou mot de passe incorrect',l_503:'Connexion non configurée (App-Token manquant)',l_429:'Trop de tentatives — attendez 15 minutes',logout:'Déconnexion',
+  l_sub:'Connectez-vous avec votre compte GLPI',l_doc:'Documentation',l_user:'Utilisateur',l_pass:'Mot de passe',l_btn:'Se connecter',l_err:'Utilisateur ou mot de passe incorrect',l_503:'Connexion non configurée (App-Token manquant)',l_429:'Trop de tentatives — attendez 15 minutes',logout:'Déconnexion',cfg_title:'Configuration',
+  tf_tit:'Vérification en deux étapes',tf_sub:'Saisissez le code de votre application d’authentification',tf_btn:'Vérifier',tf_email:'Envoyer le code par e-mail',tf_recov:'Utiliser un code de récupération',tf_recov_sub:'Saisissez un de vos codes de récupération',tf_back:'← Retour',tf_bad:'Code incorrect',tf_expired:'Session expirée, reconnectez-vous',tf_email_sent:'Code envoyé à votre e-mail',tf_email_err:'Impossible d’envoyer l’e-mail',sec_title:'Sécurité (2FA)',tw_h:'Double facteur (2FA)',tw_off:'Désactivé',tw_on:'Activé',tw_intro:'Ajoutez un second facteur : en plus de votre mot de passe GLPI, un code de votre application d’authentification sera requis pour vous connecter.',tw_start:'Activer la 2FA',tw_scan:'Scannez le code avec votre application (Google Authenticator, Aegis…) ou saisissez cette clé manuellement :',tw_copy:'Toucher pour copier',tw_openapp:'Ouvrir dans l’application',tw_confirm:'Confirmer',tw_bad:'Code incorrect',tw_codes_note:'Conservez ces codes de récupération en lieu sûr. Chacun ne sert qu’une fois si vous perdez l’accès à votre application.',tw_copy_codes:'Copier les codes',tw_done:'Terminé',tw_on_note:'La 2FA est active. Pour régénérer des codes ou la désactiver, saisissez un code actuel.',tw_regen:'Régénérer les codes de récupération',tw_disable:'Désactiver la 2FA',
+  app_crm:'CRM',crm_empresa:'Entreprise :',crm_clientes:'clients',crm_vencidos:'contrats expirés',crm_v30:'expirent sous 30 jours',crm_v60:'expirent sous 60 jours',crm_cliente:'Client',crm_resp:'Responsable commercial',crm_contratos:'Contrats',crm_renov:'Renouvellement',crm_sinasignar:'non assigné',crm_sincontrato:'sans contrat',crm_none:'Cette entreprise n’a pas de clients (entités filles)',crm_forbidden:'Réservé aux administrateurs et superviseurs',crm_vencido:'expiré',
   apps:'Apps',hub_h:'Bienvenue',hub_sub:'Choisissez une application',app_proj:'Panneau de projets',app_proj_d:'Portfolio, avancement et calendrier',app_fich:'Pointages GPS',app_fich_d:'Présence des techniciens sur le terrain',
   filtrar:'Filtrer',allTec:'Tous les techniciens',f_total:'Pointages',f_tec:'Techniciens',f_hours:'Heures',f_tecnico:'Technicien',f_cliente:'Client',f_entrada:'Entrée',f_salida:'Sortie',f_dur:'Durée',scope_admin:'Tous les techniciens',scope_supervisor:'Mon équipe',scope_tecnico:'Mes pointages',f_csv:'Exporter CSV',f_map:'Emplacements',f_nogps:'Pas de coordonnées GPS',f_mapnote:'Répartition par emplacement GPS (clic sur un point = Google Maps).',lic_h:'Licence GPS',lic_note:"L'app lit cette clé depuis GLPI — les utilisateurs ne la saisissent plus.",lic_key:'Clé de licence',lic_save:'Enregistrer dans GLPI',lic_active:'Activé',lic_inactive:'Sans licence',lic_activate:'Activer',lic_change:'Changer',lic_saving:'enregistrement…',lic_saved:'enregistrée dans GLPI',lic_error:'erreur',app_link:"Voir l'app"},
  de:{tit:'GLPI-Verwaltungszentrum',upd:'Aktualisiert',t_res:'Übersicht',t_exp:'Explorer',t_map:'Karte',
@@ -678,7 +743,9 @@ const I18N={
   p_gantt:'Gantt · Aufgabenplan',p_kanban:'Kanban · Aufgaben nach Status',p_det:'Details',p_kb:'Wissensdatenbank',
   d_area:'Bereich',d_ent:'Entität',d_resp:'Verantwortlich',d_prog:'Fortschritt',d_plan:'Geplant',d_done:'erledigt',d_pend:'offen',
   close:'Schließen',noDesc:'Keine Beschreibung',noKb:'Keine Artikel mit diesem Projekt in GLPI verknüpft.',noDates:'Keine Daten.',noTaskDates:'Keine Aufgaben-Daten.',today:'heute',noData:'Daten konnten nicht geladen werden',
-  l_sub:'Mit Ihrem GLPI-Konto anmelden',l_doc:'Dokumentation',l_user:'Benutzer',l_pass:'Passwort',l_btn:'Anmelden',l_err:'Falscher Benutzer oder Passwort',l_503:'Login nicht konfiguriert (App-Token fehlt)',l_429:'Zu viele Versuche — 15 Minuten warten',logout:'Abmelden',
+  l_sub:'Mit Ihrem GLPI-Konto anmelden',l_doc:'Dokumentation',l_user:'Benutzer',l_pass:'Passwort',l_btn:'Anmelden',l_err:'Falscher Benutzer oder Passwort',l_503:'Login nicht konfiguriert (App-Token fehlt)',l_429:'Zu viele Versuche — 15 Minuten warten',logout:'Abmelden',cfg_title:'Einstellungen',
+  tf_tit:'Zwei-Schritt-Verifizierung',tf_sub:'Gib den Code aus deiner Authenticator-App ein',tf_btn:'Bestätigen',tf_email:'Code per E-Mail senden',tf_recov:'Wiederherstellungscode verwenden',tf_recov_sub:'Gib einen deiner Wiederherstellungscodes ein',tf_back:'← Zurück',tf_bad:'Falscher Code',tf_expired:'Sitzung abgelaufen, bitte neu anmelden',tf_email_sent:'Code an deine E-Mail gesendet',tf_email_err:'E-Mail konnte nicht gesendet werden',sec_title:'Sicherheit (2FA)',tw_h:'Zwei-Faktor (2FA)',tw_off:'Deaktiviert',tw_on:'Aktiviert',tw_intro:'Füge einen zweiten Faktor hinzu: zusätzlich zu deinem GLPI-Passwort brauchst du zum Anmelden einen Code aus deiner Authenticator-App.',tw_start:'2FA aktivieren',tw_scan:'Scanne den Code mit deiner App (Google Authenticator, Aegis…) oder gib diesen Schlüssel manuell ein:',tw_copy:'Zum Kopieren tippen',tw_openapp:'In Authenticator-App öffnen',tw_confirm:'Bestätigen',tw_bad:'Falscher Code',tw_codes_note:'Bewahre diese Wiederherstellungscodes sicher auf. Jeder funktioniert einmal, falls du den Zugriff auf deine App verlierst.',tw_copy_codes:'Codes kopieren',tw_done:'Fertig',tw_on_note:'2FA ist aktiv. Zum Neu-Erstellen der Codes oder Deaktivieren gib einen aktuellen Code ein.',tw_regen:'Wiederherstellungscodes neu erstellen',tw_disable:'2FA deaktivieren',
+  app_crm:'CRM',crm_empresa:'Firma:',crm_clientes:'Kunden',crm_vencidos:'abgelaufene Verträge',crm_v30:'laufen in 30 Tagen ab',crm_v60:'laufen in 60 Tagen ab',crm_cliente:'Kunde',crm_resp:'Kundenbetreuer',crm_contratos:'Verträge',crm_renov:'Verlängerung',crm_sinasignar:'nicht zugewiesen',crm_sincontrato:'kein Vertrag',crm_none:'Diese Firma hat keine Kunden (Unterentitäten)',crm_forbidden:'Nur für Administratoren und Supervisoren',crm_vencido:'abgelaufen',
   apps:'Apps',hub_h:'Willkommen',hub_sub:'Wählen Sie eine App',app_proj:'Projekt-Panel',app_proj_d:'Portfolio, Fortschritt und Zeitplan',app_fich:'GPS-Check-ins',app_fich_d:'Anwesenheit der Außendiensttechniker',
   filtrar:'Filtern',allTec:'Alle Techniker',f_total:'Check-ins',f_tec:'Techniker',f_hours:'Stunden',f_tecnico:'Techniker',f_cliente:'Kunde',f_entrada:'Eingang',f_salida:'Ausgang',f_dur:'Dauer',scope_admin:'Alle Techniker',scope_supervisor:'Mein Team',scope_tecnico:'Meine Check-ins',f_csv:'CSV exportieren',f_map:'Standorte',f_nogps:'Keine GPS-Koordinaten',f_mapnote:'Verteilung nach GPS-Standort (Klick auf einen Punkt = Google Maps).',lic_h:'GPS-Lizenz',lic_note:'Die App liest diesen Schlüssel aus GLPI — Benutzer geben ihn nicht mehr ein.',lic_key:'Lizenzschlüssel',lic_save:'In GLPI speichern',lic_active:'Aktiviert',lic_inactive:'Keine Lizenz',lic_activate:'Aktivieren',lic_change:'Ändern',lic_saving:'speichern…',lic_saved:'in GLPI gespeichert',lic_error:'Fehler',app_link:'App öffnen'},
  pt:{tit:'Centro de Administração GLPI',upd:'Atualizado',t_res:'Resumo',t_exp:'Explorador',t_map:'Mapa',
@@ -688,7 +755,9 @@ const I18N={
   p_gantt:'Gantt · Cronograma de tarefas',p_kanban:'Kanban · Tarefas por estado',p_det:'Detalhes',p_kb:'Base de conhecimento',
   d_area:'Área',d_ent:'Entidade',d_resp:'Responsável',d_prog:'Progresso',d_plan:'Planejado',d_done:'concluídas',d_pend:'pendentes',
   close:'Fechar',noDesc:'Sem descrição',noKb:'Nenhum artigo vinculado a este projeto no GLPI.',noDates:'Sem datas.',noTaskDates:'Sem datas de tarefas.',today:'hoje',noData:'Não foi possível carregar os dados',
-  l_sub:'Entre com sua conta GLPI',l_doc:'Documentação',l_user:'Usuário',l_pass:'Senha',l_btn:'Entrar',l_err:'Usuário ou senha incorretos',l_503:'Login não configurado (App-Token ausente)',l_429:'Muitas tentativas — aguarde 15 minutos',logout:'Sair',
+  l_sub:'Entre com sua conta GLPI',l_doc:'Documentação',l_user:'Usuário',l_pass:'Senha',l_btn:'Entrar',l_err:'Usuário ou senha incorretos',l_503:'Login não configurado (App-Token ausente)',l_429:'Muitas tentativas — aguarde 15 minutos',logout:'Sair',cfg_title:'Configurações',
+  tf_tit:'Verificação em duas etapas',tf_sub:'Digite o código do seu app autenticador',tf_btn:'Verificar',tf_email:'Enviar código por e-mail',tf_recov:'Usar um código de recuperação',tf_recov_sub:'Digite um dos seus códigos de recuperação',tf_back:'← Voltar',tf_bad:'Código incorreto',tf_expired:'Sessão expirada, entre novamente',tf_email_sent:'Código enviado para o seu e-mail',tf_email_err:'Não foi possível enviar o e-mail',sec_title:'Segurança (2FA)',tw_h:'Dois fatores (2FA)',tw_off:'Desativado',tw_on:'Ativado',tw_intro:'Adicione um segundo fator: além da sua senha do GLPI, você precisará de um código do seu app autenticador para entrar.',tw_start:'Ativar 2FA',tw_scan:'Escaneie o código com seu app (Google Authenticator, Aegis…) ou digite esta chave manualmente:',tw_copy:'Toque para copiar',tw_openapp:'Abrir no app autenticador',tw_confirm:'Confirmar',tw_bad:'Código incorreto',tw_codes_note:'Guarde estes códigos de recuperação em local seguro. Cada um serve uma vez caso perca o acesso ao seu app.',tw_copy_codes:'Copiar códigos',tw_done:'Pronto',tw_on_note:'O 2FA está ativo. Para regenerar códigos ou desativá-lo, digite um código atual.',tw_regen:'Regenerar códigos de recuperação',tw_disable:'Desativar 2FA',
+  app_crm:'CRM',crm_empresa:'Empresa:',crm_clientes:'clientes',crm_vencidos:'contratos vencidos',crm_v30:'vencem em 30 dias',crm_v60:'vencem em 60 dias',crm_cliente:'Cliente',crm_resp:'Responsável comercial',crm_contratos:'Contratos',crm_renov:'Renovação',crm_sinasignar:'sem responsável',crm_sincontrato:'sem contrato',crm_none:'Esta empresa não tem clientes (entidades filhas)',crm_forbidden:'Apenas administradores e supervisores',crm_vencido:'vencido',
   apps:'Apps',hub_h:'Bem-vindo',hub_sub:'Escolha um aplicativo',app_proj:'Painel de Projetos',app_proj_d:'Portfólio, progresso e cronograma',app_fich:'Registros GPS',app_fich_d:'Presença de técnicos em campo',
   filtrar:'Filtrar',allTec:'Todos os técnicos',f_total:'Registros',f_tec:'Técnicos',f_hours:'Horas',f_tecnico:'Técnico',f_cliente:'Cliente',f_entrada:'Entrada',f_salida:'Saída',f_dur:'Duração',scope_admin:'Todos os técnicos',scope_supervisor:'Minha equipe',scope_tecnico:'Meus registros',f_csv:'Exportar CSV',f_map:'Localizações',f_nogps:'Sem coordenadas GPS',f_mapnote:'Distribuição por localização GPS (clique num ponto = Google Maps).',lic_h:'Licença GPS',lic_note:'O app lê esta chave do GLPI — os usuários não a inserem manualmente.',lic_key:'Chave de licença',lic_save:'Salvar no GLPI',lic_active:'Ativado',lic_inactive:'Sem licença',lic_activate:'Ativar',lic_change:'Alterar',lic_saving:'salvando…',lic_saved:'salva no GLPI',lic_error:'erro',app_link:'Ver app'}
 };
@@ -762,13 +831,19 @@ function applyStatic(){
   $('#f-entidad').options[0].text=T('allEnts'); $('#f-resp').options[0].text=T('allResp');
   $('#clr').textContent=T('clear'); $('#h-act').textContent=T('h_act'); $('#h-tl').textContent=T('h_tl');
   $('#gen').textContent=DATA.generated?T('upd')+' '+DATA.generated:'';
-  $('#l-tit').textContent=_bn||T('tit'); $('#l-sub').textContent=_bn?T('tit'):T('l_sub');
-  const _ll=$('#l-logo'); if(_ll)_ll.textContent=((_bn||'·')[0]||'·').toUpperCase();
+  const _ln=(CONFIG.branding&&CONFIG.branding.login_name)||_bn||T('tit');
+  const _ls=(CONFIG.branding&&CONFIG.branding.login_subtitle)||'';
+  $('#l-tit').textContent=_ln; $('#l-sub').textContent=_ls||(_bn?T('tit'):T('l_sub'));
+  const _llo=(CONFIG.branding&&CONFIG.branding.login_logo_url)||'';
+  const _ll=$('#l-logo'); if(_ll){ if(_llo){_ll.textContent='';_ll.style.background='#fff center/contain no-repeat';_ll.style.backgroundImage='url("'+_llo+'")';} else {_ll.style.backgroundImage='';_ll.textContent=((_ln||'·')[0]||'·').toUpperCase();} }
   const _lb=$('#l-brandsub'); if(_lb)_lb.textContent=T('tit');
   const _lc=$('#l-corner'); if(_lc)_lc.textContent=(_bn?_bn+' · ':'')+new Date().getFullYear();
   $('#l-user').placeholder=T('l_user'); $('#l-pass').placeholder=T('l_pass');
   { const _ld=$('#l-doc'); if(_ld)_ld.textContent=T('l_doc'); }
   $('#l-btn').textContent=T('l_btn'); $('#logout').title=T('logout');
+  $('#tf-tit').textContent=T('tf_tit'); $('#tf-btn').textContent=T('tf_btn');
+  $('#tf-email').textContent=T('tf_email'); $('#tf-recov').textContent=T('tf_recov'); $('#tf-back').textContent=T('tf_back');
+  $('#secbtn').title=T('sec_title'); $('#cfgbtn').title=T('cfg_title'); $('#tw-h').textContent=T('tw_h'); $('#tw-close').textContent=T('close');
   $('#btnhome').textContent='⌂ '+T('apps');
   $('#fi-go').textContent=T('filtrar'); $('#fi-tec').options[0].text=T('allTec');
   $('#fi-csv').textContent=T('f_csv'); $('#fi-mh').textContent=T('f_map');
@@ -785,24 +860,31 @@ function loadData(){
   }).then(d=>{
     if(!d)return;
     DATA=d; hideLogin();
-    $('#who').textContent=d.user||''; $('#logout').style.display='grid'; $('#profsync').style.display='grid'; $('#whyinfo').style.display='grid';
+    $('#who').textContent=d.user||''; $('#logout').style.display='grid'; $('#profsync').style.display='grid'; $('#whyinfo').style.display='grid'; $('#secbtn').style.display='grid'; maybeNudge2fa();
+    $('#cfgbtn').style.display=d.isSuperAdmin?'grid':'none';   // la rueda de config solo la ve el Super-Admin
     fillSel('#f-area',uniq(d.projects.map(p=>p.area)));
     fillSel('#f-estado',uniq(d.projects.map(p=>p.estado)));
     fillSel('#f-entidad',uniq(d.projects.map(p=>p.entidad)));
     fillSel('#f-resp',uniq(d.projects.map(p=>p.responsable)));
-    applyStatic(); renderResumen(); renderExpl(); renderMapa(); renderHub();
+    applyStatic(); renderResumen(); renderExpl(); renderMapa(); renderHub(); loadModules();
     const _dest=appsList().some(a=>a.k===APP)?APP:'proyectos'; // recarga: quedarse donde estaba
     showApp(_dest);
     loadBoard().then(renderMapa);
   }).catch(()=>{$('#kpis').innerHTML='<div class="empty">'+T('noData')+'</div>';});
 }
 // el "hub" ahora es un dock de cubos 3D en escala de grises (uno por app inactiva)
-const APP_META={proyectos:{c:'#4a4a52',c2:'#37373e',c3:'#26262c',fc:'#fff'},fichadas:{c:'#8b8b94',c2:'#71717a',c3:'#585860',fc:'#fff'},tickets:{c:'#c2c2c9',c2:'#a6a6ae',c3:'#88888f',fc:'#1b1b1f'},cumplimiento:{c:'#6e6e78',c2:'#5a5a63',c3:'#47474f',fc:'#fff'}};
+const APP_META={proyectos:{c:'#4a4a52',c2:'#37373e',c3:'#26262c',fc:'#fff'},fichadas:{c:'#8b8b94',c2:'#71717a',c3:'#585860',fc:'#fff'},tickets:{c:'#c2c2c9',c2:'#a6a6ae',c3:'#88888f',fc:'#1b1b1f'},cumplimiento:{c:'#6e6e78',c2:'#5a5a63',c3:'#47474f',fc:'#fff'},crm:{c:'#4a6b5f',c2:'#3a5449',c3:'#2b3f37',fc:'#fff'}};
+const MODMETA={c:'#5a6b8c',c2:'#47566f',c3:'#374255',fc:'#fff'}; // cubo de módulos drop-in
+let MODULES=[]; // módulos descubiertos por modules.php (según entidad del usuario)
 function appsList(){
   const list=[{k:'proyectos',t:T('app_proj')},{k:'tickets',t:T('app_tk')}];
   if(DATA.isAdmin||DATA.isSuper) list.push({k:'cumplimiento',t:T('app_cmp')});
+  const _crm=CONFIG.crm||{};
+  if((DATA.isAdmin||DATA.isSuper)&&_crm.enabled) list.push({k:'crm',t:_crm.label||T('app_crm')});
   const _gps=(CONFIG.modules&&CONFIG.modules.gps)||{};
   if((DATA.isAdmin||DATA.isSuper)&&_gps.enabled) list.push({k:'fichadas',t:_gps.label||T('app_fich')});
+  // módulos drop-in descubiertos (modules/<id>/) visibles para el usuario → cubos-link
+  (MODULES||[]).forEach(m=>list.push({k:'m:'+m.id,t:m.nombre,url:m.url,ext:true}));
   return list.sort((a,b)=>a.t.localeCompare(b.t,LANG,{sensitivity:'base'})); // cubos en orden alfabético
 }
 function renderHub(){
@@ -813,7 +895,7 @@ function renderHub(){
   const cap=el('div','dcap',esc(T('apps'))); d.appendChild(cap);
   const fresh=!localStorage.getItem('rh-dock-used'); // pulso hasta el primer uso
   apps.filter(a=>a.k!==APP).forEach(a=>{
-    const m=APP_META[a.k]||APP_META.proyectos;
+    const m=APP_META[a.k]||(a.ext?MODMETA:APP_META.proyectos);
     const L=esc(((a.t||'·')[0]||'·').toUpperCase());
     const w=el('div','cubewrap'+(fresh?' pulse':''));
     const c=el('div','cube');
@@ -821,7 +903,7 @@ function renderHub(){
     c.innerHTML=`<div class="box"><div class="cface cf1">${L}</div><div class="cface cf2">${L}</div><div class="cface cf3"></div><div class="cface cf4"></div><div class="cface cf5"></div><div class="cface cf6"></div></div>`;
     const lb=el('div','clbl',esc(a.t));
     w.appendChild(c); w.appendChild(lb);
-    w.addEventListener('click',()=>{ if(BUSYAPP)return; BUSYAPP=true; localStorage.setItem('rh-dock-used','1'); c.classList.add('spin'); setTimeout(()=>{showApp(a.k,true);BUSYAPP=false;},430); });
+    w.addEventListener('click',()=>{ if(BUSYAPP)return; BUSYAPP=true; localStorage.setItem('rh-dock-used','1'); c.classList.add('spin'); setTimeout(()=>{ showApp(a.k,true); BUSYAPP=false; },430); });
     d.appendChild(w);
   });
 }
@@ -1003,31 +1085,118 @@ if(lcv){
   addEventListener('resize',()=>{if(LRUN)lpBuild();});
 }
 function showLogin(){
-  $('#loginwrap').classList.add('on');$('#logout').style.display='none';$('#profsync').style.display='none';$('#whyinfo').style.display='none';$('#cnt').textContent='';$('#who').textContent='';applyStatic();
+  $('#loginwrap').classList.add('on');$('#logout').style.display='none';$('#profsync').style.display='none';$('#whyinfo').style.display='none';$('#secbtn').style.display='none';$('#cfgbtn').style.display='none';$('#cnt').textContent='';$('#who').textContent='';resetLoginForms();applyStatic();
   const start=()=>{lpBuild();if(!LRUN){LRUN=true;lpLoop();}};
   (document.fonts&&document.fonts.load)?document.fonts.load("700 100px 'Space Grotesk'").then(start).catch(start):start();
 }
 function hideLogin(){$('#loginwrap').classList.remove('on');LRUN=false;if(lctx&&LW)lctx.clearRect(0,0,LW,LH);}
+// ---- login + doble factor (2FA) ----
+const SEC={setup:false,require:false,mode:'totp'};
+function jpost(url,body){return fetch(url,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})}).then(r=>r.json().then(j=>({s:r.status,j})).catch(()=>({s:r.status,j:{}})));}
+function resetLoginForms(){$('#twofaform').style.display='none';$('#loginform').style.display='';$('#l-err').textContent='';$('#tf-err').textContent='';}
+function showTwofaStep(j){
+  $('#loginform').style.display='none';$('#twofaform').style.display='';
+  $('#tf-err').textContent='';$('#tf-code').value='';$('#tf-code').placeholder='000000';
+  $('#tf-email').style.display=(j&&j.has_email)?'':'none';
+  SEC.mode='totp';$('#tf-sub').textContent=T('tf_sub');
+  setTimeout(()=>$('#tf-code').focus(),60);
+}
+function afterLogin(j){resetLoginForms();$('#l-pass').value='';$('#tf-code').value='';SEC.setup=!!(j&&j.twofa_setup);SEC.require=!!(j&&j.require_2fa);loadData();}
 $('#loginform').addEventListener('submit',e=>{
   e.preventDefault();
   const btn=$('#l-btn'); btn.disabled=true; $('#l-err').textContent='';
-  fetch('login.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({usuario:$('#l-user').value,password:$('#l-pass').value})})
-    .then(r=>r.json().then(j=>({s:r.status,j})).catch(()=>({s:r.status,j:{}})))
+  jpost('login.php',{usuario:$('#l-user').value,password:$('#l-pass').value})
     .then(({s,j})=>{ btn.disabled=false;
-      if(j&&j.ok){ $('#l-pass').value=''; loadData(); }
+      if(j&&j.ok){ afterLogin(j); }
+      else if(j&&j.twofa==='required'){ showTwofaStep(j); }
       else if(s===503){ $('#l-err').textContent=T('l_503'); }
       else if(s===429){ $('#l-err').textContent=T('l_429'); }
       else { $('#l-err').textContent=T('l_err'); }
     }).catch(()=>{ btn.disabled=false; $('#l-err').textContent=T('l_err'); });
 });
+$('#twofaform').addEventListener('submit',e=>{
+  e.preventDefault();
+  const btn=$('#tf-btn'); btn.disabled=true; $('#tf-err').textContent='';
+  jpost('login.php',{code:$('#tf-code').value.trim(),method:SEC.mode})
+    .then(({s,j})=>{ btn.disabled=false;
+      if(j&&j.ok){ afterLogin(j); }
+      else if(s===429){ $('#tf-err').textContent=T('l_429'); }
+      else if(j&&j.error==='expired'){ $('#tf-err').textContent=T('tf_expired'); setTimeout(resetLoginForms,1600); }
+      else { $('#tf-err').textContent=T('tf_bad'); $('#tf-code').select(); }
+    }).catch(()=>{ btn.disabled=false; $('#tf-err').textContent=T('l_err'); });
+});
+$('#tf-email').addEventListener('click',e=>{e.preventDefault();$('#tf-err').textContent='';
+  jpost('login.php',{send_email:true}).then(({j})=>{
+    if(j&&j.ok&&j.sent){ SEC.mode='email'; $('#tf-code').value=''; $('#tf-sub').textContent=T('tf_email_sent')+(j.to?' ('+j.to+')':''); $('#tf-code').focus(); }
+    else { $('#tf-err').textContent=T('tf_email_err'); }
+  });
+});
+$('#tf-recov').addEventListener('click',e=>{e.preventDefault();SEC.mode='recovery';$('#tf-sub').textContent=T('tf_recov_sub');$('#tf-code').value='';$('#tf-code').placeholder='XXXXXXXXXX';$('#tf-code').focus();});
+$('#tf-back').addEventListener('click',e=>{e.preventDefault();resetLoginForms();});
 $('#logout').addEventListener('click',()=>{fetch('logout.php',{method:'POST',credentials:'same-origin'}).then(()=>{DATA={projects:[],states:[]};showLogin();});});
+
+// ---- gestión / enrolamiento del 2FA ----
+function secApi(action,body){return fetch('2fa.php?action='+action,{method:body?'POST':'GET',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined}).then(r=>r.json()).catch(()=>({ok:false}));}
+function openSec(){$('#twofawrap').classList.add('on');secStatus();}
+function closeSec(){$('#twofawrap').classList.remove('on');}
+function maybeNudge2fa(){ if(SEC.setup){$('#secbtn').classList.add('nudge'); if(SEC.require) openSec();} else {$('#secbtn').classList.remove('nudge');} }
+function secStatus(){$('#tw-body').innerHTML='<div class="profmsg">…</div>';secApi('status').then(j=>{ if(j&&j.enabled)secViewOn(); else secViewOff(); });}
+function secViewOff(){
+  $('#tw-body').innerHTML='<span class="tw-badge off">'+T('tw_off')+'</span><p class="tw-note">'+T('tw_intro')+'</p><button class="tw-btn" id="tw-start">'+T('tw_start')+'</button>';
+  $('#tw-start').onclick=secBegin;
+}
+function secBegin(){
+  $('#tw-body').innerHTML='<div class="profmsg">…</div>';
+  secApi('begin',{}).then(j=>{ if(!j||!j.ok){secStatus();return;}
+    $('#tw-body').innerHTML='<p class="tw-note">'+T('tw_scan')+'</p>'+
+      '<div class="tw-qr" id="tw-qr"></div>'+
+      '<div class="tw-secret" id="tw-sec" title="'+T('tw_copy')+'">'+esc(j.grouped)+'</div>'+
+      '<p class="tw-note"><a href="'+esc(j.uri)+'" style="color:var(--accent)">'+T('tw_openapp')+'</a></p>'+
+      '<input class="tw-in" id="tw-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000">'+
+      '<button class="tw-btn" id="tw-confirm">'+T('tw_confirm')+'</button><div class="lerr" id="tw-err"></div>';
+    try{ var q=qrcode(0,'M'); q.addData(j.uri); q.make(); $('#tw-qr').innerHTML=q.createSvgTag({cellSize:5,margin:1,scalable:true}); }
+    catch(_){ $('#tw-qr').style.display='none'; }
+    $('#tw-sec').onclick=()=>{try{navigator.clipboard.writeText(j.secret);}catch(_){}};
+    $('#tw-confirm').onclick=secConfirm;
+    $('#tw-code').addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();secConfirm();}});
+    $('#tw-code').focus();
+  });
+}
+function secConfirm(){const code=$('#tw-code').value.trim();$('#tw-err').textContent='';
+  secApi('confirm',{code}).then(j=>{ if(j&&j.ok){SEC.setup=false;$('#secbtn').classList.remove('nudge');secShowCodes(j.recovery);} else {$('#tw-err').textContent=T('tw_bad');$('#tw-code').select();} });}
+function secShowCodes(codes){
+  $('#tw-body').innerHTML='<span class="tw-badge on">'+T('tw_on')+'</span><p class="tw-note">'+T('tw_codes_note')+'</p>'+
+    '<div class="tw-codes">'+(codes||[]).map(c=>'<span>'+esc(c)+'</span>').join('')+'</div>'+
+    '<button class="tw-btn ghost" id="tw-copyc">'+T('tw_copy_codes')+'</button><button class="tw-btn" id="tw-done">'+T('tw_done')+'</button>';
+  $('#tw-copyc').onclick=()=>{try{navigator.clipboard.writeText((codes||[]).join('\n'));}catch(_){}};
+  $('#tw-done').onclick=secStatus;
+}
+function secViewOn(){
+  $('#tw-body').innerHTML='<span class="tw-badge on">'+T('tw_on')+'</span><p class="tw-note">'+T('tw_on_note')+'</p>'+
+    '<input class="tw-in" id="tw-code" inputmode="numeric" maxlength="10" placeholder="000000">'+
+    '<button class="tw-btn ghost" id="tw-regen">'+T('tw_regen')+'</button>'+
+    '<button class="tw-btn danger" id="tw-disable">'+T('tw_disable')+'</button><div class="lerr" id="tw-err"></div>';
+  $('#tw-regen').onclick=()=>{const code=$('#tw-code').value.trim();$('#tw-err').textContent='';secApi('recodes',{code}).then(j=>{ if(j&&j.ok)secShowCodes(j.recovery); else $('#tw-err').textContent=T('tw_bad'); });};
+  $('#tw-disable').onclick=()=>{const code=$('#tw-code').value.trim();$('#tw-err').textContent='';secApi('disable',{code}).then(j=>{ if(j&&j.ok)secStatus(); else $('#tw-err').textContent=T('tw_bad'); });};
+}
+$('#secbtn').addEventListener('click',openSec);
+$('#cfgbtn').addEventListener('click',()=>{location.href='setup.php';});
+$('#tw-close').addEventListener('click',closeSec);
+$('#twofawrap').addEventListener('click',e=>{if(e.target.id==='twofawrap')closeSec();});
 
 // ---- config del server: branding + módulos (NADA hardcodeado) ----
 let CONFIG={branding:{},modules:{gps:{}}};
+function applyAccent(){
+  const b=CONFIG.branding||{};
+  const dark=(document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))==='dark';
+  const acc=(dark&&b.accent_dark)?b.accent_dark:b.accent;
+  if(acc) document.documentElement.style.setProperty('--accent',acc);
+}
+try{new MutationObserver(applyAccent).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyAccent);}catch(e){}
 function applyBranding(){
   const b=CONFIG.branding||{}, gps=(CONFIG.modules||{}).gps||{};
-  if(b.accent) document.documentElement.style.setProperty('--accent',b.accent);
+  applyAccent();
   const mk=$('#mark'); if(mk) mk.textContent=((b.app_name||'·')[0]||'·').toUpperCase();
   if(b.logo_url) document.querySelectorAll('.markbox').forEach(m=>{const img=el('img');img.src=b.logo_url;img.style.width='30px';img.style.height='auto';m.replaceWith(img);});
   const al=$('#fi-applink'); if(al){ if(gps.app_url){al.href=gps.app_url;al.style.display='';}else{al.style.display='none';} }
@@ -1038,6 +1207,12 @@ function loadConfig(){
     if(c){CONFIG=c; if(!localStorage.getItem('rh-lang')&&c.branding&&c.branding.default_lang){LANG=c.branding.default_lang;$lang.value=LANG;}}
     applyBranding();
   }).catch(()=>{applyBranding();});
+}
+// ---- módulos drop-in: descubrir los visibles y volver a pintar el dock ----
+function loadModules(){
+  return fetch('modules.php?_='+Date.now(),{credentials:'same-origin'})
+    .then(r=>r.ok?r.json():{modules:[]}).then(j=>{MODULES=(j&&j.modules)||[];renderHub();})
+    .catch(()=>{MODULES=[];});
 }
 // ---- selector de perfil (elegir perfil de GLPI) ----
 function closeProf(){$('#profwrap').classList.remove('on');}
@@ -1374,6 +1549,37 @@ $('#tk-clr').addEventListener('click',()=>{
 
 // ---- app Cumplimiento: el panel no verifica los backups, verifica que ----
 // ---- alguien verificó los backups (evidencia = tickets reales de GLPI) ----
+// ---- app CRM: vista comercial de las entidades hijas de una empresa (nativa) ----
+let CRM={data:null,ent:null};
+function fetchCrm(ent){
+  const q = ent!=null&&ent!==''?('?entidad='+encodeURIComponent(ent)) : '';
+  $('#crm-list').innerHTML='<div class="empty">…</div>';
+  fetch('crm.php'+q,{credentials:'same-origin'})
+    .then(r=>{ if(r.status===401){showLogin();return null;} if(r.status===403){$('#crm-list').innerHTML='<div class="empty">'+T('crm_forbidden')+'</div>';return null;} return r.json(); })
+    .then(d=>{ if(!d)return; CRM.data=d; CRM.ent=d.selected; renderCrm(); })
+    .catch(()=>{ $('#crm-list').innerHTML='<div class="empty">'+T('noData')+'</div>'; });
+}
+function renderCrm(){
+  const d=CRM.data; if(!d)return;
+  const sel=$('#crm-sel');
+  sel.innerHTML=(d.parents||[]).map(p=>'<option value="'+p.id+'"'+(p.id===d.selected?' selected':'')+'>'+esc(p.name)+'</option>').join('');
+  $('#crm-emp-lbl').textContent=T('crm_empresa');
+  const cl=d.clientes||[], av=d.avisos||{};
+  $('#crm-count').textContent=cl.length+' '+T('crm_clientes');
+  $('#crm-kpis').innerHTML=[[cl.length,T('crm_clientes')],[av.vencidos||0,T('crm_vencidos')],[av.vencen_30||0,T('crm_v30')],[av.vencen_60||0,T('crm_v60')]]
+    .map(x=>'<div class="kpi"><b>'+x[0]+'</b><span>'+esc(x[1])+'</span></div>').join('');
+  const box=$('#crm-list');
+  if(!cl.length){ box.innerHTML='<div class="empty">'+T('crm_none')+'</div>'; return; }
+  const head='<div class="crmrow crmhead"><span>'+T('crm_cliente')+'</span><span>'+T('crm_resp')+'</span><span>'+T('crm_contratos')+'</span><span>'+T('crm_renov')+'</span></div>';
+  box.innerHTML=head+cl.map(c=>{
+    const resp=c.responsable?('<span class="crmname" style="font-weight:600">'+esc(c.responsable)+'</span>'):('<i class="crmna">'+T('crm_sinasignar')+'</i>');
+    let renov='<i class="crmna">'+T('crm_sincontrato')+'</i>';
+    if(c.renovacion){ const dd=c.dias_para_renovar; const cls=dd==null?'crmsoon':(dd<0?'crmbad':(dd<=30?'crmwarn':(dd<=60?'crmsoon':'crmok')));
+      renov='<span class="crmchip '+cls+'">'+esc(String(c.renovacion).slice(0,10))+(dd!=null?(' · '+(dd<0?T('crm_vencido'):dd+'d')):'')+'</span>'; }
+    return '<div class="crmrow"><span class="crmname">'+esc(c.nombre)+'</span><span>'+resp+'</span><span class="crmnum">'+(c.contratos||0)+'</span><span>'+renov+'</span></div>';
+  }).join('');
+}
+if($('#crm-sel')) $('#crm-sel').addEventListener('change',e=>fetchCrm(e.target.value));
 let CMP={data:null,sel:null,editing:false,draft:null};
 function fetchCumplimiento(){
   fetch('data-cumplimiento.php',{credentials:'same-origin'})
@@ -1505,14 +1711,21 @@ let BUSYAPP=false;
 function showApp(app,anim){
   APP=app;
   if(app!=='hub')localStorage.setItem('rh-app',app);
-  ['hub','proyectos','fichadas','tickets','cumplimiento'].forEach(a=>{const s=$('#v-'+a);s.classList.toggle('appon',a===app);s.classList.remove('circ');});
-  if(anim){const s=$('#v-'+app);void s.offsetWidth;s.classList.add('circ');setTimeout(()=>s.classList.remove('circ'),820);}
+  const isMod=app.indexOf('m:')===0;
+  ['hub','proyectos','fichadas','tickets','cumplimiento','crm'].forEach(a=>{const s=$('#v-'+a);s.classList.toggle('appon',!isMod&&a===app);s.classList.remove('circ');});
+  const vm=$('#v-module'); if(vm){ vm.classList.toggle('appon',isMod); vm.classList.remove('circ'); }
+  if(isMod){
+    const mid=app.slice(2), m=(MODULES||[]).find(x=>x.id===mid), fr=$('#modframe');
+    if(m&&fr){ const src=m.url+(m.url.indexOf('?')<0?'?embed=1':'&embed=1'); if(fr.getAttribute('src')!==src)fr.setAttribute('src',src); }
+  }
+  if(anim){const s=isMod?vm:$('#v-'+app);if(s){void s.offsetWidth;s.classList.add('circ');setTimeout(()=>s.classList.remove('circ'),820);}}
   $('#btnhome').style.display='none';
   document.querySelectorAll('.tab.pt').forEach(t=>t.style.display=app==='proyectos'?'flex':'none');
   if(app==='proyectos')setTab(curTab);
   if(app==='fichadas'){ if(!FICH_INIT){FICH_INIT=true;setPeriod('today');} else fetchFichadas(); }
   if(app==='tickets'){ if(!TK.data)fetchTickets(); else renderTickets(); }
   if(app==='cumplimiento'){ if(!CMP.data)fetchCumplimiento(); else renderCmp(); }
+  if(app==='crm'){ if(!CRM.data)fetchCrm(); else renderCrm(); }
   renderHub();
   window.scrollTo({top:0});
 }

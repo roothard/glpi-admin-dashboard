@@ -15,13 +15,15 @@ $cfg = Settings::load();
 $configured = Settings::isConfigured($cfg);
 
 panel_session();
-$isAdmin = !empty($_SESSION['isAdmin']);
-if ($configured && !$isAdmin) {
+// La configuración es exclusiva del perfil Super-Admin (fallback por nombre de
+// perfil para sesiones abiertas antes de sumar isSuperAdmin).
+$isSuperAdmin = !empty($_SESSION['isSuperAdmin']) || (strtolower($_SESSION['profile'] ?? '') === 'super-admin');
+if ($configured && !$isSuperAdmin) {
     header('Content-Type: text/html; charset=utf-8');
     echo '<!doctype html><meta charset="utf-8"><title>Setup locked</title>'
        . '<div style="font:15px system-ui;max-width:520px;margin:12vh auto;text-align:center;color:#334">'
-       . '<h2>🔒 Configuration is locked</h2><p>Sign in as a GLPI administrator from the dashboard, then reopen setup.</p>'
-       . '<p><a href="index.html">← Back to the dashboard</a></p></div>';
+       . '<h2>🔒 Configuración restringida</h2><p>Entrá al tablero con un perfil <b>Super-Admin</b> de GLPI y volvé a abrir la configuración.</p>'
+       . '<p><a href="index.html">← Volver al tablero</a></p></div>';
     exit;
 }
 
@@ -104,6 +106,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    if ($action === 'entities') { // listar entidades para elegir las "empresa/padre" del CRM
+        // Modelo por-sesión: usa la sesión GLPI del admin logueado (sin token de
+        // servicio). GLPI aplica su aislamiento por entidad automáticamente.
+        $tok = $_SESSION['glpi_token'] ?? '';
+        if ($tok === '') { echo json_encode(['ok' => false, 'msg' => 'sesión requerida — entrá al tablero primero']); exit; }
+        list($c, $ents) = glpi_fetch('/Entity', ['range' => '0-1000'], $tok);
+        if ($c >= 400) { echo json_encode(['ok' => false, 'msg' => "GLPI HTTP $c"]); exit; }
+        $name = []; $hasKids = [];
+        foreach ((array)$ents as $e) {
+            $id = (int)($e['id'] ?? -1); if ($id < 0) continue;
+            $name[$id] = ($e['completename'] ?? '') !== '' ? $e['completename'] : (string)($e['name'] ?? ('#' . $id));
+            $pid = (int)($e['entities_id'] ?? -1); if ($pid >= 0) { $hasKids[$pid] = true; }
+        }
+        $out = [];
+        foreach ($name as $id => $n) { $out[] = ['id' => $id, 'name' => $n, 'kids' => !empty($hasKids[$id])]; }
+        usort($out, fn($a, $b) => strcasecmp($a['name'], $b['name']));
+        echo json_encode(['ok' => true, 'entities' => $out], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     $keepSecret = fn($new, $old) => (trim((string)$new) === '') ? $old : trim((string)$new);
     $csv = fn($s) => array_values(array_filter(array_map('trim', explode(',', (string)$s))));
 
@@ -125,11 +147,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cfg['projects']['state_done']        = $csv($in['state_done'] ?? '');
     $cfg['projects']['state_planned']     = $csv($in['state_planned'] ?? '');
 
-    $cfg['branding']['app_name']     = trim($in['app_name'] ?? '') ?: 'Projects Dashboard';
-    $cfg['branding']['subtitle']     = trim($in['subtitle'] ?? ($cfg['branding']['subtitle'] ?? ''));
-    $cfg['branding']['accent']       = preg_match('/^#[0-9a-fA-F]{6}$/', $in['accent'] ?? '') ? $in['accent'] : '#405cde';
-    $cfg['branding']['logo_url']     = trim($in['logo_url'] ?? '');
-    $cfg['branding']['default_lang'] = in_array(($in['default_lang'] ?? 'es'), ['es', 'en', 'fr', 'de', 'pt'], true) ? $in['default_lang'] : 'es';
+    $cfg['branding']['app_name']       = trim($in['app_name'] ?? '') ?: 'Projects Dashboard';
+    $cfg['branding']['subtitle']       = trim($in['subtitle'] ?? ($cfg['branding']['subtitle'] ?? ''));
+    $cfg['branding']['accent']         = preg_match('/^#[0-9a-fA-F]{6}$/', $in['accent'] ?? '') ? $in['accent'] : '#405cde';
+    $cfg['branding']['logo_url']       = trim($in['logo_url'] ?? '');
+    $cfg['branding']['default_lang']   = in_array(($in['default_lang'] ?? 'es'), ['es', 'en', 'fr', 'de', 'pt'], true) ? $in['default_lang'] : 'es';
+    // Paleta pre-establecida (o 'custom' → usa el color 'accent' de arriba).
+    $palKeys = array_keys(Settings::palettes());
+    $cfg['branding']['palette']        = in_array(($in['palette'] ?? 'roothard'), array_merge($palKeys, ['custom']), true) ? $in['palette'] : 'roothard';
+    // Marca propia del login (vacío = hereda de la app).
+    $cfg['branding']['login_name']     = trim($in['login_name'] ?? '');
+    $cfg['branding']['login_subtitle'] = trim($in['login_subtitle'] ?? '');
+    $cfg['branding']['login_logo_url'] = trim($in['login_logo_url'] ?? '');
 
     $cfg['modules']['gps']['enabled']    = !empty($in['gps_enabled']);
     $cfg['modules']['gps']['label']      = trim($in['gps_label'] ?? '') ?: 'GPS Check-ins';
@@ -143,6 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cfg['contact']['google_chat']  = !empty($in['contact_gchat']);
     $cfg['contact']['msg_default']  = trim($in['contact_msg_default'] ?? '') ?: ($cfg['contact']['msg_default'] ?? '');
     $cfg['contact']['msg_reminder'] = trim($in['contact_msg_reminder'] ?? '') ?: ($cfg['contact']['msg_reminder'] ?? '');
+
+    // CRM (app nativa). 'parents' = entidades "empresa" que administran clientes;
+    // vacío = autodescubre las que el usuario ve y que tienen hijas.
+    $cfg['crm']['enabled'] = !empty($in['crm_enabled']);
+    $cfg['crm']['label']   = trim($in['crm_label'] ?? '') ?: 'CRM';
+    $cfg['crm']['parents'] = array_values(array_unique(array_filter(array_map('intval',
+        is_array($in['crm_parents'] ?? null) ? $in['crm_parents'] : explode(',', (string)($in['crm_parents'] ?? '')))
+    )));
 
     $cfg['timezone'] = trim($in['timezone'] ?? 'UTC') ?: 'UTC';
 
@@ -171,6 +208,9 @@ $g = $cfg['glpi'];
 $p = $cfg['projects'];
 $gps = $cfg['modules']['gps'];
 $ct = ($cfg['contact'] ?? []) + ['google_chat'=>true,'msg_default'=>'','msg_reminder'=>''];
+$crm = ($cfg['crm'] ?? []) + ['enabled'=>false,'label'=>'CRM','parents'=>[]];
+$palettes = Settings::palettes();
+$curPalette = in_array(($b['palette'] ?? 'roothard'), array_merge(array_keys($palettes), ['custom']), true) ? $b['palette'] : 'roothard';
 $mask = fn($v) => $v !== '' ? '••••••••' : '';
 $h = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES);
 $deflang = in_array($b['default_lang'], ['es','en','fr','de','pt'], true) ? $b['default_lang'] : 'es';
@@ -216,6 +256,22 @@ details.step[open]>summary::before{transform:rotate(90deg)}
 button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18px;cursor:pointer}
 .save{background:var(--ac);color:#fff}.test{background:var(--card);color:var(--tx);border:1px solid var(--bd2)}
 #msg{font-size:13.5px;font-weight:600}
+/* paletas de color */
+.pals{display:flex;gap:10px;flex-wrap:wrap}
+.pal{cursor:pointer;border:2px solid var(--bd2);border-radius:11px;padding:9px 11px;display:flex;align-items:center;gap:9px;background:var(--bg);min-width:132px}
+.pal:hover{border-color:var(--bd)}
+.pal.on{border-color:var(--ac);box-shadow:0 0 0 2px color-mix(in srgb,var(--ac) 22%,transparent)}
+.pal input{position:absolute;opacity:0;pointer-events:none}
+.pal .sw{width:22px;height:22px;border-radius:7px;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.pal .pname{font-weight:600;font-size:13px}
+/* multiselect de entidades (CRM) */
+.entbox{border:1px solid var(--bd2);border-radius:10px;max-height:210px;overflow:auto;background:var(--bg)}
+.entrow{display:flex;align-items:center;gap:9px;padding:7px 11px;border-bottom:1px solid var(--bd);cursor:pointer;font-size:13.5px}
+.entrow:last-child{border-bottom:none}
+.entrow:hover{background:var(--card)}
+.entrow input{width:auto;margin:0}
+.entrow .badge{margin-left:auto;font-size:11px;color:var(--mu);border:1px solid var(--bd2);border-radius:6px;padding:1px 6px}
+.entrow .badge.kids{color:var(--ac);border-color:var(--ac)}
 </style></head>
 <body><div class="wrap">
 <div class="topbar">
@@ -295,8 +351,8 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
   </div>
 </details>
 
-<details class="step">
-  <summary><span data-i="s3">3 · Apariencia</span> <span class="opt" data-i="optonly">— opcional</span></summary>
+<details class="step" open>
+  <summary><span data-i="s3">General · Marca</span> <span class="opt" data-i="s3opt">— logo, nombre y colores</span></summary>
   <div class="body">
     <div class="field"><label data-i="l_name">Nombre de la app</label>
       <div style="display:flex;gap:8px;align-items:stretch">
@@ -304,9 +360,56 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
         <button type="button" class="act test" id="fetchent" data-i="b_fetchent" style="white-space:nowrap;padding:9px 13px">Traer de GLPI</button>
       </div>
       <p class="help" data-i="h_name"></p></div>
-    <div class="field"><label data-i="l_accent">Color principal</label><input type="color" name="accent" value="<?= $h($b['accent']) ?>"></div>
-    <div class="field"><label data-i="l_logo">URL del logo</label><input type="url" name="logo_url" value="<?= $h($b['logo_url']) ?>" placeholder="opcional"><p class="help" data-i="h_logo"></p></div>
+    <div class="field"><label data-i="l_logo">URL del logo de la app</label><input type="url" name="logo_url" value="<?= $h($b['logo_url']) ?>" placeholder="opcional"><p class="help" data-i="h_logo"></p></div>
+
+    <div class="field" style="border-top:1px solid var(--bd);padding-top:14px"><label data-i="l_palette">Paleta de colores</label>
+      <div class="pals" id="pals">
+      <?php foreach ($palettes as $pk => $pv): ?>
+        <label class="pal<?= $curPalette===$pk?' on':'' ?>" data-pal="<?= $h($pk) ?>">
+          <input type="radio" name="palette" value="<?= $h($pk) ?>" <?= $curPalette===$pk?'checked':'' ?>>
+          <span class="sw" style="background:<?= $h($pv['accent']) ?>"></span>
+          <span class="pname"><?= $h($pv['name']) ?></span>
+        </label>
+      <?php endforeach; ?>
+        <label class="pal<?= $curPalette==='custom'?' on':'' ?>" data-pal="custom">
+          <input type="radio" name="palette" value="custom" <?= $curPalette==='custom'?'checked':'' ?>>
+          <span class="sw" id="customsw" style="background:<?= $h($b['accent']) ?>"></span>
+          <span class="pname" data-i="l_custom">Personalizado</span>
+        </label>
+      </div>
+      <div class="field" id="customwrap" style="margin:12px 0 0;<?= $curPalette==='custom'?'':'display:none' ?>">
+        <label data-i="l_accent">Color principal</label><input type="color" name="accent" value="<?= $h($b['accent']) ?>">
+      </div>
+      <p class="help" data-i="h_palette"></p>
+    </div>
+
+    <div class="field" style="border-top:1px solid var(--bd);padding-top:14px"><label data-i="l_loginbrand" style="font-size:14px">Pantalla de inicio de sesión</label>
+      <p class="help" data-i="h_loginbrand" style="margin:0 0 10px"></p>
+      <input type="text" name="login_name" value="<?= $h($b['login_name'] ?? '') ?>" placeholder="<?= $h($b['app_name']) ?>">
+      <p class="help" data-i="h_loginname"></p>
+      <input type="text" name="login_subtitle" value="<?= $h($b['login_subtitle'] ?? '') ?>" placeholder="<?= $h($b['subtitle'] ?? '') ?>" style="margin-top:8px">
+      <input type="url" name="login_logo_url" value="<?= $h($b['login_logo_url'] ?? '') ?>" placeholder="URL del logo del login (opcional)" style="margin-top:8px">
+    </div>
+
     <div class="field"><label data-i="l_lang">Idioma por defecto</label><select name="default_lang"><?php foreach (['es'=>'Español','en'=>'English','fr'=>'Français','de'=>'Deutsch','pt'=>'Português'] as $k=>$v) echo '<option value="'.$k.'" '.($b['default_lang']===$k?'selected':'').">$v</option>"; ?></select></div>
+  </div>
+</details>
+
+<details class="step" id="step-crm">
+  <summary><span data-i="scrm">CRM · Empresas y clientes</span> <span class="opt" data-i="optonly">— opcional</span></summary>
+  <div class="body">
+    <p class="help" data-i="h_crm" style="margin:2px 0 12px"></p>
+    <div class="field chk2"><input type="checkbox" name="crm_enabled" id="crmen" <?= $crm['enabled'] ? 'checked' : '' ?>><label for="crmen" style="margin:0" data-i="l_crmen">Activar el CRM (cubo para admin/supervisor)</label></div>
+    <div class="field"><label data-i="l_crmlabel">Etiqueta del cubo</label><input type="text" name="crm_label" value="<?= $h($crm['label']) ?>" placeholder="CRM"></div>
+    <div class="field">
+      <label data-i="l_crmparents">Entidades «empresa» (administran clientes)</label>
+      <input type="hidden" name="crm_parents_stored" value="<?= $h(implode(',', array_map('intval', $crm['parents']))) ?>">
+      <div style="display:flex;gap:8px;margin:0 0 8px">
+        <button type="button" class="act test" id="loadents" data-i="b_loadents" style="white-space:nowrap;padding:9px 13px">Cargar entidades de GLPI</button>
+      </div>
+      <div class="entbox" id="entbox"><div style="padding:11px;color:var(--mu);font-size:13px" data-i="crm_empty">Tocá «Cargar entidades» para elegir. Si dejás vacío, se autodetectan las entidades con hijas.</div></div>
+      <p class="help" data-i="h_crmparents"></p>
+    </div>
   </div>
 </details>
 
@@ -447,6 +550,17 @@ Object.assign(I18N.en,{optonly:'— optional',s5c:'Contact messages',h_contact:'
 Object.assign(I18N.fr,{optonly:'— optionnel',s5c:'Messages de contact',h_contact:'Boutons pour écrire aux techniciens (WhatsApp/SMS/Mail) avec un message pré-rempli. Utilisez <code>{nombre}</code> pour le nom.',l_msgdef:'Message par défaut',l_msgrem:'Message de rappel (non pointé)',l_gchat:'Afficher le bouton Google Chat'});
 Object.assign(I18N.de,{optonly:'— optional',s5c:'Kontaktnachrichten',h_contact:'Buttons, um Technikern zu schreiben (WhatsApp/SMS/Mail) mit vorausgefülltem Text. <code>{nombre}</code> = Name.',l_msgdef:'Standardnachricht',l_msgrem:'Erinnerung (heute nicht erfasst)',l_gchat:'Google-Chat-Button anzeigen'});
 Object.assign(I18N.pt,{optonly:'— opcional',s5c:'Mensagens de contato',h_contact:'Botões para escrever aos técnicos (WhatsApp/SMS/Mail) com texto pré-preenchido. Use <code>{nombre}</code> para o nome.',l_msgdef:'Mensagem padrão',l_msgrem:'Mensagem de lembrete (sem registro hoje)',l_gchat:'Mostrar botão do Google Chat'});
+// Marca general + paletas + login + CRM
+Object.assign(I18N.es,{s3:'General · Marca',s3opt:'— logo, nombre y colores',l_logo:'URL del logo de la app',l_palette:'Paleta de colores',l_custom:'Personalizado',h_palette:'Elegí una de las 3 paletas o «Personalizado» para un color libre. Se aplica al color de acento de todo el tablero.',l_loginbrand:'Pantalla de inicio de sesión',h_loginbrand:'Marca propia del login. Si dejás algo vacío, usa lo de la app.',h_loginname:'Título que se ve en la pantalla de login.',
+  scrm:'CRM · Empresas y clientes',h_crm:'El CRM muestra los <b>clientes</b> (entidades hijas) de cada <b>empresa</b> (entidad padre) con sus contratos y renovaciones. Solo lo ven admin y supervisores.',l_crmen:'Activar el CRM (cubo para admin/supervisor)',l_crmlabel:'Etiqueta del cubo',l_crmparents:'Entidades «empresa» (administran clientes)',b_loadents:'Cargar entidades de GLPI',crm_empty:'Tocá «Cargar entidades» para elegir. Si dejás vacío, se autodetectan las entidades con hijas.',h_crmparents:'Marcá qué entidades son «empresa». Sus entidades hijas se listan como clientes. Vacío = autodetección.',m_entsload:'Leyendo entidades…',m_ents:'✓ {n} entidades',crm_kids:'con hijas'});
+Object.assign(I18N.en,{s3:'General · Brand',s3opt:'— logo, name and colours',l_logo:'App logo URL',l_palette:'Colour palette',l_custom:'Custom',h_palette:'Pick one of the 3 palettes or “Custom” for a free colour. It sets the accent colour across the dashboard.',l_loginbrand:'Login screen',h_loginbrand:'The login’s own branding. Leave a field blank to inherit the app’s.',h_loginname:'Title shown on the login screen.',
+  scrm:'CRM · Companies & clients',h_crm:'The CRM shows the <b>clients</b> (child entities) of each <b>company</b> (parent entity) with their contracts and renewals. Only admins and supervisors see it.',l_crmen:'Enable the CRM (cube for admin/supervisor)',l_crmlabel:'Cube label',l_crmparents:'“Company” entities (they manage clients)',b_loadents:'Load entities from GLPI',crm_empty:'Click “Load entities” to choose. If left empty, entities with children are auto-detected.',h_crmparents:'Tick which entities are “companies”. Their child entities are listed as clients. Empty = auto-detect.',m_entsload:'Reading entities…',m_ents:'✓ {n} entities',crm_kids:'has children'});
+Object.assign(I18N.fr,{s3:'Général · Marque',s3opt:'— logo, nom et couleurs',l_logo:'URL du logo de l’app',l_palette:'Palette de couleurs',l_custom:'Personnalisé',h_palette:'Choisissez une des 3 palettes ou « Personnalisé » pour une couleur libre. Définit la couleur d’accent du tableau.',l_loginbrand:'Écran de connexion',h_loginbrand:'La marque propre à la connexion. Laissez vide pour hériter de l’app.',h_loginname:'Titre affiché sur l’écran de connexion.',
+  scrm:'CRM · Entreprises & clients',h_crm:'Le CRM affiche les <b>clients</b> (entités filles) de chaque <b>entreprise</b> (entité parente) avec leurs contrats et renouvellements. Réservé aux admins et superviseurs.',l_crmen:'Activer le CRM (cube pour admin/superviseur)',l_crmlabel:'Libellé du cube',l_crmparents:'Entités « entreprise » (gèrent des clients)',b_loadents:'Charger les entités depuis GLPI',crm_empty:'Cliquez sur « Charger les entités » pour choisir. Vide = détection automatique des entités ayant des filles.',h_crmparents:'Cochez les entités « entreprise ». Leurs entités filles apparaissent comme clients. Vide = auto.',m_entsload:'Lecture des entités…',m_ents:'✓ {n} entités',crm_kids:'a des filles'});
+Object.assign(I18N.de,{s3:'Allgemein · Marke',s3opt:'— Logo, Name und Farben',l_logo:'App-Logo-URL',l_palette:'Farbpalette',l_custom:'Benutzerdefiniert',h_palette:'Wählen Sie eine der 3 Paletten oder „Benutzerdefiniert“ für eine freie Farbe. Legt die Akzentfarbe im Dashboard fest.',l_loginbrand:'Anmeldebildschirm',h_loginbrand:'Eigenes Branding des Logins. Leer lassen, um das der App zu übernehmen.',h_loginname:'Titel auf dem Anmeldebildschirm.',
+  scrm:'CRM · Firmen & Kunden',h_crm:'Das CRM zeigt die <b>Kunden</b> (Unter-Entitäten) jeder <b>Firma</b> (übergeordnete Entität) mit Verträgen und Verlängerungen. Nur Admins und Supervisoren sehen es.',l_crmen:'CRM aktivieren (Würfel für Admin/Supervisor)',l_crmlabel:'Würfel-Beschriftung',l_crmparents:'„Firma“-Entitäten (verwalten Kunden)',b_loadents:'Entitäten aus GLPI laden',crm_empty:'„Entitäten laden“ klicken, um zu wählen. Leer = Entitäten mit Kindern werden automatisch erkannt.',h_crmparents:'Markieren Sie die „Firma“-Entitäten. Ihre Unter-Entitäten erscheinen als Kunden. Leer = automatisch.',m_entsload:'Entitäten werden gelesen…',m_ents:'✓ {n} Entitäten',crm_kids:'hat Kinder'});
+Object.assign(I18N.pt,{s3:'Geral · Marca',s3opt:'— logo, nome e cores',l_logo:'URL do logo do app',l_palette:'Paleta de cores',l_custom:'Personalizado',h_palette:'Escolha uma das 3 paletas ou «Personalizado» para uma cor livre. Define a cor de destaque do painel.',l_loginbrand:'Tela de login',h_loginbrand:'A marca própria do login. Deixe em branco para herdar a do app.',h_loginname:'Título exibido na tela de login.',
+  scrm:'CRM · Empresas & clientes',h_crm:'O CRM mostra os <b>clientes</b> (entidades filhas) de cada <b>empresa</b> (entidade pai) com contratos e renovações. Só admins e supervisores veem.',l_crmen:'Ativar o CRM (cubo para admin/supervisor)',l_crmlabel:'Rótulo do cubo',l_crmparents:'Entidades «empresa» (administram clientes)',b_loadents:'Carregar entidades do GLPI',crm_empty:'Toque em «Carregar entidades» para escolher. Vazio = entidades com filhas são detectadas automaticamente.',h_crmparents:'Marque quais entidades são «empresa». Suas entidades filhas aparecem como clientes. Vazio = automático.',m_entsload:'Lendo entidades…',m_ents:'✓ {n} entidades',crm_kids:'tem filhas'});
 let LANG=localStorage.getItem('pd-lang')||DEF||'es';
 if(!I18N[LANG])LANG='es';
 const T=k=>(I18N[LANG]&&I18N[LANG][k])||(I18N.en[k])||k;
@@ -465,8 +579,12 @@ $('#theme').addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'d
 updTheme(); applyI18n();
 // form
 const f=$('#f'), msg=$('#msg');
-const data=()=>{const o={};new FormData(f).forEach((v,k)=>o[k]=v);
-  ['glpi_tokens_in_query','glpi_insecure','include_only_leaf','include_untyped','gps_enabled'].forEach(k=>o[k]=f.elements[k].checked?1:'');return o;};
+const data=()=>{const o={};new FormData(f).forEach((v,k)=>{if(k==='crm_parents')return;o[k]=v;});
+  ['glpi_tokens_in_query','glpi_insecure','include_only_leaf','include_untyped','gps_enabled','crm_enabled'].forEach(k=>o[k]=(f.elements[k]&&f.elements[k].checked)?1:'');
+  const boxes=document.querySelectorAll('#entbox input[type=checkbox]');
+  o['crm_parents']=boxes.length?[...boxes].filter(x=>x.checked).map(x=>x.value).join(','):(o['crm_parents_stored']||'');
+  delete o['crm_parents_stored'];
+  return o;};
 const post=pl=>fetch('setup.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pl)}).then(r=>r.json());
 $('#test').onclick=()=>{msg.style.color='var(--mu)';msg.textContent=T('m_testing');
   post(Object.assign(data(),{action:'test'})).then(j=>{msg.style.color=j.ok?'#1f9d55':'#d33';msg.textContent=j.ok?T('m_ok').replace('{n}',j.n):('✕ '+j.msg);}).catch(()=>{msg.style.color='#d33';msg.textContent=T('m_reqfail');});};
@@ -485,6 +603,37 @@ $('#fetchent').onclick=()=>{msg.style.color='var(--mu)';msg.textContent=T('m_fet
   post(Object.assign(data(),{action:'entity'})).then(j=>{
     if(j.ok&&j.name){f.elements['app_name'].value=j.name;msg.style.color='#1f9d55';msg.textContent=T('m_fetched');}
     else{msg.style.color='#d33';msg.textContent=j.msg?('✕ '+j.msg):T('m_fetchnone');}
+  }).catch(()=>{msg.style.color='#d33';msg.textContent=T('m_reqfail');});};
+// paletas de color: al elegir una, resalta y muestra/oculta el color libre
+document.querySelectorAll('#pals .pal').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('#pals .pal').forEach(x=>x.classList.remove('on'));
+    p.classList.add('on');
+    const r=p.querySelector('input[type=radio]'); if(r)r.checked=true;
+    const cw=document.getElementById('customwrap'); if(cw)cw.style.display=(p.dataset.pal==='custom')?'':'none';
+  });
+});
+{const ac=f.elements['accent']; if(ac)ac.addEventListener('input',e=>{const sw=document.getElementById('customsw'); if(sw)sw.style.background=e.target.value;});}
+// CRM: cargar entidades y pintar el selector de empresas-padre
+let ENTS=null;
+function renderEnts(){
+  const box=document.getElementById('entbox'); if(!box||!ENTS)return;
+  const stored=(f.elements['crm_parents_stored'].value||'').split(',').filter(Boolean).map(Number);
+  box.innerHTML='';
+  ENTS.forEach(en=>{
+    const row=document.createElement('label');row.className='entrow';
+    const cb=document.createElement('input');cb.type='checkbox';cb.value=en.id;if(stored.includes(en.id))cb.checked=true;
+    const nm=document.createElement('span');nm.textContent=en.name;
+    row.appendChild(cb);row.appendChild(nm);
+    if(en.kids){const bd=document.createElement('span');bd.className='badge kids';bd.textContent=T('crm_kids');row.appendChild(bd);}
+    box.appendChild(row);
+  });
+}
+$('#loadents').onclick=()=>{msg.style.color='var(--mu)';msg.textContent=T('m_entsload');
+  post(Object.assign(data(),{action:'entities'})).then(j=>{
+    if(!j.ok){msg.style.color='#d33';msg.textContent='✕ '+(j.msg||T('m_reqfail'));return;}
+    ENTS=j.entities||[];renderEnts();
+    msg.style.color='#1f9d55';msg.textContent=T('m_ents').replace('{n}',ENTS.length);
   }).catch(()=>{msg.style.color='#d33';msg.textContent=T('m_reqfail');});};
 f.onsubmit=e=>{e.preventDefault();msg.style.color='var(--mu)';msg.textContent=T('m_saving');
   post(Object.assign(data(),{action:'save'})).then(j=>{
