@@ -41,9 +41,11 @@ timeline and linked knowledge-base articles.
 > Status: **working** — REST generator, web setup wizard, and login-gated
 > portal are all in use. A Docker image is on the roadmap (see below).
 
-> 📖 **User manual & changelog:** [`docs/`](docs/index.html) (Spanish) — how each
-> app works, compliance best practices, recommended GLPI categories, and the full
-> version history. See also [CHANGELOG.md](CHANGELOG.md).
+> 📖 **User manual & changelog** (Spanish) — read it online at
+> **<https://gps.roothard.com.ar/docDash.html>**, or in this repo under
+> [`docs/`](docs/index.html): how each app works (Projects, GPS, Tickets, CRM,
+> Compliance), the config panel, 2FA, compliance best practices and recommended
+> GLPI categories. See also [CHANGELOG.md](CHANGELOG.md).
 
 ![Overview — light theme](docs/shots/overview.png)
 

@@ -122,10 +122,12 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
     <div class="sb-title">Introducción</div>
     <a class="sb-link" href="#intro">Qué es el panel</a>
     <a class="sb-link" href="#nav">Navegación (el dock de cubos)</a>
+    <a class="sb-link" href="#barras">Mostrar / ocultar las barras</a>
     <div class="sb-title">Aplicaciones</div>
     <a class="sb-link" href="#proyectos">Proyectos</a>
     <a class="sb-link" href="#fichadas">Fichadas GPS</a>
     <a class="sb-link" href="#tickets">Tickets</a>
+    <a class="sb-link" href="#crm">CRM</a>
     <a class="sb-link" href="#cumplimiento">Cumplimiento</a>
     <div class="sb-title">Cumplimiento en detalle</div>
     <a class="sb-link" href="#estados">Los cuatro estados</a>
@@ -134,8 +136,11 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
     <div class="sb-title">Buenas prácticas</div>
     <a class="sb-link" href="#practicas">Recomendaciones</a>
     <a class="sb-link" href="#categorias">Categorías en GLPI</a>
+    <div class="sb-title">Configuración</div>
+    <a class="sb-link" href="#config">Marca, colores y paletas</a>
+    <a class="sb-link" href="#crm-setup">Configurar el CRM</a>
     <div class="sb-title">Referencia</div>
-    <a class="sb-link" href="#seguridad">Seguridad</a>
+    <a class="sb-link" href="#seguridad">Seguridad y 2FA</a>
     <a class="sb-link" href="#changelog">Registro de versiones</a>
   </nav>
   <div class="scrim" id="scrim"></div>
@@ -145,10 +150,11 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
       <div class="breadcrumb">RootHard · <b>Centro de Administración GLPI</b></div>
       <h1 class="doc-h1" id="intro">Manual del panel de administración GLPI</h1>
       <p class="doc-lead">Un panel liviano y autoalojado que lee tu GLPI por su API REST y muestra
-        cuatro aplicaciones: <strong>Proyectos</strong>, <strong>Fichadas GPS</strong>,
-        <strong>Tickets</strong> y <strong>Cumplimiento</strong>. Cada usuario inicia sesión con
-        su propia cuenta de GLPI y solo ve lo que GLPI le permite ver. Este manual explica cómo se
-        usa cada aplicación, con foco en Cumplimiento y en cómo conviene organizar las categorías.</p>
+        cinco aplicaciones: <strong>Proyectos</strong>, <strong>Fichadas GPS</strong>,
+        <strong>Tickets</strong>, <strong>CRM</strong> y <strong>Cumplimiento</strong>. Cada usuario
+        inicia sesión con su propia cuenta de GLPI y solo ve lo que GLPI le permite ver. Este manual
+        explica cómo se usa cada aplicación, cómo se configura la marca y los colores, y cómo
+        conviene organizar las categorías.</p>
 
       <p class="doc-p">El panel es de <strong>solo lectura</strong> sobre GLPI: nunca modifica tus
         tickets ni tus proyectos. Toma los datos, los ordena y los presenta. La única información
@@ -160,12 +166,26 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
         aplicación. Al hacer clic en un cubo, la app actual se transforma en él y se abre la nueva
         con una transición. Cada cubo lleva la inicial de su app: <code class="ic">P</code>
         Proyectos, <code class="ic">F</code> Fichadas, <code class="ic">T</code> Tickets,
-        <code class="ic">C</code> Cumplimiento.</p>
+        <code class="ic">C</code> CRM y <code class="ic">C</code> Cumplimiento.</p>
       <div class="callout callout-info"><span class="callout-icon">ℹ️</span>
         <div class="callout-body"><strong>Visibilidad por perfil.</strong> Proyectos y Tickets los
-        ven todos los perfiles. <strong>Fichadas</strong> y <strong>Cumplimiento</strong> aparecen
-        solo para administradores y supervisores, porque son vistas de gestión. Al recargar la
-        página, el panel te deja en la misma app en la que estabas.</div></div>
+        ven todos los perfiles. <strong>Fichadas</strong>, <strong>CRM</strong> y
+        <strong>Cumplimiento</strong> aparecen solo para administradores y supervisores, porque son
+        vistas de gestión. La <strong>rueda ⚙</strong> de configuración, arriba a la derecha, la ve
+        solo el perfil <strong>Super-Admin</strong>. Al recargar la página, el panel te deja en la
+        misma app en la que estabas.</div></div>
+
+      <h2 class="doc-h2" id="barras">Mostrar / ocultar las barras</h2>
+      <p class="doc-p">Podés ganar espacio ocultando las dos barras, y el panel <strong>recuerda</strong>
+        tu elección en ese navegador:</p>
+      <ul class="doc-ul">
+        <li><strong>Dock de cubos (lateral).</strong> El botón <em>«Ocultar»</em> al pie del dock lo
+          esconde; para traerlo de vuelta, la pestañita <code class="ic">›</code> del borde
+          izquierdo.</li>
+        <li><strong>Barra superior.</strong> El botón <code class="ic">▲</code> del encabezado la
+          oculta; la pestañita <code class="ic">⌄</code> arriba al centro la muestra. Además se
+          <strong>oculta sola al bajar</strong> y reaparece al subir con el scroll.</li>
+      </ul>
 
       <h2 class="doc-h2" id="proyectos">Aplicación · Proyectos</h2>
       <p class="doc-p">Muestra el portafolio de proyectos de GLPI con tres pestañas:
@@ -191,6 +211,23 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
         <li><strong>Horas</strong> — horas trabajadas por cliente (apiladas por categoría), por
           técnico y volumen de tickets por mes.</li>
       </ul>
+
+      <h2 class="doc-h2" id="crm">Aplicación · CRM</h2>
+      <p class="doc-p">Una vista comercial de tu cartera, para <strong>administradores y
+        supervisores</strong>. Parte de una idea simple sobre las entidades de GLPI: una
+        <strong>empresa</strong> es una entidad <em>padre</em> y sus <strong>clientes</strong> son
+        sus entidades <em>hijas</em>. Arriba hay un <strong>selector de empresa</strong>: elegís con
+        cuál trabajar y la tabla muestra sus clientes.</p>
+      <p class="doc-p">De cada cliente ves su cantidad de <strong>contratos</strong>, la fecha de
+        <strong>renovación</strong> más próxima (con un semáforo por vencidos / vencen en 30 / en
+        60 días) y el <strong>responsable comercial</strong>. Como todo el panel, se arma con
+        <strong>tu propia sesión de GLPI</strong>: solo ves las empresas y clientes que GLPI te
+        permite ver.</p>
+      <div class="callout callout-info"><span class="callout-icon">ℹ️</span>
+        <div class="callout-body"><strong>Plugin <em>manageentities</em> (opcional).</strong> Los
+        contratos, la renovación y el responsable salen del plugin GLPI <em>manageentities</em>. Si
+        no está instalado, el CRM funciona igual: la lista de clientes se arma con las entidades y
+        esas columnas quedan en «—». Ver <a href="#crm-setup">Configurar el CRM</a>.</div></div>
 
       <h2 class="doc-h2" id="cumplimiento">Aplicación · Cumplimiento</h2>
       <p class="doc-p">Es una vista de <strong>gobierno</strong>, pensada para una reunión de
@@ -318,14 +355,59 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
 ├── Revisión de alertas
 └── Auditoría de firewall</pre>
 
-      <h2 class="doc-h2" id="seguridad">Seguridad</h2>
+      <h2 class="doc-h2" id="config">Configuración: marca, colores y paletas</h2>
+      <p class="doc-p">La configuración se abre con la <strong>rueda ⚙</strong> del encabezado y solo
+        la ve y la puede abrir el perfil <strong>Super-Admin</strong> de GLPI (también en
+        <code class="ic">/setup.php</code>). Todo se guarda en un archivo del servidor, fuera de la
+        carpeta pública; los secretos nunca llegan al navegador.</p>
+      <p class="doc-p">Está organizada en secciones: una parte <strong>general</strong> del panel y
+        una sección <strong>por cada app</strong>. En <strong>General · Marca</strong> configurás:</p>
+      <ul class="doc-ul">
+        <li><strong>Nombre y logo de la app</strong> (podés traer el nombre de tu entidad raíz de
+          GLPI).</li>
+        <li><strong>Marca propia del login</strong> — nombre, subtítulo y logo separados de los de
+          la app; si los dejás vacíos, hereda los de la app.</li>
+        <li><strong>Paleta de colores</strong> — una de las <strong>3 paletas</strong>
+          pre-establecidas (Azul, Esmeralda, Violeta) o <em>Personalizado</em> con un color libre.
+          Define el color de acento de todo el tablero, en claro y oscuro.</li>
+        <li><strong>Idioma por defecto</strong> del panel.</li>
+      </ul>
+      <div class="callout callout-info"><span class="callout-icon">🎨</span>
+        <div class="callout-body">El acento se aplica al instante en todo el tablero y se adapta al
+        tema claro/oscuro. La marca del login (nombre y logo) es lo que ven las personas
+        <em>antes</em> de entrar.</div></div>
+
+      <h2 class="doc-h2" id="crm-setup">Configurar el CRM</h2>
+      <p class="doc-p">En la sección <strong>CRM</strong> del panel de configuración:</p>
+      <ul class="doc-ul">
+        <li><strong>Activar el CRM</strong> y ponerle la etiqueta del cubo.</li>
+        <li><strong>Entidades «empresa»</strong> — con «Cargar entidades de GLPI» aparecen todas las
+          que podés ver; marcás cuáles administran clientes (sus entidades hijas serán los
+          clientes). Las que ya tienen hijas salen con una marca para orientarte.</li>
+      </ul>
+      <div class="callout callout-ok"><span class="callout-icon">✓</span>
+        <div class="callout-body">Si dejás la lista <strong>vacía</strong>, el panel
+        <strong>autodetecta</strong> como empresas a todas las entidades que tengan hijas. Para el
+        detalle de contratos y renovaciones hace falta el plugin GLPI <em>manageentities</em>; sin
+        él, el CRM igual lista los clientes.</div></div>
+
+      <h2 class="doc-h2" id="seguridad">Seguridad y doble factor</h2>
       <ul class="doc-ul">
         <li>Cada usuario inicia sesión con su <strong>propia cuenta de GLPI</strong>; el panel solo
-          muestra lo que esa cuenta puede ver. El App-Token nunca llega al navegador.</li>
+          muestra lo que esa cuenta puede ver. El App-Token nunca llega al navegador, y el tablero
+          se arma <strong>por sesión</strong>, sin guardar un token de servicio.</li>
         <li>Las credenciales viajan a GLPI en una cabecera <code class="ic">Authorization: Basic</code>,
           nunca en la URL, así no quedan en los registros del servidor web.</li>
         <li>La sesión se regenera al iniciar sesión (anti-fijación) y hay un límite de intentos por
-          IP (10 fallidos en 15 minutos) contra la fuerza bruta.</li>
+          IP y por usuario (10 fallidos en 15 minutos) contra la fuerza bruta.</li>
+        <li><strong>Doble factor (2FA), opcional por usuario:</strong> se activa desde el ícono
+          <code class="ic">🔒</code> del encabezado. Usás una <strong>app autenticadora</strong>
+          (TOTP, con un código QR que genera el propio panel), con respaldo por <strong>código al
+          email</strong> y <strong>códigos de recuperación</strong> de un solo uso. Se puede
+          <strong>exigir</strong> a toda la organización.</li>
+        <li>Cada intento de acceso queda <strong>registrado</strong> (login correcto/fallido,
+          bloqueos, 2FA) para que un SIEM como <strong>Wazuh</strong> alerte sobre logins fallidos o
+          anómalos.</li>
         <li>La configuración y los secretos viven fuera de la carpeta pública; las cookies son
           <code class="ic">HttpOnly</code> + <code class="ic">SameSite=Lax</code>.</li>
       </ul>
@@ -405,22 +487,6 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
     </div>
   </main>
 </div>
-<script>
-(function(){
-  var links=[].slice.call(document.querySelectorAll('.sb-link'));
-  var secs=links.map(function(l){var id=l.getAttribute('href').slice(1);return document.getElementById(id);}).filter(Boolean);
-  function onScroll(){
-    var y=window.scrollY+120, cur=secs[0];
-    for(var i=0;i<secs.length;i++){ if(secs[i].offsetTop<=y) cur=secs[i]; }
-    links.forEach(function(l){l.classList.toggle('active', cur && l.getAttribute('href')==='#'+cur.id);});
-  }
-  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
-  var mb=document.getElementById('menuBtn'), sc=document.getElementById('scrim');
-  function close(){document.body.classList.remove('nav-open');}
-  mb.addEventListener('click',function(){document.body.classList.toggle('nav-open');});
-  sc.addEventListener('click',close);
-  document.querySelectorAll('.sb-link').forEach(function(l){l.addEventListener('click',close);});
-})();
-</script>
+<script src="docDash.js"></script>
 </body>
 </html>
