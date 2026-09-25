@@ -112,7 +112,7 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
   <span class="hdr-divider"></span>
   <span class="hdr-title">Centro de Administración GLPI · Documentación</span>
   <div class="hdr-right">
-    <span class="hdr-ver">v1.3.0</span>
+    <span class="hdr-ver">v1.4.0</span>
     <a class="hdr-gh" href="https://github.com/roothard/glpi-admin-dashboard" target="_blank" rel="noopener">GitHub</a>
   </div>
 </header>
@@ -333,7 +333,28 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
       <h2 class="doc-h2" id="changelog">Registro de versiones</h2>
 
       <div class="ver">
-        <div class="ver-head"><span class="ver-tag cur">v1.3.0</span>
+        <div class="ver-head"><span class="ver-tag cur">v1.4.0</span>
+          <span class="ver-date">2026-09-25</span><span class="ver-name">CRM, 2FA y configuración modular</span></div>
+        <ul class="doc-ul">
+          <li>Nueva aplicación <strong>CRM</strong> (cubo nativo, solo admin/supervisor): los
+            <strong>clientes</strong> son las entidades hijas de una <strong>empresa</strong>
+            (entidad padre), con selector de empresa, cantidad de contratos, fecha de
+            <strong>renovación</strong> más próxima y responsable comercial. Usa el plugin
+            <em>manageentities</em> si está y funciona igual sin él.</li>
+          <li><strong>Doble factor (2FA)</strong>: TOTP con código QR propio, respaldo por
+            <strong>código al email</strong> y <strong>códigos de recuperación</strong>;
+            anti-fuerza-bruta y registro de cada intento para el SIEM (Wazuh).</li>
+          <li><strong>Panel de configuración modular</strong>: sección <em>General · Marca</em>
+            (nombre y logo, <strong>marca propia del login</strong> y <strong>3 paletas de
+            color</strong>) más una sección por app. La config se abre con la
+            <strong>rueda ⚙</strong> y queda restringida al perfil <strong>Super-Admin</strong>.</li>
+          <li><strong>Modelo por-sesión</strong>: el tablero se arma con la sesión GLPI de cada
+            usuario (sin token de servicio guardado).</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="ver-head"><span class="ver-tag">v1.3.0</span>
           <span class="ver-date">2026-09-19</span><span class="ver-name">App Cumplimiento</span></div>
         <ul class="doc-ul">
           <li>Nueva aplicación <strong>Cumplimiento</strong>: procesos críticos verificados contra

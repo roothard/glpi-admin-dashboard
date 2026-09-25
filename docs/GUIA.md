@@ -77,16 +77,29 @@ Está agrupado en secciones plegables dentro de `/setup.php`.
 > Los **colores** de las barras salen directamente de los colores que ya tienen tus
 > estados en GLPI. El mapeo de arriba es solo para la lógica de «Requieren atención».
 
-### 3.3 Apariencia
+### 3.3 General · Marca
 | Opción | Qué hace | Default |
 |---|---|---|
-| **Nombre de la app** | Título en el encabezado y en el login. | «Projects Dashboard» |
-| **Subtítulo** | Texto secundario del encabezado. | — |
-| **Color principal** | Color de acento del tablero. | Azul |
-| **URL del logo** | Reemplaza el ícono por un PNG/SVG por URL. | — |
+| **Nombre de la app** | Título en el encabezado (podés traerlo de tu entidad raíz de GLPI). | «Projects Dashboard» |
+| **URL del logo de la app** | Reemplaza el ícono por un PNG/SVG por URL. | — |
+| **Paleta de colores** | Una de las **3 paletas** pre-establecidas (Azul, Esmeralda, Violeta) o **Personalizado** con un color libre. Define el acento de todo el tablero. | Azul RootHard |
+| **Pantalla de login** | Marca propia del login: **nombre, subtítulo y logo** separados de los de la app. Si dejás algo vacío, hereda de la app. | Hereda de la app |
 | **Idioma por defecto** | Idioma inicial (ES/EN/FR/DE/PT). Cada usuario puede cambiarlo. | Español |
 
-### 3.4 Módulo Fichadas GPS (opcional)
+### 3.4 CRM (opcional)
+Vista comercial para **admin y supervisores**: elegís una **empresa** (entidad
+padre) y ves sus **clientes** (entidades hijas) con contratos, renovación más
+próxima y responsable comercial. Se enriquece con el plugin GLPI
+*manageentities* si está instalado, y funciona igual sin él (contratos/renovación
+quedan en N/A).
+
+| Opción | Qué hace | Default |
+|---|---|---|
+| **Activar el CRM** | Muestra el cubo CRM (solo a admin/supervisor). | Off |
+| **Etiqueta del cubo** | Nombre de la app en el tablero. | «CRM» |
+| **Entidades «empresa»** | Cuáles entidades administran clientes (sus hijas = clientes). Cargalas con «Cargar entidades de GLPI». Vacío = se autodetectan las que tienen hijas. | Autodetección |
+
+### 3.5 Módulo Fichadas GPS (opcional)
 Muestra una segunda app con la presencia de técnicos en campo. Lee tickets
 **«Visita técnica»** directo de la base de datos de GLPI.
 
@@ -101,7 +114,7 @@ Muestra una segunda app con la presencia de técnicos en campo. Lee tickets
 > instalación de GLPI (o preguntale a quien administra el servidor). Ideal usar un
 > usuario MySQL **de solo lectura**.
 
-### 3.5 Avanzado
+### 3.6 Avanzado
 | Opción | Qué hace | Default |
 |---|---|---|
 | **Zona horaria** | Para el sello de «Actualizado». | `UTC` |
@@ -112,8 +125,8 @@ Muestra una segunda app con la presencia de técnicos en campo. Lee tickets
 
 - **Refresco de datos:** una tarea programada (cron) actualiza el tablero cada 15
   minutos: `*/15 * * * * php /ruta/bin/generate.php`.
-- **Reconfigurar:** entrá de nuevo a `/setup.php` estando logueado como
-  **administrador** de GLPI.
+- **Reconfigurar:** abrí la configuración con la **rueda ⚙** del encabezado
+  (o `/setup.php`). Solo la ve y la puede abrir el perfil **Super-Admin** de GLPI.
 - **Idioma / tema:** cada usuario los elige desde el tablero (se recuerdan en su
   navegador).
 
@@ -126,8 +139,17 @@ Muestra una segunda app con la presencia de técnicos en campo. Lee tickets
 - El navegador **nunca** recibe los tokens: el App-Token queda en el servidor y las
   personas entran con su propia cuenta de GLPI (cookie de sesión HttpOnly).
 - Solo la carpeta **`public/`** se publica; serví **HTTPS**.
-- La sincronización es **solo-lectura**; el token de usuario solo necesita permiso
-  de lectura de Proyectos.
+- El tablero se arma **por sesión** con los permisos GLPI de cada usuario (no se
+  guarda un token de servicio). La sincronización por cron, si la usás, es
+  **solo-lectura**.
+- **Doble factor (2FA):** opcional, por usuario — **TOTP** (app autenticadora, con
+  código QR propio), respaldo por **código al email** y **códigos de
+  recuperación**. Se puede **exigir** a toda la organización. Hay bloqueo por
+  fuerza bruta (por IP y por usuario) y **cada intento queda registrado** (JSON +
+  `syslog`) para que un SIEM como **Wazuh** alerte sobre logins fallidos o
+  anómalos.
+- La **configuración** (`/setup.php` y la rueda ⚙) es exclusiva del perfil
+  **Super-Admin**.
 
 ---
 
