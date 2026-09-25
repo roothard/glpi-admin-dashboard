@@ -24,6 +24,16 @@ $me = (int)($_SESSION['glpiID'] ?? 0);
 $isAdmin = !empty($_SESSION['isAdmin']);
 $isSuper = !empty($_SESSION['isSuper']);
 
+// GLPI guarda las fechas en la zona del servidor de base (UTC acá). Las pasamos
+// a la zona configurada del panel para mostrarlas correctas (ej. Argentina UTC-3).
+$UTC = new DateTimeZone('UTC');
+try { $TZ = new DateTimeZone(cfg()['timezone'] ?: 'UTC'); } catch (\Throwable $e) { $TZ = $UTC; }
+$toLocal = function ($s) use ($UTC, $TZ) {
+    if (!$s || $s === 'NULL' || strpos((string)$s, '0000-00-00') === 0) { return $s; }
+    try { $d = new DateTime($s, $UTC); $d->setTimezone($TZ); return $d->format('Y-m-d H:i:s'); }
+    catch (\Throwable $e) { return $s; }
+};
+
 $where = "t.name LIKE 'Visita técnica%' AND t.is_deleted=0";
 $scope = 'tecnico';
 if ($isAdmin) {
@@ -62,7 +72,7 @@ if ($scope === 'supervisor' || $scope === 'admin') {
         while ($x = $r->fetch_assoc()) {
             $team[] = ['id' => (int)$x['id'], 'nombre' => $x['nombre'],
                        'nom1' => $x['firstname'] ?: strtok((string)$x['nombre'], ' '),
-                       'tel' => $x['tel'], 'email' => $x['email'], 'last' => $x['last_in'],
+                       'tel' => $x['tel'], 'email' => $x['email'], 'last' => $toLocal($x['last_in']),
                        'hoy' => ((int)$x['hoy']) === 1, 'abierta' => ((int)$x['abierta']) === 1];
         }
     }
@@ -90,7 +100,7 @@ while ($x = $r->fetch_assoc()) {
     $dur = null;
     if ($x['entrada'] && $x['salida']) { $dur = max(0, strtotime($x['salida']) - strtotime($x['entrada'])); }
     $rows[] = ['id' => (int)$x['id'], 'tecnico' => $x['tecnico'], 'cliente' => $x['cliente'],
-               'entrada' => $x['entrada'], 'salida' => $x['salida'], 'dur' => $dur, 'lat' => $lat, 'lon' => $lon];
+               'entrada' => $toLocal($x['entrada']), 'salida' => $toLocal($x['salida']), 'dur' => $dur, 'lat' => $lat, 'lon' => $lon];
 }
 
 echo json_encode(['user' => $_SESSION['user'], 'scope' => $scope, 'team' => $team, 'fichadas' => $rows], JSON_UNESCAPED_UNICODE);

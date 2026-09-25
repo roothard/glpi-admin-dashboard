@@ -185,7 +185,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $ok = Settings::save($cfg);
     $gen = null;
-    if ($ok && Settings::isConfigured($cfg)) {
+    // El generador estático solo corre si hay un user_token configurado (modo cron).
+    // En el modelo por-sesión no hay token de servicio: el tablero se arma en vivo
+    // con la sesión de cada usuario, así que no hay nada que "sincronizar" al guardar.
+    if ($ok && Settings::isConfigured($cfg) && trim($cfg['glpi']['user_token'] ?? '') !== '') {
         try {
             require_once dirname(__DIR__) . '/src/DashboardGenerator.php';
             $flat = Settings::flat($cfg);
@@ -469,7 +472,7 @@ const I18N={
   s4:'4 · Módulo Fichadas GPS',l_gpsen:'Activar el módulo de fichadas',l_gpslabel:'Etiqueta de la pestaña',l_gpsurl:'Link a la web de la app',h_gpsurl:'Se muestra como un botón dentro del módulo.',
   h_gpsdb:'<b>Base de datos:</b> este módulo lee tickets «Visita técnica» directo de la base de GLPI. Los datos de conexión están en el archivo <code>config/config_db.php</code> de tu GLPI.',
   l_dbhost:'Host de la DB',l_dbname:'Nombre de la DB',l_dbuser:'Usuario de la DB',l_dbpass:'Contraseña de la DB',adv2:'Avanzado',l_tz:'Zona horaria',h_tz:'Ej: <code>America/Argentina/Buenos_Aires</code>. Para el sello de «Actualizado».',
-  b_test:'Probar conexión',b_save:'Guardar e instalar',m_testing:'Probando…',m_saving:'Guardando y sincronizando…',m_ok:'✓ Conectado · {n} estados visibles',m_saved:'✓ Guardado · {n} proyectos',m_savefail:'Error al guardar',m_reqfail:'Falló la solicitud',m_syncfail:'Guardado, pero la sincronización falló: '},
+  b_test:'Probar conexión',b_save:'Guardar',m_testing:'Probando…',m_saving:'Guardando y sincronizando…',m_ok:'✓ Conectado · {n} estados visibles',m_saved:'✓ Guardado · {n} proyectos',m_savefail:'Error al guardar',m_reqfail:'Falló la solicitud',m_syncfail:'Guardado, pero la sincronización falló: '},
  en:{title:'Setup',intro:'You only need your <b>GLPI URL</b> and <b>two tokens</b>. Everything else is optional and pre-filled. Password fields are write-only: leave blank to keep the stored value.',
   s1:'1 · Connect to GLPI',l_url:'GLPI URL',h_url:'The address where you open GLPI (without <code>/apirest.php</code> — added automatically).',
   h_app:'In GLPI: <b>Setup → General → «API» tab</b>. Enable <b>«Enable REST API»</b>, then <b>«Add API client»</b> and copy its <b>«Application token (app_token)»</b>.',
@@ -485,7 +488,7 @@ const I18N={
   s4:'4 · GPS Check-ins module',l_gpsen:'Enable the check-ins module',l_gpslabel:'Tab label',l_gpsurl:'App website link',h_gpsurl:'Shown as a button inside the module.',
   h_gpsdb:'<b>Database:</b> this module reads «Visita técnica» tickets straight from the GLPI database. The connection details are in your GLPI <code>config/config_db.php</code> file.',
   l_dbhost:'DB host',l_dbname:'DB name',l_dbuser:'DB user',l_dbpass:'DB password',adv2:'Advanced',l_tz:'Timezone',h_tz:'e.g. <code>America/Argentina/Buenos_Aires</code>. For the «Updated» stamp.',
-  b_test:'Test connection',b_save:'Save & install',m_testing:'Testing…',m_saving:'Saving & syncing…',m_ok:'✓ Connected · {n} states visible',m_saved:'✓ Saved · {n} projects',m_savefail:'Save failed',m_reqfail:'Request failed',m_syncfail:'Saved, but sync failed: '},
+  b_test:'Test connection',b_save:'Save',m_testing:'Testing…',m_saving:'Saving & syncing…',m_ok:'✓ Connected · {n} states visible',m_saved:'✓ Saved · {n} projects',m_savefail:'Save failed',m_reqfail:'Request failed',m_syncfail:'Saved, but sync failed: '},
  fr:{title:'Installation',intro:'Il vous faut seulement l’<b>URL de votre GLPI</b> et <b>deux jetons</b>. Le reste est optionnel et pré-rempli. Les champs mot de passe sont en écriture seule : laissez vide pour conserver la valeur.',
   s1:'1 · Se connecter à GLPI',l_url:'URL de GLPI',h_url:'L’adresse où vous ouvrez GLPI (sans <code>/apirest.php</code> — ajouté automatiquement).',
   h_app:'Dans GLPI : <b>Configuration → Général → onglet «API»</b>. Activez <b>«Activer l’API REST»</b>, puis <b>«Ajouter un client API»</b> et copiez le <b>«Jeton d’application (app_token)»</b>.',
@@ -501,7 +504,7 @@ const I18N={
   s4:'4 · Module Pointages GPS',l_gpsen:'Activer le module de pointages',l_gpslabel:'Libellé de l’onglet',l_gpsurl:'Lien du site de l’app',h_gpsurl:'Affiché comme un bouton dans le module.',
   h_gpsdb:'<b>Base de données :</b> ce module lit les tickets «Visita técnica» directement dans la base GLPI. Les identifiants sont dans le fichier <code>config/config_db.php</code> de votre GLPI.',
   l_dbhost:'Hôte de la BD',l_dbname:'Nom de la BD',l_dbuser:'Utilisateur BD',l_dbpass:'Mot de passe BD',adv2:'Avancé',l_tz:'Fuseau horaire',h_tz:'ex : <code>America/Argentina/Buenos_Aires</code>. Pour l’horodatage «Mis à jour».',
-  b_test:'Tester la connexion',b_save:'Enregistrer et installer',m_testing:'Test…',m_saving:'Enregistrement et sync…',m_ok:'✓ Connecté · {n} états visibles',m_saved:'✓ Enregistré · {n} projets',m_savefail:'Échec de l’enregistrement',m_reqfail:'Échec de la requête',m_syncfail:'Enregistré, mais la sync a échoué : '},
+  b_test:'Tester la connexion',b_save:'Enregistrer',m_testing:'Test…',m_saving:'Enregistrement et sync…',m_ok:'✓ Connecté · {n} états visibles',m_saved:'✓ Enregistré · {n} projets',m_savefail:'Échec de l’enregistrement',m_reqfail:'Échec de la requête',m_syncfail:'Enregistré, mais la sync a échoué : '},
  de:{title:'Installation',intro:'Sie brauchen nur Ihre <b>GLPI-URL</b> und <b>zwei Tokens</b>. Der Rest ist optional und vorbelegt. Passwortfelder sind schreibgeschützt: leer lassen, um den Wert zu behalten.',
   s1:'1 · Mit GLPI verbinden',l_url:'GLPI-URL',h_url:'Die Adresse, unter der Sie GLPI öffnen (ohne <code>/apirest.php</code> — wird automatisch ergänzt).',
   h_app:'In GLPI: <b>Konfiguration → Allgemein → Reiter «API»</b>. Aktivieren Sie <b>«REST-API aktivieren»</b>, dann <b>«API-Client hinzufügen»</b> und kopieren Sie das <b>«Anwendungs-Token (app_token)»</b>.',
@@ -517,7 +520,7 @@ const I18N={
   s4:'4 · GPS-Check-ins-Modul',l_gpsen:'Modul aktivieren',l_gpslabel:'Tab-Beschriftung',l_gpsurl:'Link zur App-Website',h_gpsurl:'Wird als Button im Modul angezeigt.',
   h_gpsdb:'<b>Datenbank:</b> dieses Modul liest «Visita técnica»-Tickets direkt aus der GLPI-Datenbank. Die Zugangsdaten stehen in der Datei <code>config/config_db.php</code> Ihres GLPI.',
   l_dbhost:'DB-Host',l_dbname:'DB-Name',l_dbuser:'DB-Benutzer',l_dbpass:'DB-Passwort',adv2:'Erweitert',l_tz:'Zeitzone',h_tz:'z. B. <code>America/Argentina/Buenos_Aires</code>. Für den «Aktualisiert»-Stempel.',
-  b_test:'Verbindung testen',b_save:'Speichern & installieren',m_testing:'Teste…',m_saving:'Speichern & Sync…',m_ok:'✓ Verbunden · {n} Status sichtbar',m_saved:'✓ Gespeichert · {n} Projekte',m_savefail:'Speichern fehlgeschlagen',m_reqfail:'Anfrage fehlgeschlagen',m_syncfail:'Gespeichert, aber Sync fehlgeschlagen: '},
+  b_test:'Verbindung testen',b_save:'Speichern',m_testing:'Teste…',m_saving:'Speichern & Sync…',m_ok:'✓ Verbunden · {n} Status sichtbar',m_saved:'✓ Gespeichert · {n} Projekte',m_savefail:'Speichern fehlgeschlagen',m_reqfail:'Anfrage fehlgeschlagen',m_syncfail:'Gespeichert, aber Sync fehlgeschlagen: '},
  pt:{title:'Instalação',intro:'Você só precisa da <b>URL do seu GLPI</b> e <b>dois tokens</b>. O resto é opcional e já vem preenchido. Campos de senha são de escrita apenas: deixe em branco para manter o valor.',
   s1:'1 · Conectar ao GLPI',l_url:'URL do GLPI',h_url:'O endereço onde você abre o GLPI (sem <code>/apirest.php</code> — adicionado sozinho).',
   h_app:'No GLPI: <b>Configuração → Geral → aba «API»</b>. Ative <b>«Habilitar a API REST»</b>, depois <b>«Adicionar cliente API»</b> e copie o <b>«Token de aplicação (app_token)»</b>.',
@@ -533,7 +536,7 @@ const I18N={
   s4:'4 · Módulo Registros GPS',l_gpsen:'Ativar o módulo',l_gpslabel:'Rótulo da aba',l_gpsurl:'Link do site do app',h_gpsurl:'Exibido como um botão dentro do módulo.',
   h_gpsdb:'<b>Banco de dados:</b> este módulo lê tickets «Visita técnica» direto do banco do GLPI. Os dados de conexão estão no arquivo <code>config/config_db.php</code> do seu GLPI.',
   l_dbhost:'Host do BD',l_dbname:'Nome do BD',l_dbuser:'Usuário do BD',l_dbpass:'Senha do BD',adv2:'Avançado',l_tz:'Fuso horário',h_tz:'ex: <code>America/Argentina/Buenos_Aires</code>. Para o carimbo «Atualizado».',
-  b_test:'Testar conexão',b_save:'Salvar e instalar',m_testing:'Testando…',m_saving:'Salvando e sincronizando…',m_ok:'✓ Conectado · {n} estados visíveis',m_saved:'✓ Salvo · {n} projetos',m_savefail:'Falha ao salvar',m_reqfail:'Falha na solicitação',m_syncfail:'Salvo, mas a sincronização falhou: '}
+  b_test:'Testar conexão',b_save:'Salvar',m_testing:'Testando…',m_saving:'Salvando e sincronizando…',m_ok:'✓ Conectado · {n} estados visíveis',m_saved:'✓ Salvo · {n} projetos',m_savefail:'Falha ao salvar',m_reqfail:'Falha na solicitação',m_syncfail:'Salvo, mas a sincronização falhou: '}
 };
 Object.assign(I18N.es,{b_types:'Elegir de GLPI',opt_alltypes:'— Todos los proyectos —',l_untyped:'Mostrar también proyectos sin tipo',h_untyped:'Si filtrás por tipo, los proyectos SIN tipo se muestran igual con un aviso «Sin tipo» (recomendado: así ninguno queda invisible por accidente). Destildá para excluirlos.',m_typesload:'Leyendo tipos de GLPI…',m_types:'✓ {n} tipos · {u} proyectos sin tipo'});
 Object.assign(I18N.en,{b_types:'Pick from GLPI',opt_alltypes:'— All projects —',l_untyped:'Also show untyped projects',h_untyped:'With a type filter set, projects WITHOUT a type are still shown with an “Untyped” notice (recommended: nothing goes invisible by accident). Untick to exclude them.',m_typesload:'Reading GLPI types…',m_types:'✓ {n} types · {u} untyped projects'});

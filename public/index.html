@@ -416,6 +416,20 @@ main{padding-top:20px;padding-bottom:60px}
 .cube .tip{position:absolute;left:62px;top:50%;transform:translateY(-50%) translateX(-6px);white-space:nowrap;font:600 12px var(--disp);background:var(--surface);border:1px solid var(--border);padding:5px 12px;border-radius:9px;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow)}
 .cube:hover .tip{opacity:1;transform:translateY(-50%) translateX(0)}
 body.dockon .wrap{padding-left:104px}
+/* barras plegables: dock (lateral) + barra superior, con recordado por usuario */
+.top{transition:transform .28s ease}
+body.top-hidden .top{transform:translateY(-100%)}
+#topshow{position:fixed;top:0;left:50%;z-index:60;transform:translate(-50%,-120%);background:var(--surface);border:1px solid var(--border2);border-top:none;border-radius:0 0 11px 11px;padding:2px 18px;cursor:pointer;font-size:13px;line-height:1.5;color:var(--muted);box-shadow:var(--shadow);transition:transform .28s ease}
+body.top-hidden #topshow{transform:translate(-50%,0)}
+#topshow:hover{color:var(--accent)}
+#dock{transition:transform .3s ease}
+body.dock-hidden #dock{transform:translateX(-160%)}
+body.dockon.dock-hidden .wrap{padding-left:0}
+#dockshow{position:fixed;left:0;top:50%;z-index:60;transform:translate(-120%,-50%) rotate(-90deg);transform-origin:left center;background:var(--surface);border:1px solid var(--border2);border-left:none;border-radius:0 11px 11px 0;padding:2px 16px;cursor:pointer;font-size:13px;color:var(--muted);box-shadow:var(--shadow);transition:transform .3s ease}
+body.dockon.dock-hidden #dockshow{transform:translate(0,-50%) rotate(-90deg)}
+#dockshow:hover{color:var(--accent)}
+.dock-x{margin-top:8px;cursor:pointer;color:var(--muted);font-size:12px;border:1px solid var(--border2);border-radius:8px;padding:2px 9px;background:var(--surface);transition:.15s}
+.dock-x:hover{border-color:var(--accent);color:var(--accent)}
 @media(max-width:760px){
   /* celular: el cubo queda al MEDIO de la pantalla, pegado a la izquierda */
   #dock{left:6px;top:50%;transform:translateY(-50%);width:60px;gap:6px}
@@ -449,6 +463,7 @@ body.dockon .wrap{padding-left:104px}
       <button class="iconbtn" id="theme" title="Tema">🌙</button>
       <select id="lang"><option value="es">ES</option><option value="en">EN</option><option value="fr">FR</option><option value="de">DE</option><option value="pt">PT</option></select>
       <button class="iconbtn" id="logout" title="Salir" style="display:none">⎋</button>
+      <button class="iconbtn" id="toptoggle" title="Ocultar barra superior">▲</button>
     </div>
   </div>
   <nav class="tabs">
@@ -458,6 +473,8 @@ body.dockon .wrap{padding-left:104px}
     <button class="tab pt" data-v="mapa">🗺 Mapa</button>
   </nav>
 </div></header>
+<div id="topshow" title="Mostrar barra superior">⌄</div>
+<div id="dockshow" title="Mostrar apps">⌄</div>
 
 <div id="dock"></div>
 <main class="wrap">
@@ -707,7 +724,7 @@ const I18N={
   p_gantt:'Gantt · Cronograma de tareas',p_kanban:'Kanban · Tareas por estado',p_det:'Detalles',p_kb:'Base de Conocimiento',
   d_area:'Área',d_ent:'Entidad',d_resp:'Responsable',d_prog:'Avance',d_plan:'Planificado',d_done:'hechas',d_pend:'pendientes',
   close:'Cerrar',noDesc:'Sin descripción',noKb:'Sin artículos vinculados a este proyecto en GLPI.',noDates:'Sin fechas.',noTaskDates:'Sin fechas de tareas.',today:'hoy',noData:'No se pudieron cargar los datos',
-  l_sub:'Ingresá con tu cuenta de GLPI',l_doc:'Documentación',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Acceder',l_err:'Usuario o contraseña incorrectos',l_503:'Login no configurado (falta App-Token)',l_429:'Demasiados intentos — esperá 15 minutos',logout:'Salir',cfg_title:'Configuración',
+  l_sub:'Ingresá con tu cuenta de GLPI',l_doc:'Documentación',l_user:'Usuario',l_pass:'Contraseña',l_btn:'Acceder',l_err:'Usuario o contraseña incorrectos',l_503:'Login no configurado (falta App-Token)',l_429:'Demasiados intentos — esperá 15 minutos',logout:'Salir',cfg_title:'Configuración',bar_hide:'Ocultar',bar_hidetop:'Ocultar barra superior',bar_hidedock:'Ocultar apps',bar_showtop:'Mostrar barra superior',bar_showdock:'Mostrar apps',
   tf_tit:'Verificación en dos pasos',tf_sub:'Ingresá el código de tu app autenticadora',tf_btn:'Verificar',tf_email:'Enviar código por email',tf_recov:'Usar un código de recuperación',tf_recov_sub:'Ingresá uno de tus códigos de recuperación',tf_back:'← Volver',tf_bad:'Código incorrecto',tf_expired:'La sesión expiró, ingresá de nuevo',tf_email_sent:'Código enviado a tu email',tf_email_err:'No se pudo enviar el email',sec_title:'Seguridad (2FA)',tw_h:'Doble factor (2FA)',tw_off:'Desactivado',tw_on:'Activado',tw_intro:'Sumá un segundo factor: además de tu contraseña de GLPI necesitarás un código de tu app autenticadora para entrar.',tw_start:'Activar 2FA',tw_scan:'Escaneá el código con tu app (Google Authenticator, Aegis…) o ingresá esta clave manualmente:',tw_copy:'Tocá para copiar',tw_openapp:'Abrir en la app autenticadora',tw_confirm:'Confirmar',tw_bad:'Código incorrecto',tw_codes_note:'Guardá estos códigos de recuperación en un lugar seguro. Cada uno sirve una sola vez si perdés el acceso a tu app.',tw_copy_codes:'Copiar códigos',tw_done:'Listo',tw_on_note:'El 2FA está activo. Para regenerar códigos o desactivarlo, ingresá un código actual.',tw_regen:'Regenerar códigos de recuperación',tw_disable:'Desactivar 2FA',
   app_crm:'CRM',crm_empresa:'Empresa:',crm_clientes:'clientes',crm_vencidos:'contratos vencidos',crm_v30:'vencen en 30 días',crm_v60:'vencen en 60 días',crm_cliente:'Cliente',crm_resp:'Responsable comercial',crm_contratos:'Contratos',crm_renov:'Renovación',crm_sinasignar:'sin asignar',crm_sincontrato:'sin contrato',crm_none:'Esta empresa no tiene clientes (entidades hijas)',crm_forbidden:'Solo para administradores y supervisores',crm_vencido:'vencido',
   apps:'Apps',hub_h:'Bienvenido',hub_sub:'Elegí una aplicación',app_proj:'Panel de Proyectos',app_proj_d:'Portfolio, avances y cronograma',app_fich:'Fichadas GPS',app_fich_d:'Presencia de técnicos en campo',
@@ -719,7 +736,7 @@ const I18N={
   p_gantt:'Gantt · Task schedule',p_kanban:'Kanban · Tasks by state',p_det:'Details',p_kb:'Knowledge Base',
   d_area:'Area',d_ent:'Entity',d_resp:'Owner',d_prog:'Progress',d_plan:'Planned',d_done:'done',d_pend:'pending',
   close:'Close',noDesc:'No description',noKb:'No articles linked to this project in GLPI.',noDates:'No dates.',noTaskDates:'No task dates.',today:'today',noData:'Could not load data',
-  l_sub:'Sign in with your GLPI account',l_doc:'Documentation',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err:'Wrong username or password',l_503:'Login not configured (App-Token missing)',l_429:'Too many attempts — wait 15 minutes',logout:'Sign out',cfg_title:'Settings',
+  l_sub:'Sign in with your GLPI account',l_doc:'Documentation',l_user:'Username',l_pass:'Password',l_btn:'Sign in',l_err:'Wrong username or password',l_503:'Login not configured (App-Token missing)',l_429:'Too many attempts — wait 15 minutes',logout:'Sign out',cfg_title:'Settings',bar_hide:'Hide',bar_hidetop:'Hide top bar',bar_hidedock:'Hide apps',bar_showtop:'Show top bar',bar_showdock:'Show apps',
   tf_tit:'Two-step verification',tf_sub:'Enter the code from your authenticator app',tf_btn:'Verify',tf_email:'Send code by email',tf_recov:'Use a recovery code',tf_recov_sub:'Enter one of your recovery codes',tf_back:'← Back',tf_bad:'Wrong code',tf_expired:'Session expired, sign in again',tf_email_sent:'Code sent to your email',tf_email_err:'Could not send the email',sec_title:'Security (2FA)',tw_h:'Two-factor (2FA)',tw_off:'Disabled',tw_on:'Enabled',tw_intro:'Add a second factor: on top of your GLPI password you will need a code from your authenticator app to sign in.',tw_start:'Enable 2FA',tw_scan:'Scan the code with your app (Google Authenticator, Aegis…) or enter this key manually:',tw_copy:'Tap to copy',tw_openapp:'Open in authenticator app',tw_confirm:'Confirm',tw_bad:'Wrong code',tw_codes_note:'Keep these recovery codes somewhere safe. Each works once if you lose access to your app.',tw_copy_codes:'Copy codes',tw_done:'Done',tw_on_note:'2FA is active. To regenerate codes or disable it, enter a current code.',tw_regen:'Regenerate recovery codes',tw_disable:'Disable 2FA',
   app_crm:'CRM',crm_empresa:'Company:',crm_clientes:'clients',crm_vencidos:'expired contracts',crm_v30:'expiring in 30 days',crm_v60:'expiring in 60 days',crm_cliente:'Client',crm_resp:'Account manager',crm_contratos:'Contracts',crm_renov:'Renewal',crm_sinasignar:'unassigned',crm_sincontrato:'no contract',crm_none:'This company has no clients (child entities)',crm_forbidden:'Admins and supervisors only',crm_vencido:'expired',
   apps:'Apps',hub_h:'Welcome',hub_sub:'Choose an app',app_proj:'Projects Panel',app_proj_d:'Portfolio, progress and schedule',app_fich:'GPS Check-ins',app_fich_d:'Field technician presence',
@@ -731,7 +748,7 @@ const I18N={
   p_gantt:'Gantt · Calendrier des tâches',p_kanban:'Kanban · Tâches par état',p_det:'Détails',p_kb:'Base de connaissances',
   d_area:'Zone',d_ent:'Entité',d_resp:'Responsable',d_prog:'Avancement',d_plan:'Planifié',d_done:'terminées',d_pend:'en attente',
   close:'Fermer',noDesc:'Sans description',noKb:'Aucun article lié à ce projet dans GLPI.',noDates:'Aucune date.',noTaskDates:'Aucune date de tâche.',today:"aujourd'hui",noData:'Impossible de charger les données',
-  l_sub:'Connectez-vous avec votre compte GLPI',l_doc:'Documentation',l_user:'Utilisateur',l_pass:'Mot de passe',l_btn:'Se connecter',l_err:'Utilisateur ou mot de passe incorrect',l_503:'Connexion non configurée (App-Token manquant)',l_429:'Trop de tentatives — attendez 15 minutes',logout:'Déconnexion',cfg_title:'Configuration',
+  l_sub:'Connectez-vous avec votre compte GLPI',l_doc:'Documentation',l_user:'Utilisateur',l_pass:'Mot de passe',l_btn:'Se connecter',l_err:'Utilisateur ou mot de passe incorrect',l_503:'Connexion non configurée (App-Token manquant)',l_429:'Trop de tentatives — attendez 15 minutes',logout:'Déconnexion',cfg_title:'Configuration',bar_hide:'Masquer',bar_hidetop:'Masquer la barre',bar_hidedock:'Masquer les apps',bar_showtop:'Afficher la barre',bar_showdock:'Afficher les apps',
   tf_tit:'Vérification en deux étapes',tf_sub:'Saisissez le code de votre application d’authentification',tf_btn:'Vérifier',tf_email:'Envoyer le code par e-mail',tf_recov:'Utiliser un code de récupération',tf_recov_sub:'Saisissez un de vos codes de récupération',tf_back:'← Retour',tf_bad:'Code incorrect',tf_expired:'Session expirée, reconnectez-vous',tf_email_sent:'Code envoyé à votre e-mail',tf_email_err:'Impossible d’envoyer l’e-mail',sec_title:'Sécurité (2FA)',tw_h:'Double facteur (2FA)',tw_off:'Désactivé',tw_on:'Activé',tw_intro:'Ajoutez un second facteur : en plus de votre mot de passe GLPI, un code de votre application d’authentification sera requis pour vous connecter.',tw_start:'Activer la 2FA',tw_scan:'Scannez le code avec votre application (Google Authenticator, Aegis…) ou saisissez cette clé manuellement :',tw_copy:'Toucher pour copier',tw_openapp:'Ouvrir dans l’application',tw_confirm:'Confirmer',tw_bad:'Code incorrect',tw_codes_note:'Conservez ces codes de récupération en lieu sûr. Chacun ne sert qu’une fois si vous perdez l’accès à votre application.',tw_copy_codes:'Copier les codes',tw_done:'Terminé',tw_on_note:'La 2FA est active. Pour régénérer des codes ou la désactiver, saisissez un code actuel.',tw_regen:'Régénérer les codes de récupération',tw_disable:'Désactiver la 2FA',
   app_crm:'CRM',crm_empresa:'Entreprise :',crm_clientes:'clients',crm_vencidos:'contrats expirés',crm_v30:'expirent sous 30 jours',crm_v60:'expirent sous 60 jours',crm_cliente:'Client',crm_resp:'Responsable commercial',crm_contratos:'Contrats',crm_renov:'Renouvellement',crm_sinasignar:'non assigné',crm_sincontrato:'sans contrat',crm_none:'Cette entreprise n’a pas de clients (entités filles)',crm_forbidden:'Réservé aux administrateurs et superviseurs',crm_vencido:'expiré',
   apps:'Apps',hub_h:'Bienvenue',hub_sub:'Choisissez une application',app_proj:'Panneau de projets',app_proj_d:'Portfolio, avancement et calendrier',app_fich:'Pointages GPS',app_fich_d:'Présence des techniciens sur le terrain',
@@ -743,7 +760,7 @@ const I18N={
   p_gantt:'Gantt · Aufgabenplan',p_kanban:'Kanban · Aufgaben nach Status',p_det:'Details',p_kb:'Wissensdatenbank',
   d_area:'Bereich',d_ent:'Entität',d_resp:'Verantwortlich',d_prog:'Fortschritt',d_plan:'Geplant',d_done:'erledigt',d_pend:'offen',
   close:'Schließen',noDesc:'Keine Beschreibung',noKb:'Keine Artikel mit diesem Projekt in GLPI verknüpft.',noDates:'Keine Daten.',noTaskDates:'Keine Aufgaben-Daten.',today:'heute',noData:'Daten konnten nicht geladen werden',
-  l_sub:'Mit Ihrem GLPI-Konto anmelden',l_doc:'Dokumentation',l_user:'Benutzer',l_pass:'Passwort',l_btn:'Anmelden',l_err:'Falscher Benutzer oder Passwort',l_503:'Login nicht konfiguriert (App-Token fehlt)',l_429:'Zu viele Versuche — 15 Minuten warten',logout:'Abmelden',cfg_title:'Einstellungen',
+  l_sub:'Mit Ihrem GLPI-Konto anmelden',l_doc:'Dokumentation',l_user:'Benutzer',l_pass:'Passwort',l_btn:'Anmelden',l_err:'Falscher Benutzer oder Passwort',l_503:'Login nicht konfiguriert (App-Token fehlt)',l_429:'Zu viele Versuche — 15 Minuten warten',logout:'Abmelden',cfg_title:'Einstellungen',bar_hide:'Ausblenden',bar_hidetop:'Leiste ausblenden',bar_hidedock:'Apps ausblenden',bar_showtop:'Leiste einblenden',bar_showdock:'Apps einblenden',
   tf_tit:'Zwei-Schritt-Verifizierung',tf_sub:'Gib den Code aus deiner Authenticator-App ein',tf_btn:'Bestätigen',tf_email:'Code per E-Mail senden',tf_recov:'Wiederherstellungscode verwenden',tf_recov_sub:'Gib einen deiner Wiederherstellungscodes ein',tf_back:'← Zurück',tf_bad:'Falscher Code',tf_expired:'Sitzung abgelaufen, bitte neu anmelden',tf_email_sent:'Code an deine E-Mail gesendet',tf_email_err:'E-Mail konnte nicht gesendet werden',sec_title:'Sicherheit (2FA)',tw_h:'Zwei-Faktor (2FA)',tw_off:'Deaktiviert',tw_on:'Aktiviert',tw_intro:'Füge einen zweiten Faktor hinzu: zusätzlich zu deinem GLPI-Passwort brauchst du zum Anmelden einen Code aus deiner Authenticator-App.',tw_start:'2FA aktivieren',tw_scan:'Scanne den Code mit deiner App (Google Authenticator, Aegis…) oder gib diesen Schlüssel manuell ein:',tw_copy:'Zum Kopieren tippen',tw_openapp:'In Authenticator-App öffnen',tw_confirm:'Bestätigen',tw_bad:'Falscher Code',tw_codes_note:'Bewahre diese Wiederherstellungscodes sicher auf. Jeder funktioniert einmal, falls du den Zugriff auf deine App verlierst.',tw_copy_codes:'Codes kopieren',tw_done:'Fertig',tw_on_note:'2FA ist aktiv. Zum Neu-Erstellen der Codes oder Deaktivieren gib einen aktuellen Code ein.',tw_regen:'Wiederherstellungscodes neu erstellen',tw_disable:'2FA deaktivieren',
   app_crm:'CRM',crm_empresa:'Firma:',crm_clientes:'Kunden',crm_vencidos:'abgelaufene Verträge',crm_v30:'laufen in 30 Tagen ab',crm_v60:'laufen in 60 Tagen ab',crm_cliente:'Kunde',crm_resp:'Kundenbetreuer',crm_contratos:'Verträge',crm_renov:'Verlängerung',crm_sinasignar:'nicht zugewiesen',crm_sincontrato:'kein Vertrag',crm_none:'Diese Firma hat keine Kunden (Unterentitäten)',crm_forbidden:'Nur für Administratoren und Supervisoren',crm_vencido:'abgelaufen',
   apps:'Apps',hub_h:'Willkommen',hub_sub:'Wählen Sie eine App',app_proj:'Projekt-Panel',app_proj_d:'Portfolio, Fortschritt und Zeitplan',app_fich:'GPS-Check-ins',app_fich_d:'Anwesenheit der Außendiensttechniker',
@@ -755,7 +772,7 @@ const I18N={
   p_gantt:'Gantt · Cronograma de tarefas',p_kanban:'Kanban · Tarefas por estado',p_det:'Detalhes',p_kb:'Base de conhecimento',
   d_area:'Área',d_ent:'Entidade',d_resp:'Responsável',d_prog:'Progresso',d_plan:'Planejado',d_done:'concluídas',d_pend:'pendentes',
   close:'Fechar',noDesc:'Sem descrição',noKb:'Nenhum artigo vinculado a este projeto no GLPI.',noDates:'Sem datas.',noTaskDates:'Sem datas de tarefas.',today:'hoje',noData:'Não foi possível carregar os dados',
-  l_sub:'Entre com sua conta GLPI',l_doc:'Documentação',l_user:'Usuário',l_pass:'Senha',l_btn:'Entrar',l_err:'Usuário ou senha incorretos',l_503:'Login não configurado (App-Token ausente)',l_429:'Muitas tentativas — aguarde 15 minutos',logout:'Sair',cfg_title:'Configurações',
+  l_sub:'Entre com sua conta GLPI',l_doc:'Documentação',l_user:'Usuário',l_pass:'Senha',l_btn:'Entrar',l_err:'Usuário ou senha incorretos',l_503:'Login não configurado (App-Token ausente)',l_429:'Muitas tentativas — aguarde 15 minutos',logout:'Sair',cfg_title:'Configurações',bar_hide:'Ocultar',bar_hidetop:'Ocultar barra superior',bar_hidedock:'Ocultar apps',bar_showtop:'Mostrar barra superior',bar_showdock:'Mostrar apps',
   tf_tit:'Verificação em duas etapas',tf_sub:'Digite o código do seu app autenticador',tf_btn:'Verificar',tf_email:'Enviar código por e-mail',tf_recov:'Usar um código de recuperação',tf_recov_sub:'Digite um dos seus códigos de recuperação',tf_back:'← Voltar',tf_bad:'Código incorreto',tf_expired:'Sessão expirada, entre novamente',tf_email_sent:'Código enviado para o seu e-mail',tf_email_err:'Não foi possível enviar o e-mail',sec_title:'Segurança (2FA)',tw_h:'Dois fatores (2FA)',tw_off:'Desativado',tw_on:'Ativado',tw_intro:'Adicione um segundo fator: além da sua senha do GLPI, você precisará de um código do seu app autenticador para entrar.',tw_start:'Ativar 2FA',tw_scan:'Escaneie o código com seu app (Google Authenticator, Aegis…) ou digite esta chave manualmente:',tw_copy:'Toque para copiar',tw_openapp:'Abrir no app autenticador',tw_confirm:'Confirmar',tw_bad:'Código incorreto',tw_codes_note:'Guarde estes códigos de recuperação em local seguro. Cada um serve uma vez caso perca o acesso ao seu app.',tw_copy_codes:'Copiar códigos',tw_done:'Pronto',tw_on_note:'O 2FA está ativo. Para regenerar códigos ou desativá-lo, digite um código atual.',tw_regen:'Regenerar códigos de recuperação',tw_disable:'Desativar 2FA',
   app_crm:'CRM',crm_empresa:'Empresa:',crm_clientes:'clientes',crm_vencidos:'contratos vencidos',crm_v30:'vencem em 30 dias',crm_v60:'vencem em 60 dias',crm_cliente:'Cliente',crm_resp:'Responsável comercial',crm_contratos:'Contratos',crm_renov:'Renovação',crm_sinasignar:'sem responsável',crm_sincontrato:'sem contrato',crm_none:'Esta empresa não tem clientes (entidades filhas)',crm_forbidden:'Apenas administradores e supervisores',crm_vencido:'vencido',
   apps:'Apps',hub_h:'Bem-vindo',hub_sub:'Escolha um aplicativo',app_proj:'Painel de Projetos',app_proj_d:'Portfólio, progresso e cronograma',app_fich:'Registros GPS',app_fich_d:'Presença de técnicos em campo',
@@ -843,7 +860,7 @@ function applyStatic(){
   $('#l-btn').textContent=T('l_btn'); $('#logout').title=T('logout');
   $('#tf-tit').textContent=T('tf_tit'); $('#tf-btn').textContent=T('tf_btn');
   $('#tf-email').textContent=T('tf_email'); $('#tf-recov').textContent=T('tf_recov'); $('#tf-back').textContent=T('tf_back');
-  $('#secbtn').title=T('sec_title'); $('#cfgbtn').title=T('cfg_title'); $('#tw-h').textContent=T('tw_h'); $('#tw-close').textContent=T('close');
+  $('#secbtn').title=T('sec_title'); $('#cfgbtn').title=T('cfg_title'); $('#toptoggle').title=T('bar_hidetop'); $('#topshow').title=T('bar_showtop'); $('#dockshow').title=T('bar_showdock'); $('#tw-h').textContent=T('tw_h'); $('#tw-close').textContent=T('close');
   $('#btnhome').textContent='⌂ '+T('apps');
   $('#fi-go').textContent=T('filtrar'); $('#fi-tec').options[0].text=T('allTec');
   $('#fi-csv').textContent=T('f_csv'); $('#fi-mh').textContent=T('f_map');
@@ -906,6 +923,7 @@ function renderHub(){
     w.addEventListener('click',()=>{ if(BUSYAPP)return; BUSYAPP=true; localStorage.setItem('rh-dock-used','1'); c.classList.add('spin'); setTimeout(()=>{ showApp(a.k,true); BUSYAPP=false; },430); });
     d.appendChild(w);
   });
+  const x=el('div','dock-x',esc(T('bar_hide'))); x.title=T('bar_hidedock'); x.addEventListener('click',()=>setDock(true,true)); d.appendChild(x);
 }
 let FICH=null;
 $('#fi-go').addEventListener('click',fetchFichadas);
@@ -1181,6 +1199,21 @@ function secViewOn(){
 }
 $('#secbtn').addEventListener('click',openSec);
 $('#cfgbtn').addEventListener('click',()=>{location.href='setup.php';});
+// ── Barras plegables: dock (lateral) + barra superior, recordadas por usuario ──
+let TOPHARD=false;
+function setTop(hidden,persist){ document.body.classList.toggle('top-hidden',hidden); if(persist){TOPHARD=hidden; try{localStorage.setItem('rh-top-hidden',hidden?'1':'0');}catch(e){}} }
+function setDock(hidden,persist){ document.body.classList.toggle('dock-hidden',hidden); if(persist){try{localStorage.setItem('rh-dock-hidden',hidden?'1':'0');}catch(e){}} }
+$('#toptoggle').addEventListener('click',()=>setTop(!document.body.classList.contains('top-hidden'),true));
+$('#topshow').addEventListener('click',()=>setTop(false,true));
+$('#dockshow').addEventListener('click',()=>setDock(false,true));
+try{ if(localStorage.getItem('rh-top-hidden')==='1'){setTop(true,false);TOPHARD=true;}
+     if(localStorage.getItem('rh-dock-hidden')==='1'){setDock(true,false);} }catch(e){}
+// auto-ocultar la barra superior al bajar; reaparece al subir (salvo oculto manual)
+let _lastY=window.scrollY||0;
+window.addEventListener('scroll',()=>{ if(TOPHARD)return; const y=window.scrollY||0;
+  if(y>150 && y>_lastY+4){document.body.classList.add('top-hidden');}
+  else if(y<_lastY-4){document.body.classList.remove('top-hidden');}
+  _lastY=y; },{passive:true});
 $('#tw-close').addEventListener('click',closeSec);
 $('#twofawrap').addEventListener('click',e=>{if(e.target.id==='twofawrap')closeSec();});
 
