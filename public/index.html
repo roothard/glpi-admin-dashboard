@@ -31,6 +31,16 @@
 #lang{appearance:none;-webkit-appearance:none;font:700 11px var(--mono);letter-spacing:.02em;color:var(--text);background:var(--surface2) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8f9c' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 8px center;background-size:11px;border:1px solid var(--border2);border-radius:20px;padding:6px 24px 6px 12px;cursor:pointer;transition:border-color .15s,background-color .15s}
 #lang:hover{border-color:var(--accent);background-color:color-mix(in srgb,var(--accent) 10%,transparent)}
 #lang:focus{outline:none;border-color:var(--accent)}
+.persmenu{position:fixed;z-index:60;display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 14px 38px -14px rgba(0,0,0,.45);padding:12px 13px;min-width:216px}
+.persmenu.on{display:block;animation:persin .16s ease}
+@keyframes persin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.persmenu h5{margin:0 0 9px;font:600 10px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pgrid{display:flex;flex-wrap:wrap;gap:6px}
+.psw{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;border:1px solid transparent;border-radius:11px;padding:7px 6px;width:58px;transition:background .15s,border-color .15s}
+.psw:hover{background:var(--accent-soft)}
+.psw.on{border-color:var(--accent);background:var(--accent-soft)}
+.psw .dot{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.35),0 1px 2px rgba(0,0,0,.15)}
+.psw .nm{font:600 9.5px var(--sans);color:var(--text);white-space:nowrap}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
 /* viñetas suaves de luz, como papel */
@@ -187,36 +197,44 @@ main{padding-top:20px;padding-bottom:60px}
 .load-mark.logo{background:#fff;border-radius:50%;background-repeat:no-repeat;background-position:center;background-size:72%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
 .load-txt{font:600 14px var(--sans);color:var(--muted);letter-spacing:.2px}
 @keyframes lspin{to{transform:rotate(360deg)}}
-#loginwrap{position:fixed;inset:0;z-index:100;display:none;background:#e3e3e4;color:#141416;overflow:hidden}
+#loginwrap{position:fixed;inset:0;z-index:100;display:none;background:var(--lg-bg,#e3e3e4);color:var(--lg-tx,#141416);overflow:hidden}
+/* login por-tema: en claro usan el fallback (idéntico a antes); en oscuro entran las vars --lg-* */
+:root[data-theme="dark"] #loginwrap{--lg-bg:#161618;--lg-tx:#ececef;--lg-card:#1f1f23;--lg-in:#26262b;--lg-bd:#2c2c31;--lg-bd2:#3a3a41;--lg-mu:#9a9ca4;--lg-dim:#7c7e86;--lg-v1:rgba(255,255,255,.05);--lg-v2:rgba(0,0,0,.5)}
+@media(prefers-color-scheme:dark){:root:not([data-theme]) #loginwrap{--lg-bg:#161618;--lg-tx:#ececef;--lg-card:#1f1f23;--lg-in:#26262b;--lg-bd:#2c2c31;--lg-bd2:#3a3a41;--lg-mu:#9a9ca4;--lg-dim:#7c7e86;--lg-v1:rgba(255,255,255,.05);--lg-v2:rgba(0,0,0,.5)}}
 #loginwrap.on{display:block}
-#loginwrap::before{content:"";position:absolute;width:70vw;height:70vw;top:-30%;left:-18%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.85),transparent 65%);filter:blur(90px);pointer-events:none}
-#loginwrap::after{content:"";position:absolute;width:55vw;height:55vw;bottom:-25%;right:-14%;border-radius:50%;background:radial-gradient(circle,rgba(185,187,196,.55),transparent 65%);filter:blur(90px);pointer-events:none}
+#loginwrap::before{content:"";position:absolute;width:70vw;height:70vw;top:-30%;left:-18%;border-radius:50%;background:radial-gradient(circle,var(--lg-v1,rgba(255,255,255,.85)),transparent 65%);filter:blur(90px);pointer-events:none}
+#loginwrap::after{content:"";position:absolute;width:55vw;height:55vw;bottom:-25%;right:-14%;border-radius:50%;background:radial-gradient(circle,var(--lg-v2,rgba(185,187,196,.55)),transparent 65%);filter:blur(90px);pointer-events:none}
 #lpx{position:absolute;inset:0;cursor:grab;z-index:1}
 #lpx.drag{cursor:grabbing}
 .l-top{position:absolute;left:26px;top:22px;z-index:5;display:flex;gap:10px;align-items:center}
-.l-logo{width:30px;height:30px;border-radius:9px;background:#141416;display:grid;place-items:center;color:#fff;font:700 13px var(--disp)}
-.l-top small{font:600 11px var(--disp);letter-spacing:.2em;color:#6f7178;text-transform:uppercase}
-.l-hint{position:absolute;left:26px;bottom:22px;z-index:5;font:600 11px var(--disp);letter-spacing:.22em;color:#6f7178;text-transform:uppercase}
-.l-links{position:absolute;left:50%;transform:translateX(-50%);bottom:22px;z-index:5;display:flex;gap:8px;align-items:center;font:600 12px var(--sans);color:#8f9199}
-.l-links a{color:#8f9199;text-decoration:none;transition:color .15s}
+.l-logo{width:30px;height:30px;border-radius:9px;background:var(--lg-tx,#141416);display:grid;place-items:center;color:var(--lg-card,#fff);font:700 13px var(--disp)}
+.l-top small{font:600 11px var(--disp);letter-spacing:.2em;color:var(--lg-mu,#6f7178);text-transform:uppercase}
+.l-hint{position:absolute;left:26px;bottom:22px;z-index:5;font:600 11px var(--disp);letter-spacing:.22em;color:var(--lg-mu,#6f7178);text-transform:uppercase}
+.l-links{position:absolute;left:50%;transform:translateX(-50%);bottom:22px;z-index:5;display:flex;gap:8px;align-items:center;font:600 12px var(--sans);color:var(--lg-dim,#8f9199)}
+.l-links a{color:var(--lg-dim,#8f9199);text-decoration:none;transition:color .15s}
 .l-links a:hover{color:var(--accent,#405cde)}
 .l-hint::before{content:"— ";color:var(--accent)}
-.l-corner{position:absolute;right:26px;bottom:22px;z-index:5;font:600 11px var(--disp);letter-spacing:.14em;color:#6f7178}
+.l-corner{position:absolute;right:26px;bottom:22px;z-index:5;font:600 11px var(--disp);letter-spacing:.14em;color:var(--lg-mu,#6f7178)}
 .lctrls{position:absolute;top:18px;right:18px;display:flex;gap:8px;align-items:center;z-index:6}
-.lctrls .ltoggle{font:600 12px var(--sans);color:#141416;background:#fff;border:1px solid #d6d6da;border-radius:9px;padding:8px 10px;cursor:pointer;outline:none}
+.lctrls .ltoggle{font:600 12px var(--sans);color:var(--lg-tx,#141416);background:var(--lg-card,#fff);border:1px solid var(--lg-bd,#d6d6da);border-radius:9px;padding:8px 10px;cursor:pointer;outline:none}
 .lctrls .ltoggle:hover{border-color:var(--accent)}
 .lctrls select.ltoggle{padding:8px 9px}
-.logincard{position:absolute;z-index:5;left:50%;top:56%;transform:translate(-50%,-8%);width:330px;max-width:90vw;background:#fff;border:1px solid #d6d6da;border-radius:20px;padding:26px 26px 20px;box-shadow:0 20px 55px rgba(20,20,30,.14);text-align:center}
+.logincard{position:absolute;z-index:5;left:50%;top:56%;transform:translate(-50%,-8%);width:330px;max-width:90vw;background:var(--lg-card,#fff);border:1px solid var(--lg-bd,#d6d6da);border-radius:20px;padding:26px 26px 20px;box-shadow:0 20px 55px rgba(20,20,30,.14);text-align:center}
 .logincard .lmark{display:none}
-.logincard h2{font:700 17px var(--disp);letter-spacing:-.01em;color:#141416;margin:0 0 2px}
-.logincard p{color:#83858f;font-size:12.5px;margin:0 0 18px}
-.logincard input{width:100%;font:500 14px var(--sans);color:#141416;background:#f0f0f2;border:1px solid #dddde2;border-radius:11px;padding:11px 14px;margin-bottom:10px;outline:none}
-.logincard input::placeholder{color:#9a9ca6}
-.logincard input:focus{border-color:var(--accent);background:#fff}
-.logincard button{width:100%;font:700 14px var(--disp);color:#fff;background:#141416;border:none;border-radius:11px;padding:12px;cursor:pointer;margin-top:4px;transition:background .25s}
-.logincard button:hover{background:var(--accent)}
+.logincard h2{font:700 17px var(--disp);letter-spacing:-.01em;color:var(--lg-tx,#141416);margin:0 0 2px}
+.logincard p{color:var(--lg-mu,#83858f);font-size:12.5px;margin:0 0 18px}
+.logincard input{width:100%;font:500 14px var(--sans);color:var(--lg-tx,#141416);background:var(--lg-in,#f0f0f2);border:1px solid var(--lg-bd2,#dddde2);border-radius:11px;padding:11px 14px;margin-bottom:10px;outline:none}
+.logincard input::placeholder{color:var(--lg-dim,#9a9ca6)}
+.logincard input:focus{border-color:var(--accent);background:var(--lg-card,#fff)}
+.logincard button{width:100%;font:700 14px var(--disp);color:var(--lg-card,#fff);background:var(--lg-tx,#141416);border:none;border-radius:11px;padding:12px;cursor:pointer;margin-top:4px;transition:background .25s}
+.logincard button:hover{background:var(--accent);color:#fff}
 .logincard button:disabled{opacity:.6;cursor:default}
 .lerr{color:#e2506e;font-size:12.5px;min-height:16px;margin-top:8px}
+.lpass-wrap{position:relative;margin-bottom:10px}
+.lpass-wrap>input{margin-bottom:0;padding-right:44px}
+.lpass-wrap>.lpass-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;min-width:0;margin:0;display:grid;place-items:center;background:transparent;border:none;border-radius:8px;cursor:pointer;color:var(--lg-dim,#9a9ca6);padding:0;font:inherit;box-shadow:none;transition:color .15s,background .15s}
+.lpass-wrap>.lpass-eye:hover{color:var(--lg-tx,#141416);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.lpass-wrap>.lpass-eye svg{width:18px;height:18px;display:block;pointer-events:none}
 #who{color:var(--muted);font:600 11px var(--mono);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ---- portal (apps) ---- */
 .appview{display:none}.appview.appon{display:block}
@@ -488,12 +506,14 @@ body.dockon.dock-hidden #dockshow{transform:translate(0,-50%) rotate(-90deg)}
       <button class="iconbtn" id="cfgbtn" title="Configuración" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <span class="tbdiv"></span>
       <button class="iconbtn" id="theme" title="Tema"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z"/></svg></button>
+      <button class="iconbtn" id="persbtn" title="Apariencia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="17" cy="10.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12.5" r="1.1" fill="currentColor" stroke="none"/><path d="M12 3a9 9 0 1 0 0 18 2.4 2.4 0 0 0 1.9-3.9 2.4 2.4 0 0 1 1.9-3.9H17a4 4 0 0 0 4-4.1A9 9 0 0 0 12 3z"/></svg></button>
       <select id="lang"><option value="es">ES</option><option value="en">EN</option><option value="fr">FR</option><option value="de">DE</option><option value="pt">PT</option></select>
       <span class="tbdiv"></span>
       <button class="iconbtn" id="logout" title="Salir" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
       <button class="iconbtn" id="toptoggle" title="Ocultar barra superior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14.5l6-6 6 6"/></svg></button>
     </div>
   </div>
+  <div id="persmenu" class="persmenu"></div>
   <nav class="tabs">
     <button class="tab" id="btnhome" style="display:none">⌂ Apps</button>
     <div class="seg" id="ptseg">
@@ -696,7 +716,7 @@ body.dockon.dock-hidden #dockshow{transform:translate(0,-50%) rotate(-90deg)}
   <h2 id="l-tit">Centro de Proyectos</h2>
   <p id="l-sub">Ingresá con tu cuenta de GLPI</p>
   <input id="l-user" type="text" placeholder="Usuario" autocomplete="username" required>
-  <input id="l-pass" type="password" placeholder="Contraseña" autocomplete="current-password" required>
+  <div class="lpass-wrap"><input id="l-pass" type="password" placeholder="Contraseña" autocomplete="current-password" required><button type="button" class="lpass-eye" id="l-eye" title="Ver contraseña" aria-label="Ver contraseña" tabindex="-1"></button></div>
   <button type="submit" id="l-btn">Acceder</button>
   <div class="lerr" id="l-err"></div>
 </form>
@@ -858,6 +878,11 @@ Object.assign(I18N.fr,{seeing:'Affichage',of:'sur',why_h:'Quels projets est-ce q
 Object.assign(I18N.de,{seeing:'Angezeigt',of:'von',why_h:'Welche Projekte sehe ich?',why_p:'Sie sehen die Projekte, die Ihr Benutzer in GLPI sehen darf — gemäß Profil und aktiver Entität. Der Administrator kann das Board zusätzlich nach Projekttyp filtern. Fehlt ein erwartetes Projekt, prüfen Sie in GLPI: Profilrechte, Entität und Typ.',why_filter:'Typ-Filter',untyped:'Ohne Typ',nt_note:'Projekt(e) ohne Typ in GLPI — mit Hinweis „Ohne Typ“ angezeigt'});
 Object.assign(I18N.pt,{seeing:'Exibindo',of:'de',why_h:'Quais projetos eu vejo?',why_p:'Você vê os projetos que seu usuário pode ver no GLPI, conforme seu perfil e entidade ativa. O administrador também pode filtrar o painel por tipo de projeto. Se um projeto esperado não aparece, verifique no GLPI: permissões do perfil, entidade e tipo.',why_filter:'Filtro de tipo',untyped:'Sem tipo',nt_note:'projeto(s) sem tipo no GLPI — exibidos com o aviso «Sem tipo»'});
 Object.assign(I18N.pt,{board_none:'Sem atribuição',board_add:'+ Área',board_addname:'Nome da área',board_rename:'Renomear área',board_del:'Excluir',board_delc:'Excluir a área',board_saved:'Salvo',board_move:'Mover'});
+Object.assign(I18N.es,{per_accent:'Color de acento',per_default:'Predeterminado',pw_show:'Ver contraseña',pw_hide:'Ocultar contraseña'});
+Object.assign(I18N.en,{per_accent:'Accent color',per_default:'Default',pw_show:'Show password',pw_hide:'Hide password'});
+Object.assign(I18N.fr,{per_accent:'Couleur d\'accent',per_default:'Par défaut',pw_show:'Afficher le mot de passe',pw_hide:'Masquer le mot de passe'});
+Object.assign(I18N.de,{per_accent:'Akzentfarbe',per_default:'Standard',pw_show:'Passwort anzeigen',pw_hide:'Passwort verbergen'});
+Object.assign(I18N.pt,{per_accent:'Cor de destaque',per_default:'Padrão',pw_show:'Ver senha',pw_hide:'Ocultar senha'});
 let LANG=localStorage.getItem('rh-lang')||'es';
 const T=k=>(I18N[LANG]&&I18N[LANG][k])||k;
 
@@ -872,6 +897,20 @@ function toggleTheme(){const n=themeNow()==='dark'?'light':'dark';document.docum
 $theme.addEventListener('click',toggleTheme);
 if($ltheme)$ltheme.addEventListener('click',toggleTheme);
 updThemeIcon();
+// ---- ver/ocultar contraseña en el login ----
+const $lpass=$('#l-pass'), $leye=$('#l-eye');
+const EYE_SVG=_SVG+'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYEOFF_SVG=_SVG+'<path d="M2 12s3.5-7 10-7c2.4 0 4.5.8 6.2 1.9"/><path d="M22 12s-3.5 7-10 7c-2.4 0-4.5-.8-6.2-1.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M4 4l16 16"/></svg>';
+if($leye&&$lpass){
+  $leye.innerHTML=EYE_SVG;
+  $leye.addEventListener('click',()=>{
+    const show=$lpass.type==='password';
+    $lpass.type=show?'text':'password';
+    $leye.innerHTML=show?EYEOFF_SVG:EYE_SVG;
+    $leye.title=show?T('pw_hide'):T('pw_show');
+    $lpass.focus();
+  });
+}
 
 // ---- idioma (sincroniza header + login) ----
 const $lang=$('#lang'), $llang=$('#l-lang'); $lang.value=LANG; if($llang)$llang.value=LANG;
@@ -1292,12 +1331,17 @@ $('#twofawrap').addEventListener('click',e=>{if(e.target.id==='twofawrap')closeS
 
 // ---- config del server: branding + módulos (NADA hardcodeado) ----
 let CONFIG={branding:{},modules:{gps:{}}};
+function userPalette(){   // paleta elegida por el usuario (por-usuario, en localStorage); pisa el default del admin
+  try{const k=localStorage.getItem('rh-accent');if(!k)return null;
+    const p=(CONFIG.palettes||{})[k];return p?Object.assign({key:k},p):null;
+  }catch(e){return null;}
+}
 function applyAccent(){
-  const b=CONFIG.branding||{};
+  const src=userPalette()||CONFIG.branding||{};
   const dark=(document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))==='dark';
-  const acc=(dark&&b.accent_dark)?b.accent_dark:b.accent;
+  const acc=(dark&&src.accent_dark)?src.accent_dark:src.accent;
   if(acc) document.documentElement.style.setProperty('--accent',acc);
-  document.documentElement.style.setProperty('--tint', b.tint!=null?b.tint:'0%');
+  document.documentElement.style.setProperty('--tint', src.tint!=null?src.tint:'0%');
 }
 try{new MutationObserver(applyAccent).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyAccent);}catch(e){}
@@ -1309,6 +1353,22 @@ function applyBranding(){
   if(b.logo_url) document.querySelectorAll('.markbox').forEach(m=>{const img=el('img');img.src=b.logo_url;img.style.width='30px';img.style.height='auto';m.replaceWith(img);});
   const al=$('#fi-applink'); if(al){ if(gps.app_url){al.href=gps.app_url;al.style.display='';}else{al.style.display='none';} }
   if($('#loginwrap').classList.contains('on')) lpBuild();
+}
+// ---- Apariencia: color de acento por-usuario (localStorage). No toca la config global (settings.json). ----
+const $persbtn=$('#persbtn'), $persmenu=$('#persmenu');
+function buildPers(){
+  const pals=CONFIG.palettes||{};
+  let cur=''; try{cur=localStorage.getItem('rh-accent')||'';}catch(e){}
+  let h='<h5>'+T('per_accent')+'</h5><div class="pgrid">';
+  Object.keys(pals).forEach(k=>{const p=pals[k]||{};h+='<div class="psw'+(k===cur?' on':'')+'" data-k="'+esc(k)+'"><span class="dot" style="background:'+esc(p.accent||'#888')+'"></span><span class="nm">'+esc(p.name||k)+'</span></div>';});
+  $persmenu.innerHTML=h+'</div>';
+}
+function openPers(){buildPers();const r=$persbtn.getBoundingClientRect();$persmenu.style.top=(r.bottom+8)+'px';$persmenu.style.right=Math.max(8,window.innerWidth-r.right)+'px';$persmenu.classList.add('on');}
+function closePers(){$persmenu.classList.remove('on');}
+if($persbtn&&$persmenu){
+  $persbtn.addEventListener('click',e=>{e.stopPropagation();$persmenu.classList.contains('on')?closePers():openPers();});
+  $persmenu.addEventListener('click',e=>{const sw=e.target.closest('.psw');if(!sw)return;const k=sw.getAttribute('data-k');try{if(k)localStorage.setItem('rh-accent',k);else localStorage.removeItem('rh-accent');}catch(e){}applyAccent();buildPers();});
+  document.addEventListener('click',e=>{if($persmenu.classList.contains('on')&&!$persmenu.contains(e.target)&&!$persbtn.contains(e.target))closePers();});
 }
 function loadConfig(){
   return fetch('config.php?_='+Date.now()).then(r=>r.ok?r.json():null).then(c=>{
