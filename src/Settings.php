@@ -130,6 +130,8 @@ class Settings
                 'login_name'     => '',
                 'login_subtitle' => '',
                 'login_logo_url' => '',
+                // Logo del spinner de carga (si vacío, usa logo_url o la inicial).
+                'loading_logo'   => '',
             ],
             'modules' => [
                 'gps' => [
