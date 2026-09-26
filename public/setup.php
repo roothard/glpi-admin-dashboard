@@ -212,7 +212,7 @@ $p = $cfg['projects'];
 $gps = $cfg['modules']['gps'];
 $ct = ($cfg['contact'] ?? []) + ['google_chat'=>true,'msg_default'=>'','msg_reminder'=>''];
 $crm = ($cfg['crm'] ?? []) + ['enabled'=>false,'label'=>'CRM','parents'=>[]];
-$palettes = Settings::palettes();
+$palettes = Settings::palettesFor($cfg);
 $curPalette = in_array(($b['palette'] ?? 'roothard'), array_merge(array_keys($palettes), ['custom']), true) ? $b['palette'] : 'roothard';
 $mask = fn($v) => $v !== '' ? '••••••••' : '';
 $h = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES);

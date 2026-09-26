@@ -12,14 +12,14 @@
 <style>
 :root{color-scheme:light dark;
  /* gris editorial: papel gris, tarjetas blancas, tinta */
- --bg:#e3e3e4;--surface:#fff;--surface2:#fafafa;--border:#d6d6da;--border2:#c9c9cf;
- --text:#141416;--muted:#6f7178;--dim:#8f9199;--accent:#405cde;--accent-soft:rgba(64,92,222,.10);
+ --tint:0%;--bg:color-mix(in srgb,var(--accent) calc(var(--tint)*.8),#e3e3e4);--surface:color-mix(in srgb,var(--accent) var(--tint),#fff);--surface2:color-mix(in srgb,var(--accent) calc(var(--tint)*1.4),#fafafa);--border:color-mix(in srgb,var(--accent) calc(var(--tint)*2),#d6d6da);--border2:color-mix(in srgb,var(--accent) calc(var(--tint)*2),#c9c9cf);
+ --text:#141416;--muted:#6f7178;--dim:#8f9199;--accent:#405cde;--accent-soft:color-mix(in srgb,var(--accent) 10%,transparent);
  --vig1:rgba(255,255,255,.85);--vig2:rgba(185,187,196,.55);--shadow:0 8px 26px rgba(20,20,30,.06);
  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
  --disp:'Space Grotesk',Inter,system-ui,sans-serif}
-@media(prefers-color-scheme:dark){:root:not([data-theme]){--bg:#161618;--surface:#1f1f23;--surface2:#26262b;--border:#2c2c31;--border2:#3a3a41;--text:#ececef;--muted:#9a9ca4;--dim:#7c7e86;--accent:#6a83f2;--accent-soft:rgba(106,131,242,.16);--vig1:rgba(255,255,255,.05);--vig2:rgba(0,0,0,.5);--shadow:0 10px 30px rgba(0,0,0,.35)}}
-:root[data-theme="dark"]{--bg:#161618;--surface:#1f1f23;--surface2:#26262b;--border:#2c2c31;--border2:#3a3a41;--text:#ececef;--muted:#9a9ca4;--dim:#7c7e86;--accent:#6a83f2;--accent-soft:rgba(106,131,242,.16);--vig1:rgba(255,255,255,.05);--vig2:rgba(0,0,0,.5);--shadow:0 10px 30px rgba(0,0,0,.35)}
-:root[data-theme="light"]{--bg:#e3e3e4;--surface:#fff;--surface2:#fafafa;--border:#d6d6da;--border2:#c9c9cf;--text:#141416;--muted:#6f7178;--dim:#8f9199;--accent:#405cde;--accent-soft:rgba(64,92,222,.10);--vig1:rgba(255,255,255,.85);--vig2:rgba(185,187,196,.55);--shadow:0 8px 26px rgba(20,20,30,.06)}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){--bg:color-mix(in srgb,var(--accent) calc(var(--tint)*.8),#161618);--surface:color-mix(in srgb,var(--accent) var(--tint),#1f1f23);--surface2:color-mix(in srgb,var(--accent) calc(var(--tint)*1.4),#26262b);--border:color-mix(in srgb,var(--accent) calc(var(--tint)*2),#2c2c31);--border2:color-mix(in srgb,var(--accent) calc(var(--tint)*2),#3a3a41);--text:#ececef;--muted:#9a9ca4;--dim:#7c7e86;--accent:#6a83f2;--accent-soft:color-mix(in srgb,var(--accent) 16%,transparent);--vig1:rgba(255,255,255,.05);--vig2:rgba(0,0,0,.5);--shadow:0 10px 30px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--bg:color-mix(in srgb,var(--accent) calc(var(--tint)*.8),#161618);--surface:color-mix(in srgb,var(--accent) var(--tint),#1f1f23);--surface2:color-mix(in srgb,var(--accent) calc(var(--tint)*1.4),#26262b);--border:color-mix(in srgb,var(--accent) calc(var(--tint)*2),#2c2c31);--border2:color-mix(in srgb,var(--accent) calc(var(--tint)*2),#3a3a41);--text:#ececef;--muted:#9a9ca4;--dim:#7c7e86;--accent:#6a83f2;--accent-soft:color-mix(in srgb,var(--accent) 16%,transparent);--vig1:rgba(255,255,255,.05);--vig2:rgba(0,0,0,.5);--shadow:0 10px 30px rgba(0,0,0,.35)}
+:root[data-theme="light"]{--tint:0%;--bg:color-mix(in srgb,var(--accent) calc(var(--tint)*.8),#e3e3e4);--surface:color-mix(in srgb,var(--accent) var(--tint),#fff);--surface2:color-mix(in srgb,var(--accent) calc(var(--tint)*1.4),#fafafa);--border:color-mix(in srgb,var(--accent) calc(var(--tint)*2),#d6d6da);--border2:color-mix(in srgb,var(--accent) calc(var(--tint)*2),#c9c9cf);--text:#141416;--muted:#6f7178;--dim:#8f9199;--accent:#405cde;--accent-soft:color-mix(in srgb,var(--accent) 10%,transparent);--vig1:rgba(255,255,255,.85);--vig2:rgba(185,187,196,.55);--shadow:0 8px 26px rgba(20,20,30,.06)}
 .ctrls{display:flex;align-items:center;gap:8px;margin-left:auto}
 .iconbtn{width:34px;height:34px;display:grid;place-items:center;font-size:15px;border:1px solid var(--border2);border-radius:9px;background:var(--surface);cursor:pointer;line-height:1}
 .iconbtn:hover{border-color:var(--accent)}
@@ -1229,6 +1229,7 @@ function applyAccent(){
   const dark=(document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))==='dark';
   const acc=(dark&&b.accent_dark)?b.accent_dark:b.accent;
   if(acc) document.documentElement.style.setProperty('--accent',acc);
+  document.documentElement.style.setProperty('--tint', b.tint!=null?b.tint:'0%');
 }
 try{new MutationObserver(applyAccent).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyAccent);}catch(e){}

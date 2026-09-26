@@ -27,11 +27,39 @@ class Settings
      */
     public static function palettes(): array
     {
+        // Cada tema = acento (claro/oscuro) + nivel de "tinte" del material (vibrancy
+        // estilo macOS). tint 0% = neutro (gris actual). Agregar un tema = una línea.
         return [
-            'roothard'  => ['name' => 'Azul RootHard', 'accent' => '#405cde', 'accent_dark' => '#6a83f2'],
-            'esmeralda' => ['name' => 'Esmeralda',     'accent' => '#0d9488', 'accent_dark' => '#2dd4bf'],
-            'violeta'   => ['name' => 'Violeta',        'accent' => '#6d28d9', 'accent_dark' => '#a78bfa'],
+            'roothard' => ['name' => 'RootHard', 'accent' => '#405cde', 'accent_dark' => '#6a83f2', 'tint' => '0%'],
+            'verde'    => ['name' => 'Verde',    'accent' => '#12924a', 'accent_dark' => '#34d17e', 'tint' => '9%'],
+            'cian'     => ['name' => 'Cian',     'accent' => '#0e9bb8', 'accent_dark' => '#3ee6f5', 'tint' => '9%'],
+            'rosa'     => ['name' => 'Rosa',     'accent' => '#d1197a', 'accent_dark' => '#ff4d9a', 'tint' => '9%'],
+            'violeta'  => ['name' => 'Violeta',  'accent' => '#6d34e0', 'accent_dark' => '#9a80ff', 'tint' => '9%'],
         ];
+    }
+
+    /**
+     * Temas con el nombre visible; cada instalación puede renombrarlos desde
+     * `branding.palette_labels` (mapa id → nombre) sin tocar el código.
+     */
+    public static function palettesFor(?array $cfg = null): array
+    {
+        $cfg = $cfg ?? self::load();
+        $labels = (array)($cfg['branding']['palette_labels'] ?? []);
+        $out = self::palettes();
+        foreach ($labels as $k => $name) {
+            if (isset($out[$k]) && is_string($name) && trim($name) !== '') { $out[$k]['name'] = trim($name); }
+        }
+        return $out;
+    }
+
+    /** Nivel de tinte del tema elegido (0% para custom / neutro). */
+    public static function tintOf(array $cfg): string
+    {
+        $b = $cfg['branding'] ?? [];
+        $pal = $b['palette'] ?? 'roothard';
+        $p = self::palettes();
+        return ($pal !== 'custom' && isset($p[$pal])) ? ($p[$pal]['tint'] ?? '0%') : '0%';
     }
 
     /**
@@ -95,6 +123,8 @@ class Settings
                 // Paleta pre-establecida (clave de self::palettes()) o 'custom'
                 // para usar el color 'accent' de arriba.
                 'palette'  => 'roothard',
+                // Renombrar temas por instalación: {id: "Nombre"} (id de self::palettes()).
+                'palette_labels' => [],
                 // Marca PROPIA de la pantalla de login (si algo queda vacío,
                 // cae al valor de la app: login_name→app_name, etc.).
                 'login_name'     => '',
@@ -213,12 +243,13 @@ class Settings
         $b['login_name']     = ($b['login_name'] ?? '')     !== '' ? $b['login_name']     : ($b['app_name'] ?? '');
         $b['login_subtitle'] = ($b['login_subtitle'] ?? '') !== '' ? $b['login_subtitle'] : ($b['subtitle'] ?? '');
         $b['login_logo_url'] = ($b['login_logo_url'] ?? '') !== '' ? $b['login_logo_url'] : ($b['logo_url'] ?? '');
-        // Accent efectivo según la paleta elegida (el front lo aplica directo).
+        // Accent efectivo + tinte del material según el tema elegido.
         $b['accent']      = self::accentOf($cfg, false);
         $b['accent_dark'] = self::accentOf($cfg, true);
+        $b['tint']        = self::tintOf($cfg);
         return [
             'branding' => $b,
-            'palettes' => self::palettes(),   // para pintar los swatches del panel
+            'palettes' => self::palettesFor($cfg),   // temas (con nombres de la instalación)
             'modules'  => [
                 'gps' => [
                     'enabled' => (bool)$cfg['modules']['gps']['enabled'],
