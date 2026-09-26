@@ -4,6 +4,33 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 A user-facing version of this changelog is published at [`docs/`](docs/index.html).
 
+## [1.5.0] — 2026-09-26 — macOS UI, per-user themes & login polish
+### Added
+- **Per-user accent palette** — a palette button in the toolbar (visible to
+  everyone) lets each user pick their accent colour, stored per-browser
+  (localStorage) **without touching the global config**; the setup gear stays
+  Super-Admin only.
+- **macOS-style colour themes** — each preset tints the whole material
+  (vibrancy) via `color-mix`, not just the button; instance-overridable names.
+- **Loading spinner** after login/2FA with the brand logo, to avoid the
+  pre-load flash.
+- **Show/hide password** toggle on the login form (i18n, 5 languages).
+- **Dark mode on the login screen** — the login now follows the theme (manual
+  toggle + system auto); it was previously always light.
+### Changed
+- **macOS UI pass** (no behavioural changes): floating glass toolbar island that
+  reclaims space when hidden (animated), monochrome SVG icons with subtle
+  separators, language as a pill, refined KPI tiles, tables and cards.
+- Setup panel: **collapsible sections grouped** into Configuration / Dashboards /
+  Personalisation, keeping the numbering.
+### Fixed
+- **Fichadas** showed check-in/out times +3h (UTC): now converted to local time
+  (`America/Argentina/Buenos_Aires`); the MySQL server runs in UTC.
+- Setup **"Pick from GLPI"** (Projects) failed with
+  `ERROR_LOGIN_PARAMETERS_MISSING` because it used the empty service token; it
+  now uses the logged-in admin's GLPI session (same as CRM entities).
+- Tickets search placeholder wrongly said "Search project…"; now "Search ticket…".
+
 ## [1.4.0] — 2026-09-25 — CRM, 2FA & modular config
 ### Added
 - **CRM** app (native dock cube, admin/supervisor only): clients are the **child
