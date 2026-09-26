@@ -76,33 +76,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'types') { // list GLPI project types (with usage counts) for the setup dropdown
-        $url  = trim($in['glpi_url'] ?? $cfg['glpi']['url']);
-        $app  = trim($in['glpi_app_token'] ?? '') ?: $cfg['glpi']['app_token'];
-        $user = trim($in['glpi_user_token'] ?? '') ?: $cfg['glpi']['user_token'];
-        try {
-            $c = new GlpiClient([
-                'url' => $url, 'app_token' => $app, 'user_token' => $user,
-                'tokens_in_query' => !empty($in['glpi_tokens_in_query']),
-                'profile_id' => (int)($in['glpi_profile_id'] ?? $cfg['glpi']['profile_id']),
-                'insecure' => !empty($in['glpi_insecure']),
-            ]);
-            $c->initSession();
-            $types = [];
-            foreach ($c->getAll('ProjectType') as $t) {
-                $types[(int)$t['id']] = ['id' => (int)$t['id'], 'name' => (string)($t['name'] ?? ''), 'count' => 0];
-            }
-            $untyped = 0; $total = 0;
-            foreach ($c->getAll('Project') as $p) {
-                if (!empty($p['is_deleted']) || !empty($p['is_template'])) continue;
-                $total++;
-                $tid = (int)($p['projecttypes_id'] ?? 0);
-                if ($tid > 0 && isset($types[$tid])) { $types[$tid]['count']++; } else { $untyped++; }
-            }
-            $c->killSession();
-            echo json_encode(['ok' => true, 'types' => array_values($types), 'untyped' => $untyped, 'total' => $total], JSON_UNESCAPED_UNICODE);
-        } catch (\Throwable $e) {
-            echo json_encode(['ok' => false, 'msg' => $e->getMessage()]);
+        // Modelo por-sesión: usa la sesión GLPI del admin logueado (sin token de
+        // servicio). GLPI aplica su aislamiento por entidad automáticamente.
+        $tok = $_SESSION['glpi_token'] ?? '';
+        if ($tok === '') { echo json_encode(['ok' => false, 'msg' => 'sesión requerida — entrá al tablero primero']); exit; }
+        list($ct, $tlist) = glpi_fetch('/ProjectType', ['range' => '0-1000'], $tok);
+        if ($ct >= 400) { echo json_encode(['ok' => false, 'msg' => "GLPI HTTP $ct"]); exit; }
+        $types = [];
+        foreach ((array)$tlist as $t) {
+            $id = (int)($t['id'] ?? 0); if ($id <= 0) continue;
+            $types[$id] = ['id' => $id, 'name' => (string)($t['name'] ?? ''), 'count' => 0];
         }
+        list($cp, $plist) = glpi_fetch('/Project', ['range' => '0-2000'], $tok);
+        if ($cp >= 400) { echo json_encode(['ok' => false, 'msg' => "GLPI HTTP $cp"]); exit; }
+        $untyped = 0; $total = 0;
+        foreach ((array)$plist as $p) {
+            if (!empty($p['is_deleted']) || !empty($p['is_template'])) continue;
+            $total++;
+            $tid = (int)($p['projecttypes_id'] ?? 0);
+            if ($tid > 0 && isset($types[$tid])) { $types[$tid]['count']++; } else { $untyped++; }
+        }
+        echo json_encode(['ok' => true, 'types' => array_values($types), 'untyped' => $untyped, 'total' => $total], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
