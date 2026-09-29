@@ -16,6 +16,7 @@
  */
 require_once __DIR__ . '/GlpiApi.php';
 require_once __DIR__ . '/GlpiProbe.php';
+require_once __DIR__ . '/GlpiFieldMap.php';
 require_once __DIR__ . '/GlpiClientLegacy.php';
 require_once __DIR__ . '/GlpiClientV2.php';
 

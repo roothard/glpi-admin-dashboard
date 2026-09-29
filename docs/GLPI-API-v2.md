@@ -88,6 +88,45 @@ Documentación de desarrollador de GLPI (rama `master`, cubre GLPI 11):
   doble codificación** cuando el back-end es v2 (o legacy sobre 11). Detalle:
   `upgradeguides/glpi-11.0.html#removal-of-input-variables-auto-sanitize`.
 
+### Mapeo endpoints/campos legacy → v2 (implementado en #286)
+
+`GlpiFieldMap` traduce (fuente: schemas HL en `src/Glpi/Api/HL/Controller/*`).
+La versión se pide por header `GLPI-API-Version`; los campos de estado/fechas/
+percent son `x-version-introduced: 2.3`, así que se pide **API ≥ 2.3**.
+
+**Endpoints** (base `…/api.php`, update = PATCH, no PUT):
+
+| itemtype legacy | colección v2 | ítem v2 |
+|---|---|---|
+| `Project` | `GET /Project` | `/Project/{id}` |
+| `ProjectTask` | `GET /Project/Task` | `/Project/Task/{id}` |
+| `ProjectState` | `GET /Dropdowns/ProjectState` | `/Dropdowns/ProjectState/{id}` |
+| `ProjectType` | `GET /Dropdowns/ProjectType` | `/Dropdowns/ProjectType/{id}` |
+| `Entity` | `GET /Administration/Entity` | `/Administration/Entity/{id}` |
+| `User` | `GET /Administration/User` | `/Administration/User/{id}` |
+| `KnowbaseItem` | `GET /Knowledgebase/Article` | `/Knowledgebase/Article/{id}` |
+
+**Campos**: las FK legacy `*_id` vienen como objetos dropdown `{id,name}` y se
+aplanan por el `x-field` del schema:
+
+- Project: `status`→`projectstates_id`, `parent`→`projects_id`, `type`→
+  `projecttypes_id`, `entity`→`entities_id`, `user`→`users_id`.
+- ProjectTask: `project`→`projects_id`, `status`→`projectstates_id`,
+  `parent_task`→`projecttasks_id`.
+- Catálogos planos: ProjectState (`id,name,color`), ProjectType (`id,name`),
+  Entity (`id,name,completename`), User (`id,firstname,realname,name`; el login
+  puede venir como `username`). KnowbaseItem: el cuerpo (`x-field answer`) suele
+  llamarse `content` → se remapea a `answer`.
+
+`GlpiClientV2` aplica `GlpiFieldMap::toLegacy` sobre lo que devuelva el transporte
+OAuth2 (seams `fetch*`, se implementan en #285), así el resto de la app sigue
+recibiendo shape legacy sin cambios.
+
+**Gaps a validar en #287** (contra el homelab 11): rutas exactas y presencia de
+campos por versión; y el pivote `KnowbaseItem_Item` (KB por proyecto) **no tiene
+relación directa** en el schema v2 de Project → hoy `getSubItems` degrada a `[]`
+(igual que el legacy ante una relación inexistente).
+
 ### Detección de API (implementado en #284)
 
 `GlpiProbe` clasifica sin autenticar: legacy viva = `GET /apirest.php/initSession` con
