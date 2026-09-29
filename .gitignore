@@ -2,6 +2,11 @@
 .env
 *.env
 !.env.example
+!deploy/deploy.env.example
+deploy/deploy.env
+
+# Per-site environment marker (written by the deploy scripts on each server)
+config/version.json
 
 # Generated data
 public/data.json

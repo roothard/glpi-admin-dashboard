@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# ==========================================================================
+# deploy-pda [<rama|ref>]  —  despliega a STAGING (pda.roothard.com.ar)
+#
+# Staging se puede romper: sirve la rama en prueba. Hace lint (php -l),
+# backup del sitio vivo e instala como el usuario del sitio, marcando el
+# entorno como "staging" (el panel muestra el badge STAGING).
+#
+# Nunca toca producción (apps). Nunca pisa config/settings.json ni los
+# archivos de estado (board.json, processes.json, logs, assets, modules…).
+#
+#   ./deploy/deploy-pda            # despliega la rama por defecto (deploy.env)
+#   ./deploy/deploy-pda mi-rama    # despliega esa rama
+#   ./deploy/deploy-pda v1.6.0     # o un tag / commit
+# ==========================================================================
+set -euo pipefail
+. "$(cd "$(dirname "$0")" && pwd)/lib.sh"
+
+load_env
+REF="${1:-$PDA_DEFAULT_BRANCH}"
+: "${PDA_USER:?falta PDA_USER en deploy.env}" "${PDA_HOME:?falta PDA_HOME en deploy.env}"
+
+step "Actualizando refs (git fetch)…"
+git -C "$REPO_DIR" fetch --all --tags --quiet || true
+
+trap cleanup_stage EXIT
+step "Preparando imagen de '$REF' para STAGING…"
+build_image "$REF" "staging" "$REF"
+ok "Imagen lista — versión $IMG_VERSION (${IMG_COMMIT:0:12})"
+
+push_image "$IMG_DIR" "$PDA_USER" "$PDA_HOME"
+
+ok "STAGING actualizado: https://pda.roothard.com.ar  ·  $IMG_VERSION (${IMG_COMMIT:0:12})"
+echo "   Probá pda. Cuando esté validado, tagueá y promové con:  ./deploy/promote-apps <tag>"
