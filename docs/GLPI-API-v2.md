@@ -127,6 +127,35 @@ campos por versión; y el pivote `KnowbaseItem_Item` (KB por proyecto) **no tien
 relación directa** en el schema v2 de Project → hoy `getSubItems` degrada a `[]`
 (igual que el legacy ante una relación inexistente).
 
+### Validado contra un GLPI 11 real (11.0.x)
+
+Probado end-to-end con un cliente OAuth real (las credenciales viven en el
+gestor de secretos, nunca en el repo):
+
+- **Token endpoint: `POST {glpi}/api.php/token`** (OAuth2).
+- **Grant a usar: `password`** (Resource Owner Password Credentials). Devuelve
+  `access_token` (Bearer, `expires_in` 3600) + `refresh_token`.
+  - ⚠️ **`client_credentials` NO sirve para leer datos**: el Router hace
+    `getFromDB($user_id)` + `Session::init`, y con ese grant `user_id` es nulo →
+    `401 ERROR_UNAUTHENTICATED`. Es estructural (verificado en `Router.php` y en
+    vivo), no configurable. Por eso el modelo calza con el actual: **servicio** =
+    un usuario de servicio + su clave; **portal** = usuario/clave del login.
+  - El cliente OAuth necesita el **scope `api`** (los "Ámbitos" vacíos = ningún
+    scope → `OAuthRequestMiddleware` rechaza con "required scope").
+- Llamadas: `Authorization: Bearer <token>` + `GLPI-API-Version: 2.3`.
+- **Verificado**: `GET /api.php/v2/Project` `/Project/Task` `/Administration/Entity`
+  `/Administration/User` → 200; CRUD Project (POST → 201, DELETE → 204).
+- **Borrado**: el parámetro de purga es **`?force=true`** (no `force_purge`); sin
+  él, un itemtype con papelera queda en `is_deleted=1`.
+- Forma real confirmada (valida #286): `entity`/`status`/`type`/`parent`/`user`
+  como objetos `{id,name}` (o `null`), `content` **en crudo** (sin entidades HTML),
+  fechas en **ISO 8601 con offset** (`2026-09-29T19:37:01-03:00`) — el `d10()` del
+  generador toma los primeros 10 chars, así que sigue funcionando. `User` no trae
+  `name`, trae `username` (el mapeo ya cae a `username`).
+- **A corregir en #285/#287**: `GET /api.php/v2/Dropdowns/ProjectState` dio **404**
+  → falta confirmar la ruta real del catálogo ProjectState (para el `color`; el
+  nombre del estado ya viene embebido en `status.name`).
+
 ### Detección de API (implementado en #284)
 
 `GlpiProbe` clasifica sin autenticar: legacy viva = `GET /apirest.php/initSession` con

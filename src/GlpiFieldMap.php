@@ -68,6 +68,28 @@ class GlpiFieldMap
         ],
     ];
 
+    /**
+     * Mapeo inverso para escrituras (legacy → v2): las FK planas (`*_id`) pasan a
+     * la propiedad dropdown que la HL API espera con el id (p. ej.
+     * `projectstates_id` → `status`). El resto de los campos van tal cual.
+     * @param array<string,mixed> $input
+     * @return array<string,mixed>
+     */
+    public static function toV2Input(string $itemtype, array $input): array
+    {
+        $inv = [];
+        foreach (self::DROPDOWNS[$itemtype] ?? [] as $prop => $fk) { $inv[$fk] = $prop; }
+        $out = [];
+        foreach ($input as $k => $v) {
+            if (isset($inv[$k])) {
+                $out[$inv[$k]] = is_array($v) ? ($v['id'] ?? null) : $v;
+            } else {
+                $out[$k] = $v;
+            }
+        }
+        return $out;
+    }
+
     /** ¿Hay endpoint v2 conocido para este itemtype? */
     public static function hasEndpoint(string $itemtype): bool
     {

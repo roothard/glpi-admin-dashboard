@@ -109,9 +109,14 @@ class Settings
                 // del GLPI destino, 'legacy' fuerza apirest.php (GLPI 9/10) y 'v2'
                 // fuerza la API nueva OAuth2 (GLPI 11+). 'auto' hoy = legacy.
                 'api_mode' => 'auto',
-                // Credenciales OAuth2 (client credentials) de la API v2. Vienen del
-                // Vault/entorno, NO se versionan: dejar vacías en settings.json.
+                // Credenciales OAuth2 de la API v2. Vienen del Vault/entorno, NO se
+                // versionan: dejar vacías en settings.json. En GLPI 11 el grant es
+                // `password` (usuario/clave de servicio), porque client_credentials
+                // no trae usuario y la API lo rechaza (401). Ver docs/GLPI-API-v2.md.
                 'oauth_client_id' => '', 'oauth_client_secret' => '',
+                'oauth_username' => '', 'oauth_password' => '', 'oauth_scope' => 'api',
+                // Versión de la HL API a pedir (vacío = mínima soportada, 2.3).
+                'api_version' => '',
             ],
             'projects' => [
                 'project_type' => '', 'group_by' => 'parent',
@@ -201,6 +206,8 @@ class Settings
         // Secretos OAuth2: preferir el entorno (Vault) por sobre el archivo.
         $cfg['glpi']['oauth_client_id']     = $env('GLPI_OAUTH_CLIENT_ID', $cfg['glpi']['oauth_client_id']);
         $cfg['glpi']['oauth_client_secret'] = $env('GLPI_OAUTH_CLIENT_SECRET', $cfg['glpi']['oauth_client_secret']);
+        $cfg['glpi']['oauth_username']      = $env('GLPI_OAUTH_USERNAME', $cfg['glpi']['oauth_username']);
+        $cfg['glpi']['oauth_password']      = $env('GLPI_OAUTH_PASSWORD', $cfg['glpi']['oauth_password']);
         $cfg['projects']['project_type'] = $env('PROJECT_TYPE', $cfg['projects']['project_type']);
         if (getenv('GLPI_TOKENS_IN_QUERY') !== false) { $cfg['glpi']['tokens_in_query'] = $bool(getenv('GLPI_TOKENS_IN_QUERY')); }
         foreach (['DB_HOST' => 'host', 'DB_NAME' => 'name', 'DB_USER' => 'user', 'DB_PASS' => 'pass'] as $e => $k) {
@@ -239,6 +246,8 @@ class Settings
             // Selección de back-end de API y credenciales OAuth2 (proyecto #46).
             'api_mode' => $g['api_mode'] ?? 'auto',
             'oauth_client_id' => $g['oauth_client_id'] ?? '', 'oauth_client_secret' => $g['oauth_client_secret'] ?? '',
+            'oauth_username' => $g['oauth_username'] ?? '', 'oauth_password' => $g['oauth_password'] ?? '',
+            'oauth_scope' => $g['oauth_scope'] ?? 'api', 'api_version' => $g['api_version'] ?? '',
             // Dónde cachea GlpiProbe la detección de API (junto a la config, persistente).
             'cache_dir' => dirname(self::path()),
             'project_type' => $p['project_type'], 'group_by' => $p['group_by'],
