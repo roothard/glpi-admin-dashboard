@@ -105,6 +105,13 @@ class Settings
                 'url' => '', 'app_token' => '', 'user_token' => '',
                 'tokens_in_query' => false, 'profile_id' => 0,
                 'insecure' => false, 'resolve_host' => '', 'resolve_ip' => '',
+                // Back-end de API a usar (proyecto #46): 'auto' detecta la versión
+                // del GLPI destino, 'legacy' fuerza apirest.php (GLPI 9/10) y 'v2'
+                // fuerza la API nueva OAuth2 (GLPI 11+). 'auto' hoy = legacy.
+                'api_mode' => 'auto',
+                // Credenciales OAuth2 (client credentials) de la API v2. Vienen del
+                // Vault/entorno, NO se versionan: dejar vacías en settings.json.
+                'oauth_client_id' => '', 'oauth_client_secret' => '',
             ],
             'projects' => [
                 'project_type' => '', 'group_by' => 'parent',
@@ -190,6 +197,10 @@ class Settings
         $cfg['glpi']['url']       = $env('GLPI_URL', $cfg['glpi']['url']);
         $cfg['glpi']['app_token'] = $env('GLPI_APP_TOKEN', $cfg['glpi']['app_token']);
         $cfg['glpi']['user_token'] = $env('GLPI_USER_TOKEN', $cfg['glpi']['user_token']);
+        $cfg['glpi']['api_mode']   = $env('GLPI_API_MODE', $cfg['glpi']['api_mode']);
+        // Secretos OAuth2: preferir el entorno (Vault) por sobre el archivo.
+        $cfg['glpi']['oauth_client_id']     = $env('GLPI_OAUTH_CLIENT_ID', $cfg['glpi']['oauth_client_id']);
+        $cfg['glpi']['oauth_client_secret'] = $env('GLPI_OAUTH_CLIENT_SECRET', $cfg['glpi']['oauth_client_secret']);
         $cfg['projects']['project_type'] = $env('PROJECT_TYPE', $cfg['projects']['project_type']);
         if (getenv('GLPI_TOKENS_IN_QUERY') !== false) { $cfg['glpi']['tokens_in_query'] = $bool(getenv('GLPI_TOKENS_IN_QUERY')); }
         foreach (['DB_HOST' => 'host', 'DB_NAME' => 'name', 'DB_USER' => 'user', 'DB_PASS' => 'pass'] as $e => $k) {
@@ -225,6 +236,9 @@ class Settings
             'url' => $g['url'], 'app_token' => $g['app_token'], 'user_token' => $g['user_token'],
             'tokens_in_query' => (bool)$g['tokens_in_query'], 'profile_id' => (int)$g['profile_id'],
             'insecure' => (bool)$g['insecure'], 'timeout' => 30,
+            // Selección de back-end de API y credenciales OAuth2 (proyecto #46).
+            'api_mode' => $g['api_mode'] ?? 'auto',
+            'oauth_client_id' => $g['oauth_client_id'] ?? '', 'oauth_client_secret' => $g['oauth_client_secret'] ?? '',
             'project_type' => $p['project_type'], 'group_by' => $p['group_by'],
             'include_untyped' => (bool)($p['include_untyped'] ?? true),
             'include_only_leaf' => (bool)$p['include_only_leaf'], 'area_strip_prefix' => $p['area_strip_prefix'],

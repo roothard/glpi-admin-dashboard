@@ -1,217 +1,89 @@
 <?php
 /**
- * GlpiClient — minimal read-only client for the GLPI REST API (apirest.php).
+ * GlpiClient — fachada version-agnostic de acceso a GLPI.
  *
- * Handles session lifecycle and paginated GET/search. Designed to work even
- * when GLPI sits behind Cloudflare, which strips the `Authorization` header:
- * set `tokens_in_query = true` to also pass the user token as a query param.
+ * No habla HTTP directamente: elige un back-end que implementa GlpiApi y le
+ * delega todo. Así los consumidores (DashboardGenerator, generate.php, data.php,
+ * setup.php) siguen haciendo `new GlpiClient($cfg)` sin enterarse de si detrás
+ * hay API legacy (apirest.php, GLPI 9/10) o API v2 (OAuth2, GLPI 11+).
+ *
+ * El back-end se elige por `api_mode` en la config:
+ *   - 'legacy' → GlpiClientLegacy.
+ *   - 'v2'     → GlpiClientV2.
+ *   - 'auto'   → autodetección (proyecto #46, tarea #284); por ahora cae a legacy.
  *
  * @license MIT
  */
+require_once __DIR__ . '/GlpiApi.php';
+require_once __DIR__ . '/GlpiClientLegacy.php';
+require_once __DIR__ . '/GlpiClientV2.php';
 
-if (!function_exists('array_is_list')) {
-    // Polyfill for PHP < 8.0
-    function array_is_list(array $a): bool
-    {
-        if ($a === []) return true;
-        return array_keys($a) === range(0, count($a) - 1);
-    }
-}
-
-class GlpiClient
+class GlpiClient implements GlpiApi
 {
-    private string $base;          // e.g. https://glpi.example.com/apirest.php
-    private string $appToken;
-    private string $userToken;
-    private bool   $tokensInQuery;
-    private int    $timeout;
-    private bool   $insecure;        // allow self-signed TLS
-    private int    $profileId;       // 0 = keep token's default profile
-    private int    $entityId;        // -1 = keep default entity
-    private bool   $entityRecursive;
-    private ?string $session = null;
+    private GlpiApi $backend;
 
     public function __construct(array $cfg)
     {
-        $url = rtrim($cfg['url'] ?? '', '/');
-        // Accept both the base host and a full .../apirest.php URL.
-        if (!preg_match('#/apirest\.php$#i', $url)) {
-            $url .= '/apirest.php';
-        }
-        $this->base            = $url;
-        $this->appToken        = (string)($cfg['app_token'] ?? '');
-        $this->userToken       = (string)($cfg['user_token'] ?? '');
-        $this->tokensInQuery   = (bool)($cfg['tokens_in_query'] ?? false);
-        $this->timeout         = (int)($cfg['timeout'] ?? 30);
-        $this->insecure        = (bool)($cfg['insecure'] ?? false);
-        $this->profileId       = (int)($cfg['profile_id'] ?? 0);
-        $this->entityId        = array_key_exists('entity_id', $cfg) && $cfg['entity_id'] !== '' ? (int)$cfg['entity_id'] : -1;
-        $this->entityRecursive = (bool)($cfg['entity_recursive'] ?? true);
+        $this->backend = self::makeBackend($cfg);
     }
 
-    /**
-     * Open a session; returns the session token.
-     *
-     * Tries the standard `Authorization: user_token …` header first. Many
-     * setups (Cloudflare, some Apache/FastCGI configs) strip that header, so
-     * on failure we transparently retry with the tokens as query parameters.
-     * Set `tokens_in_query = true` to skip straight to the query method.
-     */
+    /** El back-end elegido (útil para diagnóstico/tests). */
+    public function backend(): GlpiApi
+    {
+        return $this->backend;
+    }
+
+    /** Elegir el back-end según api_mode. */
+    private static function makeBackend(array $cfg): GlpiApi
+    {
+        $mode = strtolower((string)($cfg['api_mode'] ?? 'auto'));
+        switch ($mode) {
+            case 'v2':
+                return new GlpiClientV2($cfg);
+            case 'legacy':
+                return new GlpiClientLegacy($cfg);
+            case 'auto':
+            default:
+                // #284: probar capacidades del GLPI destino para decidir. Hasta
+                // entonces, el comportamiento estable es la API legacy.
+                return new GlpiClientLegacy($cfg);
+        }
+    }
+
+    // ---- delegación al back-end -----------------------------------------
+
     public function initSession(): string
     {
-        $attempts = $this->tokensInQuery ? ['query'] : ['header', 'query'];
-        $last = null;
-        foreach ($attempts as $mode) {
-            $headers = ['App-Token: ' . $this->appToken];
-            $query   = [];
-            if ($mode === 'header') {
-                $headers[] = 'Authorization: user_token ' . $this->userToken;
-            } else { // query
-                $query['app_token']  = $this->appToken;
-                $query['user_token'] = $this->userToken;
-            }
-            [$code, $body] = $this->raw('GET', '/initSession', $query, $headers);
-            if ($code === 200 && isset($body['session_token'])) {
-                $this->session = $body['session_token'];
-                $this->applyActiveContext();
-                return $this->session;
-            }
-            $last = "HTTP $code: " . (is_string($body) ? $body : json_encode($body));
-        }
-        throw new RuntimeException("initSession failed ($last)");
+        return $this->backend->initSession();
     }
 
-    /**
-     * Use an already-open session token (e.g. the logged-in user's), skipping
-     * initSession(). The dashboard can then build data with the USER's own
-     * scope — no service token stored anywhere. Do NOT killSession() on this:
-     * it belongs to the live browser session.
-     */
     public function useSession(string $token): void
     {
-        $this->session = $token;
+        $this->backend->useSession($token);
     }
 
-    /** Switch the active profile/entity if configured (some tokens default to a limited profile). */
-    private function applyActiveContext(): void
-    {
-        if ($this->profileId > 0) {
-            $this->raw('POST', '/changeActiveProfile', [], $this->authHeaders(),
-                ['profiles_id' => $this->profileId]);
-        }
-        if ($this->entityId >= 0) {
-            $this->raw('POST', '/changeActiveEntities', [], $this->authHeaders(),
-                ['entities_id' => $this->entityId, 'is_recursive' => $this->entityRecursive]);
-        }
-    }
-
-    /** Close the session (best effort). */
     public function killSession(): void
     {
-        if ($this->session === null) {
-            return;
-        }
-        try { $this->raw('GET', '/killSession', [], $this->authHeaders()); } catch (\Throwable $e) { /* ignore */ }
-        $this->session = null;
+        $this->backend->killSession();
     }
 
-    /**
-     * GET every row of an itemtype, following GLPI's Content-Range pagination.
-     * @return array<int,array<string,mixed>>
-     */
     public function getAll(string $itemtype, array $params = [], int $page = 200): array
     {
-        $out = [];
-        $start = 0;
-        do {
-            $params['range'] = $start . '-' . ($start + $page - 1);
-            [$code, $body] = $this->raw('GET', '/' . ltrim($itemtype, '/'), $params, $this->authHeaders());
-            if ($code === 401 || $code === 403) {
-                throw new RuntimeException("Unauthorized on $itemtype (HTTP $code). Check tokens / rights.");
-            }
-            if (!is_array($body)) {
-                break;
-            }
-            // GLPI returns a bare list for collections; a single object has string keys.
-            $rows = array_is_list($body) ? $body : [$body];
-            foreach ($rows as $row) {
-                if (is_array($row)) { $out[] = $row; }
-            }
-            $got = count($rows);
-            $start += $got;
-            // Stop when the page came back short (last page) or empty.
-        } while ($got === $page);
-        return $out;
+        return $this->backend->getAll($itemtype, $params, $page);
     }
 
-    /**
-     * GET the sub-items of a parent (e.g. /Project/12/ProjectTask).
-     * Returns [] on 404/empty so callers can treat "no relation" gracefully.
-     * @return array<int,array<string,mixed>>
-     */
     public function getSubItems(string $itemtype, int $id, string $subtype, array $params = []): array
     {
-        $params += ['range' => '0-999'];
-        [$code, $body] = $this->raw('GET', "/$itemtype/$id/$subtype", $params, $this->authHeaders());
-        if ($code >= 400 || !is_array($body)) {
-            return [];
-        }
-        $rows = array_is_list($body) ? $body : [$body];
-        return array_values(array_filter($rows, 'is_array'));
+        return $this->backend->getSubItems($itemtype, $id, $subtype, $params);
     }
 
-    /** GET a single item by id, or null if missing. */
     public function getItem(string $itemtype, int $id, array $params = []): ?array
     {
-        [$code, $body] = $this->raw('GET', "/$itemtype/$id", $params, $this->authHeaders());
-        return ($code === 200 && is_array($body)) ? $body : null;
+        return $this->backend->getItem($itemtype, $id, $params);
     }
 
-    private function authHeaders(): array
+    public function write(string $itemtype, string $method, array $input = [], ?int $id = null): array
     {
-        $h = ['App-Token: ' . $this->appToken];
-        if ($this->session !== null) {
-            $h[] = 'Session-Token: ' . $this->session;
-        }
-        return $h;
-    }
-
-    /**
-     * Perform one HTTP request. Returns [httpCode, decodedBody].
-     * @return array{0:int,1:mixed}
-     */
-    private function raw(string $method, string $path, array $query, array $headers, ?array $body = null): array
-    {
-        $url = $this->base . $path;
-        if ($query) {
-            $url .= '?' . http_build_query($query);
-        }
-        $opts = [
-            CURLOPT_CUSTOMREQUEST  => $method,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER     => array_merge(['Content-Type: application/json'], $headers),
-            CURLOPT_TIMEOUT        => $this->timeout,
-            CURLOPT_CONNECTTIMEOUT => min(15, $this->timeout),
-            CURLOPT_FOLLOWLOCATION => true,
-        ];
-        if ($this->insecure) {
-            $opts[CURLOPT_SSL_VERIFYPEER] = false;
-            $opts[CURLOPT_SSL_VERIFYHOST] = 0;
-        }
-        if ($body !== null) {
-            $opts[CURLOPT_POSTFIELDS] = json_encode($body);
-        }
-        $ch = curl_init($url);
-        curl_setopt_array($ch, $opts);
-        $resp = curl_exec($ch);
-        if ($resp === false) {
-            $err = curl_error($ch);
-            curl_close($ch);
-            throw new RuntimeException("HTTP transport error for $path: $err");
-        }
-        $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        $decoded = json_decode($resp, true);
-        return [$code, $decoded === null && $resp !== 'null' ? $resp : $decoded];
+        return $this->backend->write($itemtype, $method, $input, $id);
     }
 }
