@@ -16,8 +16,13 @@ A user-facing version of this changelog is published at [`docs/`](docs/index.htm
 - **Per-site environment marker**: `Settings::env()` reads `config/version.json`
   (above the docroot) and `config.php` exposes it; the panel shows a **STAGING
   badge** only when `env=staging`. No marker → production (badge hidden).
+- **Drop-in module promotion** (`deploy/promote-module <id>`): copies a site-local
+  drop-in module (`public_html/modules/<id>`, not part of the repo) from staging to
+  production, with `php -l`, a backup and no deletion of other modules. `--list`
+  shows the modules on each site.
 - **Release runbook** in [`docs/DEPLOY.md`](docs/DEPLOY.md): the staging → tag →
-  production flow, rollback, the server layout and troubleshooting.
+  production flow, drop-in module promotion, rollback, the server layout and
+  troubleshooting.
 ### Changed
 - Deploy copies **without `--delete`**, preserving each site's own files that are
   not in the repo (`assets/`, `icon/`, `modules/`, `vendor/`, runtime `config/`

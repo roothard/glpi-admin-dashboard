@@ -61,6 +61,24 @@ apps solo llega lo que ya se validó en pda.
 
 ---
 
+## Módulos drop-in (apps propias por sitio)
+
+`public_html/modules/<id>` guarda **módulos drop-in**: apps site-específicas (por
+ejemplo `firma`, el generador de firma de correo de 2050dest) que **no están en el
+repo** y son contenido local de cada sitio. `promote-apps` mueve solo el código del
+repo, así que estos módulos se promueven aparte:
+
+```bash
+./deploy/promote-module --list     # ver qué módulos hay en pda y en apps
+./deploy/promote-module firma      # copiar 'firma' de pda (staging) a apps (producción)
+```
+
+`promote-module` va siempre **pda → apps**, hace `php -l` del módulo, backup del que
+hubiera en apps (`backups/module-<id>-<ts>.tgz`) y **no borra** los demás módulos.
+Un módulo se desarrolla y valida en pda; recién ahí se promueve a apps.
+
+---
+
 ## Configuración (una sola vez)
 
 Los scripts leen la infra de `deploy/deploy.env` (**git-ignored**, no lleva contraseñas —
