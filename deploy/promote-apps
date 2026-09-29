@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# ==========================================================================
+# promote-apps <tag>   —  promueve a PRODUCCIÓN (apps.roothard.com.ar)
+# promote-apps --rollback   —  vuelve al último backup de apps
+#
+# Producción SOLO recibe releases tagueadas y YA validadas en staging:
+#
+#   1) Exige un TAG (no una rama): producción = releases, no ramas sueltas.
+#   2) Guard pda-first: el commit del tag TIENE que ser el que está corriendo
+#      en pda AHORA. Si no coincide, se rechaza — "probá en pda primero".
+#
+# Convierte la regla pda→apps en herramienta, no en memoria.
+#
+#   ./deploy/promote-apps v1.6.0
+#   ./deploy/promote-apps --rollback
+# ==========================================================================
+set -euo pipefail
+. "$(cd "$(dirname "$0")" && pwd)/lib.sh"
+
+load_env
+: "${APPS_USER:?falta APPS_USER en deploy.env}" "${APPS_HOME:?falta APPS_HOME en deploy.env}"
+: "${PDA_HOME:?falta PDA_HOME en deploy.env}"
+
+# ---- rollback ------------------------------------------------------------
+if [ "${1:-}" = "--rollback" ]; then
+  step "Rollback de PRODUCCIÓN al último backup…"
+  ssh_do "sudo bash -s" <<REMOTE || die "Rollback falló."
+set -euo pipefail
+HOME_='$APPS_HOME'; USER_='$APPS_USER'
+LAST="\$(ls -1t "\$HOME_/backups"/*.tgz 2>/dev/null | head -1)"
+[ -n "\$LAST" ] || { echo 'No hay backups para restaurar.'; exit 1; }
+echo "  restaurando \$LAST"
+tar -C "\$HOME_" -xzf "\$LAST"
+chown -R "\$USER_:\$USER_" "\$HOME_/public_html" "\$HOME_/src" "\$HOME_/bin" "\$HOME_/lib.php" "\$HOME_/rh-auth.php" "\$HOME_/config" 2>/dev/null || true
+echo "  producción restaurada desde \$LAST"
+REMOTE
+  ok "Rollback aplicado en https://apps.roothard.com.ar"
+  exit 0
+fi
+
+TAG="${1:-}"
+[ -n "$TAG" ] || die "Uso: promote-apps <tag>   (o --rollback)"
+
+step "Actualizando refs (git fetch)…"
+git -C "$REPO_DIR" fetch --all --tags --quiet || true
+
+# ---- 1) exigir un tag ----------------------------------------------------
+git -C "$REPO_DIR" rev-parse --verify --quiet "refs/tags/$TAG" >/dev/null \
+  || die "'$TAG' no es un tag. Producción solo acepta releases tagueadas (git tag $TAG && git push --tags)."
+TAG_COMMIT="$(resolve_commit "$TAG")"
+
+# ---- 2) guard pda-first --------------------------------------------------
+step "Verificando que '$TAG' esté validado en STAGING (pda)…"
+PDA_COMMIT="$(remote_commit "$PDA_HOME" || true)"
+[ -n "$PDA_COMMIT" ] || die "pda no tiene marcador de versión. Desplegá primero:  ./deploy/deploy-pda $TAG"
+if [ "$PDA_COMMIT" != "$TAG_COMMIT" ]; then
+  die "El tag '$TAG' (${TAG_COMMIT:0:12}) NO es lo que corre en pda (${PDA_COMMIT:0:12}).
+     Regla pda-primero: desplegá y validá ese commit en pda antes de promover.
+     →  ./deploy/deploy-pda $TAG"
+fi
+ok "pda corre exactamente ${TAG_COMMIT:0:12} — validado."
+
+# ---- 3) desplegar a producción ------------------------------------------
+trap cleanup_stage EXIT
+step "Preparando imagen de '$TAG' para PRODUCCIÓN…"
+build_image "$TAG" "production" "$TAG"
+push_image "$IMG_DIR" "$APPS_USER" "$APPS_HOME"
+
+ok "PRODUCCIÓN actualizada: https://apps.roothard.com.ar  ·  $IMG_VERSION (${IMG_COMMIT:0:12})"
+echo "   ¿Algo salió mal?  ./deploy/promote-apps --rollback"

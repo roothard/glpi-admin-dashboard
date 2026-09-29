@@ -21,6 +21,33 @@ class Settings
     }
 
     /**
+     * Environment marker for this install (staging vs production).
+     *
+     * Written per-site by the deploy scripts to config/version.json (next to
+     * settings.json, above docroot). Environment variables APP_ENV / APP_VERSION
+     * override the file, useful for containers. Absent → production by default,
+     * so an unstamped install never falsely shows the staging badge.
+     *
+     * @return array{env:string,version:string,ref:string,commit:string,deployed_at:string,is_staging:bool}
+     */
+    public static function env(): array
+    {
+        $file = dirname(self::path()) . '/version.json';
+        $m = is_file($file) ? (json_decode((string)file_get_contents($file), true) ?: []) : [];
+        $get = fn($k, $d = '') => (($v = getenv($k)) !== false && $v !== '') ? $v : ($m[$k] ?? $d);
+        $env = strtolower((string)$get('env', 'production'));
+        if (!in_array($env, ['staging', 'production'], true)) { $env = 'production'; }
+        return [
+            'env'         => $env,
+            'version'     => (string)$get('version', ''),
+            'ref'         => (string)$get('ref', ''),
+            'commit'      => (string)$get('commit', ''),
+            'deployed_at' => (string)$get('deployed_at', ''),
+            'is_staging'  => $env === 'staging',
+        ];
+    }
+
+    /**
      * Paletas de color pre-establecidas que el panel general ofrece.
      * Cada una define el accent para claro y oscuro. La UI muestra estas 3;
      * 'custom' deja elegir un color libre. Agregar una paleta = una entrada acá.
@@ -264,6 +291,7 @@ class Settings
                 'enabled' => (bool)($cfg['crm']['enabled'] ?? false),
                 'label'   => $cfg['crm']['label'] ?? 'CRM',
             ],
+            'env'        => self::env(),
             'configured' => self::isConfigured($cfg),
         ];
     }
