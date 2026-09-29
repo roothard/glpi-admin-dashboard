@@ -239,6 +239,8 @@ class Settings
             // Selección de back-end de API y credenciales OAuth2 (proyecto #46).
             'api_mode' => $g['api_mode'] ?? 'auto',
             'oauth_client_id' => $g['oauth_client_id'] ?? '', 'oauth_client_secret' => $g['oauth_client_secret'] ?? '',
+            // Dónde cachea GlpiProbe la detección de API (junto a la config, persistente).
+            'cache_dir' => dirname(self::path()),
             'project_type' => $p['project_type'], 'group_by' => $p['group_by'],
             'include_untyped' => (bool)($p['include_untyped'] ?? true),
             'include_only_leaf' => (bool)$p['include_only_leaf'], 'area_strip_prefix' => $p['area_strip_prefix'],

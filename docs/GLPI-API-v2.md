@@ -57,3 +57,41 @@ su smoke test, no reescribiendo.
 
 - No confundir con el multi-tenant (repo privado aparte): esto es una capacidad
   general de la herramienta y va al repo **público**.
+
+## Referencias (doc oficial de GLPI)
+
+Documentación de desarrollador de GLPI (rama `master`, cubre GLPI 11):
+
+- **Developer API (índice):** https://glpi-developer-documentation.readthedocs.io/en/master/devapi/index.html
+- **High-Level API (v2):** https://glpi-developer-documentation.readthedocs.io/en/master/devapi/hlapi/index.html
+  - Schemas: `devapi/hlapi/schemas.html` · Search: `devapi/hlapi/search.html` · Versioning: `devapi/hlapi/versioning.html`
+- **Guía de upgrade a GLPI 11.0:** https://glpi-developer-documentation.readthedocs.io/en/master/upgradeguides/glpi-11.0.html
+- **Plugins:** https://glpi-developer-documentation.readthedocs.io/en/master/plugins/index.html
+- **Checklists:** https://glpi-developer-documentation.readthedocs.io/en/master/checklists/index.html
+- **Coding standards:** https://glpi-developer-documentation.readthedocs.io/en/master/codingstandards.html
+- **Source code management:** https://glpi-developer-documentation.readthedocs.io/en/master/sourcecode.html
+- **Packaging:** https://glpi-developer-documentation.readthedocs.io/en/master/packaging.html
+
+### Hechos confirmados en la doc (base del diseño)
+
+- La **HL API** existe desde **GLPI 11.0**; el front-controller es **`api.php`** (la
+  guía muestra el path stateless `#^/front/api.php/#`). Negocia versión con el header
+  **`GLPI-API-Version`** (se fija en el request y se lee la efectiva en la respuesta);
+  rutas y schemas se filtran por versión pedida (o la última por defecto).
+- La HL API usa métodos `getOneBySchema`/`searchBySchema`/`createBySchema`/
+  `updateBySchema`/`deleteBySchema` (motor `\Glpi\Api\HL\Search`), desacoplados de las
+  search options del legacy → el **mapeo de campos (#286)** parte de los *schemas*, no
+  de las search options.
+- **GLPI 11 elimina el auto-sanitize de entrada:** cualquier dato (formulario, base o
+  **API**) viaja **en crudo**. El legacy de GLPI 9/10 devuelve el `content` con entidades
+  HTML (`&#60;p&#62;`); en 11 llega sin codificar. El **render del tablero no debe asumir
+  doble codificación** cuando el back-end es v2 (o legacy sobre 11). Detalle:
+  `upgradeguides/glpi-11.0.html#removal-of-input-variables-auto-sanitize`.
+
+### Detección de API (implementado en #284)
+
+`GlpiProbe` clasifica sin autenticar: legacy viva = `GET /apirest.php/initSession` con
+primer elemento `ERROR_*` específico o HTTP 200; v2 presente = header `GLPI-API-Version`
+en `GET /api.php/`. Sin señal clara → **fallback legacy**. Pendiente para #285: endpoint
+del token OAuth2 y grants soportados (client_credentials vs password) — confirmar en la
+*getting started* de la HL API contra el homelab 11.

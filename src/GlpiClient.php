@@ -15,16 +15,26 @@
  * @license MIT
  */
 require_once __DIR__ . '/GlpiApi.php';
+require_once __DIR__ . '/GlpiProbe.php';
 require_once __DIR__ . '/GlpiClientLegacy.php';
 require_once __DIR__ . '/GlpiClientV2.php';
 
 class GlpiClient implements GlpiApi
 {
     private GlpiApi $backend;
+    private string  $mode;        // modo efectivo tras resolver 'auto'
+    private ?array  $detection;   // resultado del probe cuando api_mode = auto
 
     public function __construct(array $cfg)
     {
-        $this->backend = self::makeBackend($cfg);
+        $mode = strtolower((string)($cfg['api_mode'] ?? 'auto'));
+        $this->detection = null;
+        if ($mode === 'auto') {
+            $this->detection = GlpiProbe::detect($cfg);
+            $mode = $this->detection['mode'];
+        }
+        $this->mode    = $mode;
+        $this->backend = self::makeBackend($mode, $cfg);
     }
 
     /** El back-end elegido (útil para diagnóstico/tests). */
@@ -33,21 +43,22 @@ class GlpiClient implements GlpiApi
         return $this->backend;
     }
 
-    /** Elegir el back-end según api_mode. */
-    private static function makeBackend(array $cfg): GlpiApi
+    /** Modo efectivo en uso: 'legacy' o 'v2' (ya resuelto si venía 'auto'). */
+    public function mode(): string
     {
-        $mode = strtolower((string)($cfg['api_mode'] ?? 'auto'));
-        switch ($mode) {
-            case 'v2':
-                return new GlpiClientV2($cfg);
-            case 'legacy':
-                return new GlpiClientLegacy($cfg);
-            case 'auto':
-            default:
-                // #284: probar capacidades del GLPI destino para decidir. Hasta
-                // entonces, el comportamiento estable es la API legacy.
-                return new GlpiClientLegacy($cfg);
-        }
+        return $this->mode;
+    }
+
+    /** Detalle del sondeo cuando api_mode = auto (null si el modo fue explícito). */
+    public function detection(): ?array
+    {
+        return $this->detection;
+    }
+
+    /** Construir el back-end para un modo ya resuelto ('legacy'|'v2'). */
+    private static function makeBackend(string $mode, array $cfg): GlpiApi
+    {
+        return $mode === 'v2' ? new GlpiClientV2($cfg) : new GlpiClientLegacy($cfg);
     }
 
     // ---- delegación al back-end -----------------------------------------
