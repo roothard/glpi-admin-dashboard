@@ -18,8 +18,10 @@ $opts = getopt('', ['out::', 'config::']);
 
 try {
     $cfg = Settings::flat(Settings::load($opts['config'] ?? null));
-    if (($cfg['url'] ?? '') === '' || ($cfg['app_token'] ?? '') === '') {
-        throw new RuntimeException('Not configured yet. Open /setup.php (or set GLPI_URL/GLPI_APP_TOKEN).');
+    // Autenticación válida = App-Token (API legacy) o client_id OAuth (API v2).
+    $hasAuth = ($cfg['app_token'] ?? '') !== '' || ($cfg['oauth_client_id'] ?? '') !== '';
+    if (($cfg['url'] ?? '') === '' || !$hasAuth) {
+        throw new RuntimeException('Not configured yet. Open /setup.php (or set GLPI_URL + App-Token for the legacy API, or the OAuth client credentials for the v2 API).');
     }
     if (!empty($cfg['timezone'])) { @date_default_timezone_set($cfg['timezone']); }
     $out = $opts['out'] ?? $cfg['output'];

@@ -231,7 +231,9 @@ class Settings
     public static function isConfigured(?array $cfg = null): bool
     {
         $cfg = $cfg ?? self::load();
-        return $cfg['glpi']['url'] !== '' && $cfg['glpi']['app_token'] !== '';
+        // Configurado = URL + autenticación (App-Token legacy o client_id OAuth v2).
+        $hasAuth = $cfg['glpi']['app_token'] !== '' || ($cfg['glpi']['oauth_client_id'] ?? '') !== '';
+        return $cfg['glpi']['url'] !== '' && $hasAuth;
     }
 
     /** Flatten to the shape GlpiClient + DashboardGenerator expect. */
