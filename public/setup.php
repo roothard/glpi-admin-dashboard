@@ -233,7 +233,7 @@ header('Content-Type: text/html; charset=utf-8');
 .topbar h1{font-size:22px;margin:0}.topbar .sp{flex:1}
 .tbtn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--bd2);border-radius:9px;background:var(--card);cursor:pointer;font-size:15px}
 .tbtn:hover{border-color:var(--ac)}
-#lang{font:600 11px system-ui;color:var(--tx);background:var(--card);border:1px solid var(--bd2);border-radius:999px;padding:5px 10px;cursor:pointer}
+#lang{width:auto;flex:none;font:600 11px system-ui;color:var(--tx);background:var(--card);border:1px solid var(--bd2);border-radius:999px;padding:5px 24px 5px 11px;cursor:pointer}
 .appsbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 20px;padding:11px 13px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
 .appsbar-lbl{font:700 10px system-ui;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-right:2px}
 .appchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--bd2);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--mu);background:transparent;user-select:none;transition:background .15s,border-color .15s,color .15s}
@@ -293,7 +293,6 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
     <option value="es">ES</option><option value="en">EN</option><option value="fr">FR</option><option value="de">DE</option><option value="pt">PT</option>
   </select>
 </div>
-<p class="sub" data-i="intro"></p>
 <form id="f">
 
 <?php
@@ -320,7 +319,7 @@ $APPBAR = [
 
 <div class="grp" data-i="grp_config"></div>
 
-<details class="step req" open>
+<details class="step req">
   <summary><span class="num">1</span> <span data-i="s1">Conectar con GLPI</span></summary>
   <div class="body">
     <div class="field">
