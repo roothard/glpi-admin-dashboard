@@ -452,6 +452,7 @@ main{padding-top:20px;padding-bottom:60px}
 .cube.spin .box{animation:cspin .45s cubic-bezier(.5,0,.3,1) forwards}
 @keyframes cspin{to{transform:rotateX(-20deg) rotateY(120deg)}} /* gira UNA cara */
 .cface{position:absolute;inset:0;display:grid;place-items:center;font:700 18px var(--disp);color:var(--fc,#fff);border:1px solid rgba(255,255,255,.35)}
+.cface svg.cicon{width:26px;height:26px;stroke:var(--fc,#fff)}
 .cf1{transform:translateZ(23px);background:linear-gradient(135deg,var(--c),var(--c2))}
 .cf2{transform:rotateY(180deg) translateZ(23px);background:var(--c2)}
 .cf3{transform:rotateY(90deg) translateZ(23px);background:linear-gradient(180deg,var(--c2),var(--c3))}
@@ -977,6 +978,7 @@ function loadData(){
 }
 // el "hub" ahora es un dock de cubos 3D en escala de grises (uno por app inactiva)
 const APP_META={proyectos:{c:'#4a4a52',c2:'#37373e',c3:'#26262c',fc:'#fff'},fichadas:{c:'#8b8b94',c2:'#71717a',c3:'#585860',fc:'#fff'},tickets:{c:'#c2c2c9',c2:'#a6a6ae',c3:'#88888f',fc:'#1b1b1f'},cumplimiento:{c:'#6e6e78',c2:'#5a5a63',c3:'#47474f',fc:'#fff'},crm:{c:'#4a6b5f',c2:'#3a5449',c3:'#2b3f37',fc:'#fff'}};
+const APP_ICON={proyectos:'<path d="M4 4l6 0"/><path d="M14 4l6 0"/><path d="M4 10a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2l0 -8"/><path d="M14 10a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2l0 -2"/>',tickets:'<path d="M15 5l0 2"/><path d="M15 11l0 2"/><path d="M15 17l0 2"/><path d="M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-3a2 2 0 0 0 0 -4v-3a2 2 0 0 1 2 -2"/>',cumplimiento:'<path d="M11.46 20.846a12 12 0 0 1 -7.96 -14.846a12 12 0 0 0 8.5 -3a12 12 0 0 0 8.5 3a12 12 0 0 1 -.09 7.06"/><path d="M15 19l2 2l4 -4"/>',crm:'<path d="M20 6v12a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2"/><path d="M10 16h6"/><path d="M11 11a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M4 8h3"/><path d="M4 12h3"/><path d="M4 16h3"/>',fichadas:'<path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"/>',firma:'<path d="M3 17c3.333 -3.333 5 -6 5 -8c0 -3 -1 -3 -2 -3s-2.032 1.085 -2 3c.034 2.048 1.658 4.877 2.5 6c1.5 2 2.5 2.5 3.5 1l2 -3c.333 2.667 1.333 4 3 4c.53 0 2.639 -2 3 -2c.517 0 1.517 .667 3 2"/>'};
 const MODMETA={c:'#5a6b8c',c2:'#47566f',c3:'#374255',fc:'#fff'}; // cubo de módulos drop-in
 let MODULES=[]; // módulos descubiertos por modules.php (según entidad del usuario)
 function appsList(){
@@ -1003,7 +1005,10 @@ function renderHub(){
     const w=el('div','cubewrap'+(fresh?' pulse':''));
     const c=el('div','cube');
     c.style.setProperty('--c',m.c);c.style.setProperty('--c2',m.c2);c.style.setProperty('--c3',m.c3);c.style.setProperty('--fc',m.fc);
-    c.innerHTML=`<div class="box"><div class="cface cf1">${L}</div><div class="cface cf2">${L}</div><div class="cface cf3"></div><div class="cface cf4"></div><div class="cface cf5"></div><div class="cface cf6"></div></div>`;
+    let _ic=APP_ICON[a.k];
+    if(!_ic&&a.ext&&(a.t||'').toLowerCase().includes('firma'))_ic=APP_ICON.firma;
+    const face=_ic?`<svg class="cicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${_ic}</svg>`:L;
+    c.innerHTML=`<div class="box"><div class="cface cf1">${face}</div><div class="cface cf2">${face}</div><div class="cface cf3"></div><div class="cface cf4"></div><div class="cface cf5"></div><div class="cface cf6"></div></div>`;
     const lb=el('div','clbl',esc(a.t));
     w.appendChild(c); w.appendChild(lb);
     w.addEventListener('click',()=>{ if(BUSYAPP)return; BUSYAPP=true; localStorage.setItem('rh-dock-used','1'); c.classList.add('spin'); setTimeout(()=>{ showApp(a.k,true); BUSYAPP=false; },430); });

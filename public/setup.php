@@ -276,7 +276,7 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
 </style></head>
 <body><div class="wrap">
 <div class="topbar">
-  <h1 data-i="title">Instalación</h1><span class="sp"></span>
+  <h1 data-i="title">Configuración</h1><span class="sp"></span>
   <button class="tbtn" id="theme" title="Tema">🌙</button>
   <select id="lang">
     <option value="es">ES</option><option value="en">EN</option><option value="fr">FR</option><option value="de">DE</option><option value="pt">PT</option>
@@ -323,13 +323,52 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
           <p class="help" data-i="h_res"></p></div>
       </div>
     </details>
+    <div class="field"><label data-i="l_tz">Zona horaria</label> <span class="opt" data-i="optonly">— opcional</span><input type="text" name="timezone" value="<?= $h($cfg['timezone']) ?>" placeholder="UTC"><p class="help" data-i="h_tz"></p></div>
   </div>
 </details>
+<div class="grp" data-i="grp_perso"></div>
 
 <details class="step">
-  <summary><span class="num">2</span> <span data-i="adv2">Avanzado</span> <span class="opt" data-i="optonly">— opcional</span></summary>
+  <summary><span class="num">2</span> <span data-i="s3">General · Marca</span> <span class="opt" data-i="s3opt">— logo, nombre y colores</span></summary>
   <div class="body">
-    <div class="field"><label data-i="l_tz">Zona horaria</label><input type="text" name="timezone" value="<?= $h($cfg['timezone']) ?>" placeholder="UTC"><p class="help" data-i="h_tz"></p></div>
+    <div class="field"><label data-i="l_name">Nombre de la app</label>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <input type="text" name="app_name" value="<?= $h($b['app_name']) ?>" placeholder="Projects Dashboard" style="flex:1">
+        <button type="button" class="act test" id="fetchent" data-i="b_fetchent" style="white-space:nowrap;padding:9px 13px">Traer de GLPI</button>
+      </div>
+      <p class="help" data-i="h_name"></p></div>
+    <div class="field"><label data-i="l_logo">URL del logo de la app</label><input type="url" name="logo_url" value="<?= $h($b['logo_url']) ?>" placeholder="opcional"><p class="help" data-i="h_logo"></p></div>
+
+    <div class="field" style="border-top:1px solid var(--bd);padding-top:14px"><label data-i="l_palette">Paleta de colores</label>
+      <div class="pals" id="pals">
+      <?php foreach ($palettes as $pk => $pv): ?>
+        <label class="pal<?= $curPalette===$pk?' on':'' ?>" data-pal="<?= $h($pk) ?>">
+          <input type="radio" name="palette" value="<?= $h($pk) ?>" <?= $curPalette===$pk?'checked':'' ?>>
+          <span class="sw" style="background:<?= $h($pv['accent']) ?>"></span>
+          <span class="pname"><?= $h($pv['name']) ?></span>
+        </label>
+      <?php endforeach; ?>
+        <label class="pal<?= $curPalette==='custom'?' on':'' ?>" data-pal="custom">
+          <input type="radio" name="palette" value="custom" <?= $curPalette==='custom'?'checked':'' ?>>
+          <span class="sw" id="customsw" style="background:<?= $h($b['accent']) ?>"></span>
+          <span class="pname" data-i="l_custom">Personalizado</span>
+        </label>
+      </div>
+      <div class="field" id="customwrap" style="margin:12px 0 0;<?= $curPalette==='custom'?'':'display:none' ?>">
+        <label data-i="l_accent">Color principal</label><input type="color" name="accent" value="<?= $h($b['accent']) ?>">
+      </div>
+      <p class="help" data-i="h_palette"></p>
+    </div>
+
+    <div class="field" style="border-top:1px solid var(--bd);padding-top:14px"><label data-i="l_loginbrand" style="font-size:14px">Pantalla de inicio de sesión</label>
+      <p class="help" data-i="h_loginbrand" style="margin:0 0 10px"></p>
+      <input type="text" name="login_name" value="<?= $h($b['login_name'] ?? '') ?>" placeholder="<?= $h($b['app_name']) ?>">
+      <p class="help" data-i="h_loginname"></p>
+      <input type="text" name="login_subtitle" value="<?= $h($b['login_subtitle'] ?? '') ?>" placeholder="<?= $h($b['subtitle'] ?? '') ?>" style="margin-top:8px">
+      <input type="url" name="login_logo_url" value="<?= $h($b['login_logo_url'] ?? '') ?>" placeholder="URL del logo del login (opcional)" style="margin-top:8px">
+    </div>
+
+    <div class="field"><label data-i="l_lang">Idioma por defecto</label><select name="default_lang"><?php foreach (['es'=>'Español','en'=>'English','fr'=>'Français','de'=>'Deutsch','pt'=>'Português'] as $k=>$v) echo '<option value="'.$k.'" '.($b['default_lang']===$k?'selected':'').">$v</option>"; ?></select></div>
   </div>
 </details>
 
@@ -405,52 +444,6 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
   </div>
 </details>
 
-<div class="grp" data-i="grp_perso"></div>
-
-<details class="step">
-  <summary><span class="num">7</span> <span data-i="s3">General · Marca</span> <span class="opt" data-i="s3opt">— logo, nombre y colores</span></summary>
-  <div class="body">
-    <div class="field"><label data-i="l_name">Nombre de la app</label>
-      <div style="display:flex;gap:8px;align-items:stretch">
-        <input type="text" name="app_name" value="<?= $h($b['app_name']) ?>" placeholder="Projects Dashboard" style="flex:1">
-        <button type="button" class="act test" id="fetchent" data-i="b_fetchent" style="white-space:nowrap;padding:9px 13px">Traer de GLPI</button>
-      </div>
-      <p class="help" data-i="h_name"></p></div>
-    <div class="field"><label data-i="l_logo">URL del logo de la app</label><input type="url" name="logo_url" value="<?= $h($b['logo_url']) ?>" placeholder="opcional"><p class="help" data-i="h_logo"></p></div>
-
-    <div class="field" style="border-top:1px solid var(--bd);padding-top:14px"><label data-i="l_palette">Paleta de colores</label>
-      <div class="pals" id="pals">
-      <?php foreach ($palettes as $pk => $pv): ?>
-        <label class="pal<?= $curPalette===$pk?' on':'' ?>" data-pal="<?= $h($pk) ?>">
-          <input type="radio" name="palette" value="<?= $h($pk) ?>" <?= $curPalette===$pk?'checked':'' ?>>
-          <span class="sw" style="background:<?= $h($pv['accent']) ?>"></span>
-          <span class="pname"><?= $h($pv['name']) ?></span>
-        </label>
-      <?php endforeach; ?>
-        <label class="pal<?= $curPalette==='custom'?' on':'' ?>" data-pal="custom">
-          <input type="radio" name="palette" value="custom" <?= $curPalette==='custom'?'checked':'' ?>>
-          <span class="sw" id="customsw" style="background:<?= $h($b['accent']) ?>"></span>
-          <span class="pname" data-i="l_custom">Personalizado</span>
-        </label>
-      </div>
-      <div class="field" id="customwrap" style="margin:12px 0 0;<?= $curPalette==='custom'?'':'display:none' ?>">
-        <label data-i="l_accent">Color principal</label><input type="color" name="accent" value="<?= $h($b['accent']) ?>">
-      </div>
-      <p class="help" data-i="h_palette"></p>
-    </div>
-
-    <div class="field" style="border-top:1px solid var(--bd);padding-top:14px"><label data-i="l_loginbrand" style="font-size:14px">Pantalla de inicio de sesión</label>
-      <p class="help" data-i="h_loginbrand" style="margin:0 0 10px"></p>
-      <input type="text" name="login_name" value="<?= $h($b['login_name'] ?? '') ?>" placeholder="<?= $h($b['app_name']) ?>">
-      <p class="help" data-i="h_loginname"></p>
-      <input type="text" name="login_subtitle" value="<?= $h($b['login_subtitle'] ?? '') ?>" placeholder="<?= $h($b['subtitle'] ?? '') ?>" style="margin-top:8px">
-      <input type="url" name="login_logo_url" value="<?= $h($b['login_logo_url'] ?? '') ?>" placeholder="URL del logo del login (opcional)" style="margin-top:8px">
-    </div>
-
-    <div class="field"><label data-i="l_lang">Idioma por defecto</label><select name="default_lang"><?php foreach (['es'=>'Español','en'=>'English','fr'=>'Français','de'=>'Deutsch','pt'=>'Português'] as $k=>$v) echo '<option value="'.$k.'" '.($b['default_lang']===$k?'selected':'').">$v</option>"; ?></select></div>
-  </div>
-</details>
-
 <div class="actions">
   <button type="button" class="act test" id="test" data-i="b_test">Probar conexión</button>
   <button type="submit" class="act save" id="save" data-i="b_save">Guardar e instalar</button>
@@ -461,7 +454,7 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
 <script>
 const DEF=<?= json_encode($deflang) ?>;
 const I18N={
- es:{title:'Instalación',intro:'Solo necesitás la <b>URL de tu GLPI</b> y <b>dos tokens</b>. Lo demás es opcional y ya tiene valores por defecto. Los campos de contraseña son de solo-escritura: dejalos vacíos para conservar lo guardado.',
+ es:{title:'Configuración',intro:'Solo necesitás la <b>URL de tu GLPI</b> y <b>dos tokens</b>. Lo demás es opcional y ya tiene valores por defecto. Los campos de contraseña son de solo-escritura: dejalos vacíos para conservar lo guardado.',
   s1:'Conectar con GLPI',l_url:'URL de GLPI',h_url:'La dirección donde entrás a tu GLPI (sin <code>/apirest.php</code> — se agrega solo).',
   h_app:'En GLPI: <b>Configuración → General → pestaña «API»</b>. Activá <b>«Habilitar la API REST»</b>, después <b>«Agregar un cliente API»</b> y copiá el <b>«Token de aplicación (app_token)»</b>.',
   l_user:'Token de usuario',h_user:'Lo usa la <b>sincronización automática</b> para leer los proyectos. En GLPI: arriba a la derecha <b>tu nombre → Preferencias → «Claves de acceso remoto»</b> → generá un <b>«Token API»</b>. Usá un usuario con permiso de lectura de Proyectos.',
@@ -477,7 +470,7 @@ const I18N={
   h_gpsdb:'<b>Base de datos:</b> este módulo lee tickets «Visita técnica» directo de la base de GLPI. Los datos de conexión están en el archivo <code>config/config_db.php</code> de tu GLPI.',
   l_dbhost:'Host de la DB',l_dbname:'Nombre de la DB',l_dbuser:'Usuario de la DB',l_dbpass:'Contraseña de la DB',adv2:'Avanzado',l_tz:'Zona horaria',h_tz:'Ej: <code>America/Argentina/Buenos_Aires</code>. Para el sello de «Actualizado».',
   b_test:'Probar conexión',b_save:'Guardar',m_testing:'Probando…',m_saving:'Guardando y sincronizando…',m_ok:'✓ Conectado · {n} estados visibles',m_saved:'✓ Guardado · {n} proyectos',m_savefail:'Error al guardar',m_reqfail:'Falló la solicitud',m_syncfail:'Guardado, pero la sincronización falló: '},
- en:{title:'Setup',intro:'You only need your <b>GLPI URL</b> and <b>two tokens</b>. Everything else is optional and pre-filled. Password fields are write-only: leave blank to keep the stored value.',
+ en:{title:'Settings',intro:'You only need your <b>GLPI URL</b> and <b>two tokens</b>. Everything else is optional and pre-filled. Password fields are write-only: leave blank to keep the stored value.',
   s1:'Connect to GLPI',l_url:'GLPI URL',h_url:'The address where you open GLPI (without <code>/apirest.php</code> — added automatically).',
   h_app:'In GLPI: <b>Setup → General → «API» tab</b>. Enable <b>«Enable REST API»</b>, then <b>«Add API client»</b> and copy its <b>«Application token (app_token)»</b>.',
   l_user:'User token',h_user:'Used by the <b>background sync</b> to read projects. In GLPI: top-right <b>your name → Preferences → «Remote access keys»</b> → generate an <b>«API token»</b>. Use a user with read access to Projects.',
@@ -493,7 +486,7 @@ const I18N={
   h_gpsdb:'<b>Database:</b> this module reads «Visita técnica» tickets straight from the GLPI database. The connection details are in your GLPI <code>config/config_db.php</code> file.',
   l_dbhost:'DB host',l_dbname:'DB name',l_dbuser:'DB user',l_dbpass:'DB password',adv2:'Advanced',l_tz:'Timezone',h_tz:'e.g. <code>America/Argentina/Buenos_Aires</code>. For the «Updated» stamp.',
   b_test:'Test connection',b_save:'Save',m_testing:'Testing…',m_saving:'Saving & syncing…',m_ok:'✓ Connected · {n} states visible',m_saved:'✓ Saved · {n} projects',m_savefail:'Save failed',m_reqfail:'Request failed',m_syncfail:'Saved, but sync failed: '},
- fr:{title:'Installation',intro:'Il vous faut seulement l’<b>URL de votre GLPI</b> et <b>deux jetons</b>. Le reste est optionnel et pré-rempli. Les champs mot de passe sont en écriture seule : laissez vide pour conserver la valeur.',
+ fr:{title:'Configuration',intro:'Il vous faut seulement l’<b>URL de votre GLPI</b> et <b>deux jetons</b>. Le reste est optionnel et pré-rempli. Les champs mot de passe sont en écriture seule : laissez vide pour conserver la valeur.',
   s1:'Se connecter à GLPI',l_url:'URL de GLPI',h_url:'L’adresse où vous ouvrez GLPI (sans <code>/apirest.php</code> — ajouté automatiquement).',
   h_app:'Dans GLPI : <b>Configuration → Général → onglet «API»</b>. Activez <b>«Activer l’API REST»</b>, puis <b>«Ajouter un client API»</b> et copiez le <b>«Jeton d’application (app_token)»</b>.',
   l_user:'Jeton utilisateur',h_user:'Utilisé par la <b>synchronisation automatique</b>. Dans GLPI : en haut à droite <b>votre nom → Préférences → «Clés d’accès distant»</b> → générez un <b>«Jeton API»</b>. Utilisez un compte ayant accès en lecture aux Projets.',
@@ -509,7 +502,7 @@ const I18N={
   h_gpsdb:'<b>Base de données :</b> ce module lit les tickets «Visita técnica» directement dans la base GLPI. Les identifiants sont dans le fichier <code>config/config_db.php</code> de votre GLPI.',
   l_dbhost:'Hôte de la BD',l_dbname:'Nom de la BD',l_dbuser:'Utilisateur BD',l_dbpass:'Mot de passe BD',adv2:'Avancé',l_tz:'Fuseau horaire',h_tz:'ex : <code>America/Argentina/Buenos_Aires</code>. Pour l’horodatage «Mis à jour».',
   b_test:'Tester la connexion',b_save:'Enregistrer',m_testing:'Test…',m_saving:'Enregistrement et sync…',m_ok:'✓ Connecté · {n} états visibles',m_saved:'✓ Enregistré · {n} projets',m_savefail:'Échec de l’enregistrement',m_reqfail:'Échec de la requête',m_syncfail:'Enregistré, mais la sync a échoué : '},
- de:{title:'Installation',intro:'Sie brauchen nur Ihre <b>GLPI-URL</b> und <b>zwei Tokens</b>. Der Rest ist optional und vorbelegt. Passwortfelder sind schreibgeschützt: leer lassen, um den Wert zu behalten.',
+ de:{title:'Konfiguration',intro:'Sie brauchen nur Ihre <b>GLPI-URL</b> und <b>zwei Tokens</b>. Der Rest ist optional und vorbelegt. Passwortfelder sind schreibgeschützt: leer lassen, um den Wert zu behalten.',
   s1:'Mit GLPI verbinden',l_url:'GLPI-URL',h_url:'Die Adresse, unter der Sie GLPI öffnen (ohne <code>/apirest.php</code> — wird automatisch ergänzt).',
   h_app:'In GLPI: <b>Konfiguration → Allgemein → Reiter «API»</b>. Aktivieren Sie <b>«REST-API aktivieren»</b>, dann <b>«API-Client hinzufügen»</b> und kopieren Sie das <b>«Anwendungs-Token (app_token)»</b>.',
   l_user:'Benutzer-Token',h_user:'Wird von der <b>automatischen Synchronisierung</b> genutzt. In GLPI: oben rechts <b>Ihr Name → Einstellungen → «Fernzugriffsschlüssel»</b> → ein <b>«API-Token»</b> erzeugen. Nutzer mit Lesezugriff auf Projekte verwenden.',
@@ -525,7 +518,7 @@ const I18N={
   h_gpsdb:'<b>Datenbank:</b> dieses Modul liest «Visita técnica»-Tickets direkt aus der GLPI-Datenbank. Die Zugangsdaten stehen in der Datei <code>config/config_db.php</code> Ihres GLPI.',
   l_dbhost:'DB-Host',l_dbname:'DB-Name',l_dbuser:'DB-Benutzer',l_dbpass:'DB-Passwort',adv2:'Erweitert',l_tz:'Zeitzone',h_tz:'z. B. <code>America/Argentina/Buenos_Aires</code>. Für den «Aktualisiert»-Stempel.',
   b_test:'Verbindung testen',b_save:'Speichern',m_testing:'Teste…',m_saving:'Speichern & Sync…',m_ok:'✓ Verbunden · {n} Status sichtbar',m_saved:'✓ Gespeichert · {n} Projekte',m_savefail:'Speichern fehlgeschlagen',m_reqfail:'Anfrage fehlgeschlagen',m_syncfail:'Gespeichert, aber Sync fehlgeschlagen: '},
- pt:{title:'Instalação',intro:'Você só precisa da <b>URL do seu GLPI</b> e <b>dois tokens</b>. O resto é opcional e já vem preenchido. Campos de senha são de escrita apenas: deixe em branco para manter o valor.',
+ pt:{title:'Configuração',intro:'Você só precisa da <b>URL do seu GLPI</b> e <b>dois tokens</b>. O resto é opcional e já vem preenchido. Campos de senha são de escrita apenas: deixe em branco para manter o valor.',
   s1:'Conectar ao GLPI',l_url:'URL do GLPI',h_url:'O endereço onde você abre o GLPI (sem <code>/apirest.php</code> — adicionado sozinho).',
   h_app:'No GLPI: <b>Configuração → Geral → aba «API»</b>. Ative <b>«Habilitar a API REST»</b>, depois <b>«Adicionar cliente API»</b> e copie o <b>«Token de aplicação (app_token)»</b>.',
   l_user:'Token de usuário',h_user:'Usado pela <b>sincronização automática</b>. No GLPI: canto superior direito <b>seu nome → Preferências → «Chaves de acesso remoto»</b> → gere um <b>«Token API»</b>. Use um usuário com leitura de Projetos.',
