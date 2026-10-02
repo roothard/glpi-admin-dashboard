@@ -48,6 +48,7 @@ foreach (glob(__DIR__ . '/modules/*/module.json') as $mf) {
     if (!is_array($m) || empty($m['id']) || empty($m['entrada'])) { continue; }
     $mid = preg_replace('/[^A-Za-z0-9_-]/', '', (string)$m['id']);   // sanea (es parte de la URL)
     if ($mid === '' || $mid !== basename(dirname($mf))) { continue; } // id debe coincidir con la carpeta
+    if ((cfg()['apps']['mod_' . $mid] ?? true) === false) { continue; } // apagado desde el administrador de apps
     $ents = array_map('intval', (array)($m['entidades'] ?? []));
 
     $vis = empty($ents) || $isAdmin;

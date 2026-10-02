@@ -158,6 +158,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach (['proyectos','tickets','cumplimiento','crm','gps','contact'] as $ak) {
         $cfg['apps'][$ak] = !empty($in['app_' . $ak]);
     }
+    // Módulos drop-in: on/off por módulo instalado.
+    foreach (glob(__DIR__ . '/modules/*/module.json') as $mf) {
+        $m = json_decode((string)@file_get_contents($mf), true);
+        if (!is_array($m) || empty($m['id'])) { continue; }
+        $mid = preg_replace('/[^A-Za-z0-9_-]/', '', (string)$m['id']);
+        if ($mid !== '' && $mid === basename(dirname($mf))) {
+            $cfg['apps']['mod_' . $mid] = !empty($in['app_mod_' . $mid]);
+        }
+    }
 
     $cfg['modules']['gps']['enabled']    = !empty($in['app_gps']);
     $cfg['modules']['gps']['label']      = trim($in['gps_label'] ?? '') ?: 'GPS Check-ins';
@@ -228,16 +237,16 @@ header('Content-Type: text/html; charset=utf-8');
 :root[data-theme=dark]{--bg:#0a0f1e;--card:#121a30;--bd:#24314f;--bd2:#31406a;--tx:#e9eef9;--mu:#96a2c1}
 :root[data-theme=light]{--bg:#f3f6fc;--card:#fff;--bd:#e3e8f4;--bd2:#d3dbee;--tx:#141b30;--mu:#57627e}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.wrap{max-width:760px;margin:0 auto;padding:24px 20px 90px}
+.wrap{max-width:900px;margin:0 auto;padding:24px 20px 90px}
 .topbar{display:flex;align-items:center;gap:8px;margin:0 0 18px}
 .topbar h1{font-size:22px;margin:0}.topbar .sp{flex:1}
-.tbtn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--bd2);border-radius:9px;background:var(--card);cursor:pointer;font-size:15px}
+.tbtn{width:52px;height:34px;display:grid;place-items:center;border:1px solid var(--bd2);border-radius:9px;background:var(--card);cursor:pointer;font-size:15px}
 .tbtn:hover{border-color:var(--ac)}
-#lang{width:auto;flex:none;font:600 11px system-ui;color:var(--tx);background:var(--card);border:1px solid var(--bd2);border-radius:999px;padding:5px 24px 5px 11px;cursor:pointer}
-.appsbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 20px;padding:11px 13px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
+#lang{width:52px;height:34px;flex:none;font:600 11px system-ui;color:var(--tx);background:var(--card);border:1px solid var(--bd2);border-radius:9px;padding:0 6px 0 9px;cursor:pointer}
+.appsbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 20px;padding:11px 13px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
 .appsbar-lbl{font:700 10px system-ui;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-right:2px}
-.appchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--bd2);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--mu);background:transparent;user-select:none;transition:background .15s,border-color .15s,color .15s}
-.appchip svg{width:17px;height:17px;stroke:currentColor}
+.appchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd2);border-radius:999px;padding:5px 11px;font-size:13px;cursor:pointer;color:var(--mu);background:transparent;user-select:none;transition:background .15s,border-color .15s,color .15s}
+.appchip svg{width:16px;height:16px;stroke:currentColor}
 .appchip:hover{border-color:var(--ac)}
 .appchip.on{background:color-mix(in srgb,var(--ac) 14%,transparent);border-color:color-mix(in srgb,var(--ac) 38%,transparent);color:var(--ac)}
 .sub{color:var(--mu);margin:0 0 22px}
@@ -305,14 +314,32 @@ $APPBAR = [
   'gps'          => ['Fichadas GPS', '<path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"/>'],
   'contact'      => ['Contacto',     '<path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12"/>'],
 ];
+// Módulos drop-in instalados (public_html/modules/<id>/module.json) → también van a la barra.
+$SIG = '<path d="M3 17c3.333 -3.333 5 -6 5 -8c0 -3 -1 -3 -2 -3s-2.032 1.085 -2 3c.034 2.048 1.658 4.877 2.5 6c1.5 2 2.5 2.5 3.5 1l2 -3c.333 2.667 1.333 4 3 4c.53 0 2.639 -2 3 -2c.517 0 1.517 .667 3 2"/>';
+$BOX = '<path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5"/><path d="M12 12l8 -4.5"/><path d="M12 12l0 9"/><path d="M12 12l-8 -4.5"/>';
+$MODBAR = [];
+foreach (glob(__DIR__ . '/modules/*/module.json') as $mf) {
+    $m = json_decode((string)@file_get_contents($mf), true);
+    if (!is_array($m) || empty($m['id'])) { continue; }
+    $mid = preg_replace('/[^A-Za-z0-9_-]/', '', (string)$m['id']);
+    if ($mid === '' || $mid !== basename(dirname($mf))) { continue; }
+    $nombre = (string)($m['nombre'] ?? $mid);
+    $MODBAR[$mid] = [$nombre, (strpos(strtolower($mid . ' ' . $nombre), 'firma') !== false) ? $SIG : $BOX];
+}
 ?>
 <div class="appsbar">
-  <span class="appsbar-lbl">Apps</span>
   <?php foreach ($APPBAR as $ak => $ad): $on = !empty($appsOn[$ak]); ?>
   <label class="appchip<?= $on ? ' on' : '' ?>" title="<?= $h($ad[0]) ?>">
     <input type="checkbox" name="app_<?= $ak ?>" <?= $on ? 'checked' : '' ?> hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?= $ad[1] ?></svg>
     <span><?= $h($ad[0]) ?></span>
+  </label>
+  <?php endforeach; ?>
+  <?php foreach ($MODBAR as $mid => $md): $on = (bool)($cfg['apps']['mod_' . $mid] ?? true); ?>
+  <label class="appchip<?= $on ? ' on' : '' ?>" title="<?= $h($md[0]) ?>">
+    <input type="checkbox" name="app_mod_<?= $h($mid) ?>" <?= $on ? 'checked' : '' ?> hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?= $md[1] ?></svg>
+    <span><?= $h($md[0]) ?></span>
   </label>
   <?php endforeach; ?>
 </div>
@@ -478,7 +505,7 @@ $APPBAR = [
 
 <div class="actions">
   <button type="button" class="act test" id="test" data-i="b_test">Probar conexión</button>
-  <button type="submit" class="act save" id="save" data-i="b_save">Guardar e instalar</button>
+  <button type="submit" class="act save" id="save" data-i="b_save">Guardar</button>
   <span id="msg"></span>
 </div>
 </form>
@@ -618,7 +645,8 @@ updTheme(); applyI18n();
 // form
 const f=$('#f'), msg=$('#msg');
 const data=()=>{const o={};new FormData(f).forEach((v,k)=>{if(k==='crm_parents')return;o[k]=v;});
-  ['glpi_tokens_in_query','glpi_insecure','include_only_leaf','include_untyped','app_proyectos','app_tickets','app_cumplimiento','app_crm','app_gps','app_contact'].forEach(k=>o[k]=(f.elements[k]&&f.elements[k].checked)?1:'');
+  ['glpi_tokens_in_query','glpi_insecure','include_only_leaf','include_untyped'].forEach(k=>o[k]=(f.elements[k]&&f.elements[k].checked)?1:'');
+  document.querySelectorAll('.appchip input').forEach(i=>o[i.name]=i.checked?1:'');
   const boxes=document.querySelectorAll('#entbox input[type=checkbox]');
   o['crm_parents']=boxes.length?[...boxes].filter(x=>x.checked).map(x=>x.value).join(','):(o['crm_parents_stored']||'');
   delete o['crm_parents_stored'];
