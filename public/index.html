@@ -982,12 +982,15 @@ const APP_ICON={proyectos:'<path d="M4 4l6 0"/><path d="M14 4l6 0"/><path d="M4 
 const MODMETA={c:'#5a6b8c',c2:'#47566f',c3:'#374255',fc:'#fff'}; // cubo de módulos drop-in
 let MODULES=[]; // módulos descubiertos por modules.php (según entidad del usuario)
 function appsList(){
-  const list=[{k:'proyectos',t:T('app_proj')},{k:'tickets',t:T('app_tk')}];
-  if(DATA.isAdmin||DATA.isSuper) list.push({k:'cumplimiento',t:T('app_cmp')});
+  const AP=CONFIG.apps||{};
+  const list=[];
+  if(AP.proyectos!==false) list.push({k:'proyectos',t:T('app_proj')});
+  if(AP.tickets!==false) list.push({k:'tickets',t:T('app_tk')});
+  if((DATA.isAdmin||DATA.isSuper)&&AP.cumplimiento!==false) list.push({k:'cumplimiento',t:T('app_cmp')});
   const _crm=CONFIG.crm||{};
-  if((DATA.isAdmin||DATA.isSuper)&&_crm.enabled) list.push({k:'crm',t:_crm.label||T('app_crm')});
+  if((DATA.isAdmin||DATA.isSuper)&&AP.crm) list.push({k:'crm',t:_crm.label||T('app_crm')});
   const _gps=(CONFIG.modules&&CONFIG.modules.gps)||{};
-  if((DATA.isAdmin||DATA.isSuper)&&_gps.enabled) list.push({k:'fichadas',t:_gps.label||T('app_fich')});
+  if((DATA.isAdmin||DATA.isSuper)&&AP.gps) list.push({k:'fichadas',t:_gps.label||T('app_fich')});
   // módulos drop-in descubiertos (modules/<id>/) visibles para el usuario → cubos-link
   (MODULES||[]).forEach(m=>list.push({k:'m:'+m.id,t:m.nombre,url:m.url,ext:true}));
   return list.sort((a,b)=>a.t.localeCompare(b.t,LANG,{sensitivity:'base'})); // cubos en orden alfabético

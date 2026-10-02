@@ -154,7 +154,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cfg['branding']['login_subtitle'] = trim($in['login_subtitle'] ?? '');
     $cfg['branding']['login_logo_url'] = trim($in['login_logo_url'] ?? '');
 
-    $cfg['modules']['gps']['enabled']    = !empty($in['gps_enabled']);
+    // Administrador de apps (barra del header): on/off por app.
+    foreach (['proyectos','tickets','cumplimiento','crm','gps','contact'] as $ak) {
+        $cfg['apps'][$ak] = !empty($in['app_' . $ak]);
+    }
+
+    $cfg['modules']['gps']['enabled']    = !empty($in['app_gps']);
     $cfg['modules']['gps']['label']      = trim($in['gps_label'] ?? '') ?: 'GPS Check-ins';
     $cfg['modules']['gps']['app_url']    = trim($in['gps_app_url'] ?? '');
     $cfg['modules']['gps']['db']['host'] = trim($in['db_host'] ?? '');
@@ -162,14 +167,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cfg['modules']['gps']['db']['user'] = trim($in['db_user'] ?? '');
     $cfg['modules']['gps']['db']['pass'] = $keepSecret($in['db_pass'] ?? '', $cfg['modules']['gps']['db']['pass']);
 
-    $cfg['contact']['enabled']      = true;
+    $cfg['contact']['enabled']      = !empty($in['app_contact']);
     $cfg['contact']['google_chat']  = !empty($in['contact_gchat']);
     $cfg['contact']['msg_default']  = trim($in['contact_msg_default'] ?? '') ?: ($cfg['contact']['msg_default'] ?? '');
     $cfg['contact']['msg_reminder'] = trim($in['contact_msg_reminder'] ?? '') ?: ($cfg['contact']['msg_reminder'] ?? '');
 
     // CRM (app nativa). 'parents' = entidades "empresa" que administran clientes;
     // vacío = autodescubre las que el usuario ve y que tienen hijas.
-    $cfg['crm']['enabled'] = !empty($in['crm_enabled']);
+    $cfg['crm']['enabled'] = !empty($in['app_crm']);
     $cfg['crm']['label']   = trim($in['crm_label'] ?? '') ?: 'CRM';
     $cfg['crm']['parents'] = array_values(array_unique(array_filter(array_map('intval',
         is_array($in['crm_parents'] ?? null) ? $in['crm_parents'] : explode(',', (string)($in['crm_parents'] ?? '')))
@@ -228,7 +233,13 @@ header('Content-Type: text/html; charset=utf-8');
 .topbar h1{font-size:22px;margin:0}.topbar .sp{flex:1}
 .tbtn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--bd2);border-radius:9px;background:var(--card);cursor:pointer;font-size:15px}
 .tbtn:hover{border-color:var(--ac)}
-#lang{font:600 12px system-ui;color:var(--tx);background:var(--card);border:1px solid var(--bd2);border-radius:9px;padding:9px}
+#lang{font:600 11px system-ui;color:var(--tx);background:var(--card);border:1px solid var(--bd2);border-radius:999px;padding:5px 10px;cursor:pointer}
+.appsbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 20px;padding:11px 13px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
+.appsbar-lbl{font:700 10px system-ui;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-right:2px}
+.appchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--bd2);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--mu);background:transparent;user-select:none;transition:background .15s,border-color .15s,color .15s}
+.appchip svg{width:17px;height:17px;stroke:currentColor}
+.appchip:hover{border-color:var(--ac)}
+.appchip.on{background:color-mix(in srgb,var(--ac) 14%,transparent);border-color:color-mix(in srgb,var(--ac) 38%,transparent);color:var(--ac)}
 .sub{color:var(--mu);margin:0 0 22px}
 input[type=text],input[type=url],input[type=number],input[type=password],select{width:100%;font:500 14px inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd2);border-radius:9px;padding:9px 11px;outline:none}
 input:focus,select:focus{border-color:var(--ac)}
@@ -284,6 +295,28 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
 </div>
 <p class="sub" data-i="intro"></p>
 <form id="f">
+
+<?php
+$appsOn = Settings::apps($cfg);
+$APPBAR = [
+  'proyectos'    => ['Proyectos',    '<path d="M4 4l6 0"/><path d="M14 4l6 0"/><path d="M4 10a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2l0 -8"/><path d="M14 10a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2l0 -2"/>'],
+  'tickets'      => ['Tickets',      '<path d="M15 5l0 2"/><path d="M15 11l0 2"/><path d="M15 17l0 2"/><path d="M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-3a2 2 0 0 0 0 -4v-3a2 2 0 0 1 2 -2"/>'],
+  'cumplimiento' => ['Cumplimiento', '<path d="M11.46 20.846a12 12 0 0 1 -7.96 -14.846a12 12 0 0 0 8.5 -3a12 12 0 0 0 8.5 3a12 12 0 0 1 -.09 7.06"/><path d="M15 19l2 2l4 -4"/>'],
+  'crm'          => ['CRM',          '<path d="M20 6v12a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2"/><path d="M10 16h6"/><path d="M11 11a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M4 8h3"/><path d="M4 12h3"/><path d="M4 16h3"/>'],
+  'gps'          => ['Fichadas GPS', '<path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"/>'],
+  'contact'      => ['Contacto',     '<path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12"/>'],
+];
+?>
+<div class="appsbar">
+  <span class="appsbar-lbl">Apps</span>
+  <?php foreach ($APPBAR as $ak => $ad): $on = !empty($appsOn[$ak]); ?>
+  <label class="appchip<?= $on ? ' on' : '' ?>" title="<?= $h($ad[0]) ?>">
+    <input type="checkbox" name="app_<?= $ak ?>" <?= $on ? 'checked' : '' ?> hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?= $ad[1] ?></svg>
+    <span><?= $h($ad[0]) ?></span>
+  </label>
+  <?php endforeach; ?>
+</div>
 
 <div class="grp" data-i="grp_config"></div>
 
@@ -406,7 +439,7 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
   <summary><span class="num">4</span> <span data-i="scrm">CRM · Empresas y clientes</span> <span class="opt" data-i="optonly">— opcional</span></summary>
   <div class="body">
     <p class="help" data-i="h_crm" style="margin:2px 0 12px"></p>
-    <div class="field chk2"><input type="checkbox" name="crm_enabled" id="crmen" <?= $crm['enabled'] ? 'checked' : '' ?>><label for="crmen" style="margin:0" data-i="l_crmen">Activar el CRM (cubo para admin/supervisor)</label></div>
+    <p class="help" style="margin:0 0 10px">El on/off de esta app se controla desde la barra «Apps» del encabezado.</p>
     <div class="field"><label data-i="l_crmlabel">Etiqueta del cubo</label><input type="text" name="crm_label" value="<?= $h($crm['label']) ?>" placeholder="CRM"></div>
     <div class="field">
       <label data-i="l_crmparents">Entidades «empresa» (administran clientes)</label>
@@ -423,7 +456,7 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
 <details class="step">
   <summary><span class="num">5</span> <span data-i="s4">Módulo Fichadas GPS</span> <span class="opt" data-i="optonly">— opcional</span></summary>
   <div class="body">
-    <div class="field chk2"><input type="checkbox" name="gps_enabled" id="gps" <?= $gps['enabled'] ? 'checked' : '' ?>><label for="gps" style="margin:0" data-i="l_gpsen">Activar el módulo</label></div>
+    <p class="help" style="margin:0 0 10px">El on/off de esta app se controla desde la barra «Apps» del encabezado.</p>
     <div class="field"><label data-i="l_gpslabel">Etiqueta de la pestaña</label><input type="text" name="gps_label" value="<?= $h($gps['label']) ?>" placeholder="GPS"></div>
     <div class="field"><label data-i="l_gpsurl">Link a la web de la app</label><input type="url" name="gps_app_url" value="<?= $h($gps['app_url']) ?>" placeholder="https://gps.tuempresa.com"><p class="help" data-i="h_gpsurl"></p></div>
     <p class="help" data-i="h_gpsdb" style="margin:2px 0 10px"></p>
@@ -577,6 +610,7 @@ function applyI18n(){
 const $=s=>document.querySelector(s);
 $('#lang').value=LANG;
 $('#lang').addEventListener('change',e=>{LANG=e.target.value;localStorage.setItem('pd-lang',LANG);applyI18n();});
+document.querySelectorAll('.appchip input').forEach(i=>i.addEventListener('change',()=>i.closest('.appchip').classList.toggle('on',i.checked)));
 // theme
 const themeNow=()=>document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
 const updTheme=()=>$('#theme').textContent=themeNow()==='dark'?'☀️':'🌙';
@@ -585,7 +619,7 @@ updTheme(); applyI18n();
 // form
 const f=$('#f'), msg=$('#msg');
 const data=()=>{const o={};new FormData(f).forEach((v,k)=>{if(k==='crm_parents')return;o[k]=v;});
-  ['glpi_tokens_in_query','glpi_insecure','include_only_leaf','include_untyped','gps_enabled','crm_enabled'].forEach(k=>o[k]=(f.elements[k]&&f.elements[k].checked)?1:'');
+  ['glpi_tokens_in_query','glpi_insecure','include_only_leaf','include_untyped','app_proyectos','app_tickets','app_cumplimiento','app_crm','app_gps','app_contact'].forEach(k=>o[k]=(f.elements[k]&&f.elements[k].checked)?1:'');
   const boxes=document.querySelectorAll('#entbox input[type=checkbox]');
   o['crm_parents']=boxes.length?[...boxes].filter(x=>x.checked).map(x=>x.value).join(','):(o['crm_parents_stored']||'');
   delete o['crm_parents_stored'];

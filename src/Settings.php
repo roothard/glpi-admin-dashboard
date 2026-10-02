@@ -181,6 +181,9 @@ class Settings
                 'parents' => [],
                 'label'   => 'CRM',
             ],
+            // On/off por app para el administrador de apps (barra del Setup).
+            // Vacío = deriva de los flags legacy (crm/gps/contact) + defaults.
+            'apps' => [],
             'security' => [
                 'require_2fa'    => false,  // when true, the UI forces enrollment before showing data
                 'throttle_ip_max'   => 10, 'throttle_ip_window'   => 900,
@@ -264,6 +267,25 @@ class Settings
     }
 
     /** The NON-SECRET subset safe to expose to the browser. */
+    /**
+     * Estado on/off efectivo de cada app (para la barra del Setup y los cubos).
+     * Si no está fijado en 'apps', deriva de los flags legacy para no cambiar
+     * el comportamiento de instalaciones existentes.
+     */
+    public static function apps(?array $cfg = null): array
+    {
+        $cfg = $cfg ?? self::load();
+        $a = $cfg['apps'] ?? [];
+        return [
+            'proyectos'    => (bool)($a['proyectos']    ?? true),
+            'tickets'      => (bool)($a['tickets']      ?? true),
+            'cumplimiento' => (bool)($a['cumplimiento'] ?? true),
+            'crm'          => (bool)($a['crm']          ?? ($cfg['crm']['enabled'] ?? false)),
+            'gps'          => (bool)($a['gps']          ?? ($cfg['modules']['gps']['enabled'] ?? false)),
+            'contact'      => (bool)($a['contact']      ?? ($cfg['contact']['enabled'] ?? true)),
+        ];
+    }
+
     public static function publicConfig(?array $cfg = null): array
     {
         $cfg = $cfg ?? self::load();
@@ -291,6 +313,7 @@ class Settings
                 'enabled' => (bool)($cfg['crm']['enabled'] ?? false),
                 'label'   => $cfg['crm']['label'] ?? 'CRM',
             ],
+            'apps'       => self::apps($cfg),
             'env'        => self::env(),
             'configured' => self::isConfigured($cfg),
         ];
