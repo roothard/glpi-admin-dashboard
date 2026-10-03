@@ -4,6 +4,80 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 A user-facing version of this changelog is published at [`docs/`](docs/index.html).
 
+## [1.7.2] — 2026-10-03 — Multilingual consistency pass
+### Added
+- **Localized drop-in module names**: a module manifest can declare
+  `nombre_i18n` (per-language names); the app bar, the dashboard dock and the
+  header show the name in the UI language, falling back to `nombre`.
+- **Drop-in modules can ship a UI translation file**: a module's page reads its
+  strings from an `i18n.json` and follows the dashboard language. The bundled
+  **email-signature module is now fully translated** (ES/EN/FR/DE/PT) — labels,
+  the Gmail step-by-step, warnings and the generated confidentiality notice —
+  updating live when the language changes.
+### Changed
+- **One language across the app**: the config panel now shares the dashboard's
+  language (same `rh-lang` key), so switching language in one carries over to the
+  other (and updates live).
+### Fixed
+- The **app-bar chips in the config panel** showed Spanish labels regardless of
+  the UI language; they now translate with the selected language (like the
+  dashboard dock cubes).
+
+## [1.7.1] — 2026-10-03 — Setup theme unified with the dashboard
+### Changed
+- **Setup panel theme unified with the dashboard**: same tinted palette (the
+  user's accent tints the material via `color-mix`), background vignette, display
+  font (Space Grotesk) and **shared theme/accent state** (via `rh-theme` + the
+  public `config.php`), updating live — the config panel no longer carries its own
+  separate palette.
+- Setup now uses the **full content width** (matching the dashboard), the app bar
+  shrinks to fit its chips, and the sections behave as an **accordion** (only one
+  open at a time).
+### Added
+- **"Back to dashboard"** button in the setup header (i18n, 5 languages).
+### Fixed
+- Setup **"Test connection"** and **"Fetch from GLPI"** (app name) failed with
+  `ERROR_LOGIN_PARAMETERS_MISSING` when no user token was configured; they now use
+  the logged-in admin's GLPI session (same per-session model as Projects/CRM).
+
+## [1.7.0] — 2026-10-02 — Config panel redesign & app manager
+### Added
+- **App manager** in the config panel: an **on/off toggle bar** for every app —
+  core apps and **drop-in modules** alike — persisted in the config (`apps` key)
+  and honoured by both the dashboard (dock cubes) and module discovery.
+- **App-specific icons** on the dock cubes and the app bar, replacing the letter
+  placeholders.
+- **Current app name in the dashboard header** (e.g. "… · CRM") when you open an app.
+### Changed
+- **Config panel redesign** (formerly "Install"): renamed to **Settings**,
+  sections reordered (Personalisation above apps), the timezone moved inside
+  "Connect to GLPI", intro text removed, the connect step collapsed by default and
+  a compact language selector. The save button now reads **"Save"**.
+- Dashboard: the **Summary / Explorer / Map tabs moved from the header into the
+  body** with consistent top spacing across views; the **Tickets selector** now
+  uses the same segmented style as the rest; drop-in modules load in an
+  **auto-height iframe** (the window scrolls like the other apps, no inner
+  scrollbar).
+
+## [1.6.0] — 2026-09-29 — Staging/production split & deploy scripts
+### Added
+- **Two-mode deploy** (`deploy/`): `deploy-pda <branch>` ships to **staging**
+  (`pda`) and `promote-apps <tag>` ships to **production** (`apps`). Each runs
+  `php -l` on the server, takes a tarball backup of the live site and installs
+  as the site user. `promote-apps --rollback` restores the last backup.
+- **Pda-first guard** in `promote-apps`: production only accepts a **tag**, and
+  only when that tag's commit is exactly what is currently running on staging —
+  the "staging first" rule is enforced by tooling instead of memory.
+- **Per-site environment marker**: `Settings::env()` reads `config/version.json`
+  (above the docroot) and `config.php` exposes it; the panel shows a **STAGING
+  badge** only when `env=staging`. No marker → production (badge hidden).
+- **Release runbook** in [`docs/DEPLOY.md`](docs/DEPLOY.md): the staging → tag →
+  production flow, rollback, the server layout and troubleshooting.
+### Changed
+- Deploy copies **without `--delete`**, preserving each site's own files that are
+  not in the repo (`assets/`, `icon/`, `modules/`, `vendor/`, runtime `config/`
+  state): the docroot is not a mirror of the repository.
+
 ## [1.5.0] — 2026-09-26 — macOS UI, per-user themes & login polish
 ### Added
 - **Per-user accent palette** — a palette button in the toolbar (visible to

@@ -356,7 +356,11 @@ foreach (glob(__DIR__ . '/modules/*/module.json') as $mf) {
     $mid = preg_replace('/[^A-Za-z0-9_-]/', '', (string)$m['id']);
     if ($mid === '' || $mid !== basename(dirname($mf))) { continue; }
     $nombre = (string)($m['nombre'] ?? $mid);
-    $MODBAR[$mid] = [$nombre, (strpos(strtolower($mid . ' ' . $nombre), 'firma') !== false) ? $SIG : $BOX];
+    $mi = [];   // nombre por idioma (opcional en el manifiesto): "nombre_i18n": {"en":"Signature",…}
+    foreach (['es', 'en', 'fr', 'de', 'pt'] as $lg) {
+        if (!empty($m['nombre_i18n'][$lg]) && is_string($m['nombre_i18n'][$lg])) { $mi[$lg] = $m['nombre_i18n'][$lg]; }
+    }
+    $MODBAR[$mid] = [$nombre, (strpos(strtolower($mid . ' ' . $nombre), 'firma') !== false) ? $SIG : $BOX, $mi];
 }
 ?>
 <div class="appsbar">
@@ -364,14 +368,14 @@ foreach (glob(__DIR__ . '/modules/*/module.json') as $mf) {
   <label class="appchip<?= $on ? ' on' : '' ?>" title="<?= $h($ad[0]) ?>">
     <input type="checkbox" name="app_<?= $ak ?>" <?= $on ? 'checked' : '' ?> hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?= $ad[1] ?></svg>
-    <span><?= $h($ad[0]) ?></span>
+    <span data-i="appbar_<?= $ak ?>"><?= $h($ad[0]) ?></span>
   </label>
   <?php endforeach; ?>
   <?php foreach ($MODBAR as $mid => $md): $on = (bool)($cfg['apps']['mod_' . $mid] ?? true); ?>
   <label class="appchip<?= $on ? ' on' : '' ?>" title="<?= $h($md[0]) ?>">
     <input type="checkbox" name="app_mod_<?= $h($mid) ?>" <?= $on ? 'checked' : '' ?> hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?= $md[1] ?></svg>
-    <span><?= $h($md[0]) ?></span>
+    <span<?= !empty($md[2]) ? ' data-mi="' . $h(json_encode($md[2], JSON_UNESCAPED_UNICODE)) . '"' : '' ?>><?= $h($md[0]) ?></span>
   </label>
   <?php endforeach; ?>
 </div>
@@ -657,17 +661,24 @@ Object.assign(I18N.en,{grp_config:'Configuration',grp_dash:'Dashboards',grp_pers
 Object.assign(I18N.fr,{grp_config:'Configuration',grp_dash:'Tableaux de bord',grp_perso:'Personnalisation'});
 Object.assign(I18N.de,{grp_config:'Konfiguration',grp_dash:'Dashboards',grp_perso:'Anpassung'});
 Object.assign(I18N.pt,{grp_config:'Configuração',grp_dash:'Dashboards',grp_perso:'Personalização'});
-let LANG=localStorage.getItem('pd-lang')||DEF||'es';
+Object.assign(I18N.es,{appbar_proyectos:'Proyectos',appbar_tickets:'Tickets',appbar_cumplimiento:'Cumplimiento',appbar_crm:'CRM',appbar_gps:'Fichadas GPS',appbar_contact:'Contacto'});
+Object.assign(I18N.en,{appbar_proyectos:'Projects',appbar_tickets:'Tickets',appbar_cumplimiento:'Compliance',appbar_crm:'CRM',appbar_gps:'GPS check-ins',appbar_contact:'Contact'});
+Object.assign(I18N.fr,{appbar_proyectos:'Projets',appbar_tickets:'Tickets',appbar_cumplimiento:'Conformité',appbar_crm:'CRM',appbar_gps:'Pointages GPS',appbar_contact:'Contact'});
+Object.assign(I18N.de,{appbar_proyectos:'Projekte',appbar_tickets:'Tickets',appbar_cumplimiento:'Compliance',appbar_crm:'CRM',appbar_gps:'GPS-Check-ins',appbar_contact:'Kontakt'});
+Object.assign(I18N.pt,{appbar_proyectos:'Projetos',appbar_tickets:'Tickets',appbar_cumplimiento:'Conformidade',appbar_crm:'CRM',appbar_gps:'Registros GPS',appbar_contact:'Contato'});
+let LANG=localStorage.getItem('rh-lang')||localStorage.getItem('pd-lang')||DEF||'es';
 if(!I18N[LANG])LANG='es';
 const T=k=>(I18N[LANG]&&I18N[LANG][k])||(I18N.en[k])||k;
 function applyI18n(){
   document.documentElement.lang=LANG;
   document.querySelectorAll('[data-i]').forEach(e=>{e.innerHTML=T(e.getAttribute('data-i'));});
+  // nombre de módulos drop-in por idioma (del manifiesto); si no hay para este idioma, queda el default
+  document.querySelectorAll('[data-mi]').forEach(e=>{try{const m=JSON.parse(e.getAttribute('data-mi'));if(m&&m[LANG])e.textContent=m[LANG];}catch(_){}} );
   document.title='Setup · '+T('title');
 }
 const $=s=>document.querySelector(s);
 $('#lang').value=LANG;
-$('#lang').addEventListener('change',e=>{LANG=e.target.value;localStorage.setItem('pd-lang',LANG);applyI18n();});
+$('#lang').addEventListener('change',e=>{LANG=e.target.value;localStorage.setItem('rh-lang',LANG);applyI18n();});
 document.querySelectorAll('.appchip input').forEach(i=>i.addEventListener('change',()=>i.closest('.appchip').classList.toggle('on',i.checked)));
 // Acordeón: al abrir una sección, cerrar las demás (solo una expandida a la vez). No toca el details anidado.
 document.querySelectorAll('#f > details.step').forEach(d=>d.addEventListener('toggle',()=>{
@@ -693,7 +704,7 @@ updTheme(); applyI18n();
     }catch(e){}
   }
   fetch('config.php?_='+Date.now(),{credentials:'same-origin'}).then(r=>r.ok?r.json():null).then(c=>{CFG=c||{};applyAccent(CFG);}).catch(()=>{});
-  window.addEventListener('storage',e=>{ if(e.key==='rh-theme'){const v=localStorage.getItem('rh-theme'); v?document.documentElement.setAttribute('data-theme',v):document.documentElement.removeAttribute('data-theme'); updTheme();} applyAccent(CFG); });
+  window.addEventListener('storage',e=>{ if(e.key==='rh-theme'){const v=localStorage.getItem('rh-theme'); v?document.documentElement.setAttribute('data-theme',v):document.documentElement.removeAttribute('data-theme'); updTheme();} if(e.key==='rh-lang'){const v=localStorage.getItem('rh-lang'); if(v&&I18N[v]){LANG=v;$('#lang').value=v;applyI18n();}} applyAccent(CFG); });
   try{ new MutationObserver(()=>applyAccent(CFG)).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']}); }catch(e){}
 })();
 // form

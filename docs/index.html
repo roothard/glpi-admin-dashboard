@@ -112,7 +112,7 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
   <span class="hdr-divider"></span>
   <span class="hdr-title">Centro de Administración GLPI · Documentación</span>
   <div class="hdr-right">
-    <span class="hdr-ver">v1.5.0</span>
+    <span class="hdr-ver">v1.7.2</span>
     <a class="hdr-gh" href="https://github.com/roothard/glpi-admin-dashboard" target="_blank" rel="noopener">GitHub</a>
   </div>
 </header>
@@ -164,9 +164,10 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
       <h2 class="doc-h2" id="nav">Navegación: el dock de cubos</h2>
       <p class="doc-p">Arriba a la izquierda hay un <strong>dock</strong> con un cubo por
         aplicación. Al hacer clic en un cubo, la app actual se transforma en él y se abre la nueva
-        con una transición. Cada cubo lleva la inicial de su app: <code class="ic">P</code>
-        Proyectos, <code class="ic">F</code> Fichadas, <code class="ic">T</code> Tickets,
-        <code class="ic">C</code> CRM y <code class="ic">C</code> Cumplimiento.</p>
+        con una transición y el <strong>nombre de la app</strong> aparece en el encabezado.
+        Cada cubo lleva un <strong>ícono</strong> propio (Proyectos, Fichadas, Tickets, CRM,
+        Cumplimiento y los módulos instalados). Solo se muestran las apps <strong>habilitadas</strong>
+        desde el administrador de apps del panel de Configuración.</p>
       <div class="callout callout-info"><span class="callout-icon">ℹ️</span>
         <div class="callout-body"><strong>Visibilidad por perfil.</strong> Proyectos y Tickets los
         ven todos los perfiles. <strong>Fichadas</strong>, <strong>CRM</strong> y
@@ -360,6 +361,11 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
         la ve y la puede abrir el perfil <strong>Super-Admin</strong> de GLPI (también en
         <code class="ic">/setup.php</code>). Todo se guarda en un archivo del servidor, fuera de la
         carpeta pública; los secretos nunca llegan al navegador.</p>
+      <p class="doc-p">En el encabezado del panel, una <strong>barra de apps</strong> con interruptores
+        permite <strong>prender y apagar</strong> cada aplicación —las nativas y los módulos
+        instalados—; lo que se apaga desaparece del tablero. El panel usa el <strong>mismo tema</strong>
+        que el tablero (colores y acento) y sus secciones funcionan en <strong>acordeón</strong>
+        (una abierta a la vez).</p>
       <p class="doc-p">Está organizada en secciones: una parte <strong>general</strong> del panel y
         una sección <strong>por cada app</strong>. En <strong>General · Marca</strong> configurás:</p>
       <ul class="doc-ul">
@@ -415,7 +421,71 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
       <h2 class="doc-h2" id="changelog">Registro de versiones</h2>
 
       <div class="ver">
-        <div class="ver-head"><span class="ver-tag cur">v1.5.0</span>
+        <div class="ver-head"><span class="ver-tag cur">v1.7.2</span>
+          <span class="ver-date">2026-10-03</span><span class="ver-name">Todo multi-idioma: módulos, Firma y un solo idioma en la app</span></div>
+        <ul class="doc-ul">
+          <li><strong>Un solo idioma en toda la app</strong>: el panel de Configuración comparte el
+            idioma del tablero, así que no se pierde al navegar entre ellos (y se actualiza en vivo).</li>
+          <li><strong>El módulo Firma quedó totalmente traducido</strong> (ES/EN/FR/DE/PT): etiquetas,
+            el paso a paso de Gmail, los avisos y el texto de confidencialidad, siguiendo el idioma del
+            tablero.</li>
+          <li><strong>Nombres de módulos por idioma</strong>: un módulo drop-in puede declarar
+            <code>nombre_i18n</code>; la barra de apps, el dock y el encabezado lo muestran en el idioma
+            de la interfaz.</li>
+          <li><strong>Corrección</strong>: los chips de la barra de apps del panel traducían mal (quedaban
+            en español); ahora siguen el idioma elegido, como los cubos del tablero.</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="ver-head"><span class="ver-tag">v1.7.1</span>
+          <span class="ver-date">2026-10-03</span><span class="ver-name">Tema del panel unificado con el tablero</span></div>
+        <ul class="doc-ul">
+          <li><strong>Panel de Configuración con el mismo tema que el tablero</strong>: misma paleta
+            con tinte del acento, fondo con viñeta, tipografía de títulos y <strong>estado de
+            tema/acento compartido</strong> (se sincronizan y se actualizan en vivo).</li>
+          <li>El panel ocupa el <strong>ancho completo</strong>, la barra de apps se ajusta a su
+            contenido y las secciones funcionan como <strong>acordeón</strong> (una abierta a la vez).</li>
+          <li>Botón <strong>«Volver al tablero»</strong> en el encabezado.</li>
+          <li><strong>Corrección</strong>: «Probar conexión» y «Traer de GLPI» usaban un token de
+            usuario inexistente; ahora usan la sesión del admin logueado.</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="ver-head"><span class="ver-tag">v1.7.0</span>
+          <span class="ver-date">2026-10-02</span><span class="ver-name">Rediseño del panel y administrador de apps</span></div>
+        <ul class="doc-ul">
+          <li><strong>Administrador de apps</strong> en el panel: una <strong>barra con interruptores
+            on/off</strong> para cada app —las nativas y los <strong>módulos drop-in</strong>—, respetada
+            por el tablero (cubos) y por el descubrimiento de módulos.</li>
+          <li><strong>Íconos por app</strong> en los cubos y en la barra (en lugar de las letras), y el
+            <strong>nombre del dashboard activo</strong> en el encabezado del tablero.</li>
+          <li><strong>Rediseño del panel</strong> (antes «Instalación», ahora <strong>«Configuración»</strong>):
+            secciones reordenadas, zona horaria dentro de «Conectar», selector de idioma compacto y
+            botón <strong>«Guardar»</strong>.</li>
+          <li>Tablero: las pestañas <em>Resumen / Explorador / Mapa</em> pasaron del encabezado al cuerpo,
+            el selector de <strong>Tickets</strong> quedó segmentado como el resto, y los módulos cargan
+            en un iframe de <strong>alto automático</strong> (scrollea la ventana, sin barra interna).</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="ver-head"><span class="ver-tag">v1.6.0</span>
+          <span class="ver-date">2026-09-29</span><span class="ver-name">Separación staging/producción y scripts de deploy</span></div>
+        <ul class="doc-ul">
+          <li><strong>Deploy en dos modos</strong> (<code>deploy/</code>): <code>deploy-pda</code> publica en
+            <strong>staging</strong> y <code>promote-apps</code> en <strong>producción</strong>, con
+            <code>php -l</code>, backup del sitio y rollback.</li>
+          <li><strong>Regla «staging primero»</strong> aplicada por herramienta: producción solo acepta un
+            <strong>tag</strong> y solo si ese commit es exactamente el que corre en staging.</li>
+          <li><strong>Marcador de entorno</strong> por sitio: la insignia <strong>STAGING</strong> aparece
+            solo en el entorno de pruebas.</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="ver-head"><span class="ver-tag">v1.5.0</span>
           <span class="ver-date">2026-09-26</span><span class="ver-name">Interfaz macOS, temas por usuario y login</span></div>
         <ul class="doc-ul">
           <li><strong>Personalización por usuario</strong>: botón de paleta en la barra (visible para

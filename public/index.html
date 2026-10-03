@@ -997,7 +997,7 @@ function appsList(){
   const _gps=(CONFIG.modules&&CONFIG.modules.gps)||{};
   if((DATA.isAdmin||DATA.isSuper)&&AP.gps) list.push({k:'fichadas',t:_gps.label||T('app_fich')});
   // módulos drop-in descubiertos (modules/<id>/) visibles para el usuario → cubos-link
-  (MODULES||[]).forEach(m=>list.push({k:'m:'+m.id,t:m.nombre,url:m.url,ext:true}));
+  (MODULES||[]).forEach(m=>list.push({k:'m:'+m.id,t:((m.nombre_i18n&&m.nombre_i18n[LANG])||m.nombre),url:m.url,ext:true}));
   return list.sort((a,b)=>a.t.localeCompare(b.t,LANG,{sensitivity:'base'})); // cubos en orden alfabético
 }
 // nombre de la app activa para el subtítulo del header (cae al título genérico si no hay app)

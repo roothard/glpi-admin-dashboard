@@ -9,10 +9,13 @@
  *
  * Contrato del manifiesto module.json (compromiso de API del producto):
  *   { "id":"crm", "nombre":"CRM", "descripcion":"…", "icono":"briefcase",
- *     "entrada":"index.php", "orden":50, "entidades":[15] }
+ *     "entrada":"index.php", "orden":50, "entidades":[15],
+ *     "nombre_i18n":{"es":"CRM","en":"CRM","fr":"CRM","de":"CRM","pt":"CRM"} }
  *   - entidades ausente o [] = visible para cualquier usuario logueado.
  *   - entidades:[…] = visible si el usuario tiene acceso a alguna de ellas
  *     (o si es admin/supervisor, que supervisan todo).
+ *   - nombre_i18n (opcional): nombre por idioma (es/en/fr/de/pt); si falta un
+ *     idioma, se usa "nombre". Lo aplican la barra de apps del panel y el dock.
  * @license MIT
  */
 require dirname(__DIR__) . '/lib.php';
@@ -59,9 +62,14 @@ foreach (glob(__DIR__ . '/modules/*/module.json') as $mf) {
 
     $entrada = ltrim((string)$m['entrada'], '/');
     if (strpos($entrada, '..') !== false) { continue; }              // sin traversal
+    $mi = [];   // nombre por idioma (opcional en el manifiesto): "nombre_i18n": {"en":"Signature",…}
+    foreach (['es', 'en', 'fr', 'de', 'pt'] as $lg) {
+        if (!empty($m['nombre_i18n'][$lg]) && is_string($m['nombre_i18n'][$lg])) { $mi[$lg] = $m['nombre_i18n'][$lg]; }
+    }
     $out[] = [
         'id'     => $mid,
         'nombre' => (string)($m['nombre'] ?? $mid),
+        'nombre_i18n' => $mi,
         'desc'   => (string)($m['descripcion'] ?? ''),
         'icono'  => (string)($m['icono'] ?? 'box'),
         'orden'  => (int)($m['orden'] ?? 100),
