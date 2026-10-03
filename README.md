@@ -63,6 +63,8 @@ timeline and linked knowledge-base articles.
 
 <p align="center"><img src="docs/shots/compliance.png" width="85%" alt="Compliance — critical processes verified against real GLPI tickets, with a 12-cycle history bar"></p>
 
+<p align="center"><img src="docs/shots/settings.png" width="85%" alt="Settings — the config panel: an app on/off manager, GLPI connection, branding, Map board, CRM and modules, themed to match the dashboard"></p>
+
 <p align="center"><img src="docs/shots/login.png" width="70%" alt="Login — your company name drawn in interactive particles"></p>
 <p align="center"><sub>The login draws <b>your company name</b> in ~2,000 interactive particles (hover scatters them; click &amp; drag swirls them).</sub></p>
 
@@ -155,6 +157,7 @@ Everything is edited in the **setup panel** (`/setup.php`) and stored in
 | **CRM** | on/off + cube label, and which entities are **"companies"** (their child entities become clients); empty = auto-detect entities that have children |
 | **Security · 2FA** | require 2FA org-wide, per-IP/user throttle windows, email-OTP backup, SIEM (Wazuh) syslog |
 | **Modules** | GPS check-ins on/off, tab label, **app website link**, its read-only DB |
+| **App manager** | an **on/off bar** in the config header toggles every app — core apps and **drop-in modules** alike — stored in `settings.json` and honoured by both the dashboard (dock cubes) and module discovery |
 
 Every value can also be supplied as an **environment variable** (`GLPI_URL`,
 `GLPI_APP_TOKEN`, `PROJECT_TYPE`, `DB_*`, …), which overrides the file — handy
@@ -206,6 +209,10 @@ for Docker. See [`config/settings.example.json`](config/settings.example.json).
 - [x] **Apps & security** — Tickets, Compliance and **CRM** apps; **2FA**
   (TOTP + email backup + recovery codes) with SIEM logging; per-session data
   model; modular setup with brand palettes and a Super-Admin config gear
+- [x] **Config & delivery** — redesigned **Settings panel** with an **app manager**
+  (on/off for every app and drop-in module), the config panel themed to match the
+  dashboard, and a **staging → production** deploy flow (`deploy/`) with a
+  pda-first guard
 - [ ] **Phase 3** — Docker image + release tarball, CI
 - [ ] **Phase 4** — extra auth modes (no-login / shared password), richer polish
 
