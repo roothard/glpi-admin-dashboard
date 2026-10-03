@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# ==========================================================================
+# promote-module <id>   —  promueve un módulo drop-in de STAGING a PRODUCCIÓN
+#
+# Los módulos drop-in viven en public_html/modules/<id> y son contenido local
+# del sitio (NO están en el repo): apps propias por cliente, como "firma".
+# El deploy de código (promote-apps) no los toca, así que este script cubre el
+# hueco: copia un módulo ya validado en pda hacia apps, con backup previo.
+#
+# Siempre va pda -> apps (staging primero). No borra otros módulos.
+#
+#   ./deploy/promote-module firma
+#   ./deploy/promote-module --list      # módulos en pda y en apps
+# ==========================================================================
+set -euo pipefail
+. "$(cd "$(dirname "$0")" && pwd)/lib.sh"
+
+load_env
+: "${PDA_HOME:?falta PDA_HOME en deploy.env}" "${APPS_USER:?falta APPS_USER en deploy.env}" "${APPS_HOME:?falta APPS_HOME en deploy.env}"
+
+if [ "${1:-}" = "--list" ]; then
+  step "Módulos drop-in en cada sitio…"
+  ssh_do "echo '  pda  (staging):'; sudo ls '$PDA_HOME/public_html/modules' 2>/dev/null | sed 's/^/    /' || echo '    (ninguno)';
+          echo '  apps (producción):'; sudo ls '$APPS_HOME/public_html/modules' 2>/dev/null | sed 's/^/    /' || echo '    (ninguno)'"
+  exit 0
+fi
+
+ID="${1:-}"
+[ -n "$ID" ] || die "Uso: promote-module <id>   (o --list)"
+case "$ID" in */*|.|..) die "id de módulo inválido: $ID";; esac
+
+step "Promoviendo módulo '$ID' de pda (staging) a apps (producción)…"
+ssh_do "sudo bash -s" <<REMOTE || die "La promoción del módulo falló."
+set -euo pipefail
+ID='$ID'
+SRC='$PDA_HOME/public_html/modules/'"\$ID"
+DSTDIR='$APPS_HOME/public_html/modules'
+USER_='$APPS_USER'
+TS="\$(date +%Y%m%d-%H%M%S)"
+PHP="\$(command -v php || command -v php8.3)"
+
+[ -d "\$SRC" ] || { echo "El módulo '\$ID' no existe en pda: \$SRC"; exit 1; }
+
+# lint de cualquier .php del módulo antes de tocar producción
+FAIL=0
+while IFS= read -r -d '' f; do
+  "\$PHP" -l "\$f" >/dev/null 2>&1 || { echo "  php -l FALLÓ: \$f"; "\$PHP" -l "\$f" || true; FAIL=1; }
+done < <(find "\$SRC" -name '*.php' -print0)
+[ "\$FAIL" = 0 ] || { echo 'Abortado: el módulo tiene PHP con errores de sintaxis.'; exit 2; }
+echo "  php -l OK"
+
+# backup del módulo en apps si ya existía
+BK='$APPS_HOME/backups'; mkdir -p "\$BK"; chown "\$USER_:\$USER_" "\$BK"
+if [ -d "\$DSTDIR/\$ID" ]; then
+  tar -C "\$DSTDIR" -czf "\$BK/module-\$ID-\$TS.tgz" "\$ID"; chown "\$USER_:\$USER_" "\$BK/module-\$ID-\$TS.tgz"
+  echo "  backup previo: \$BK/module-\$ID-\$TS.tgz"
+fi
+
+# copiar el módulo (crea modules/ si no existe; no borra otros módulos)
+mkdir -p "\$DSTDIR"
+rm -rf "\$DSTDIR/\$ID.tmp"
+cp -a "\$SRC" "\$DSTDIR/\$ID.tmp"
+rm -rf "\$DSTDIR/\$ID"
+mv "\$DSTDIR/\$ID.tmp" "\$DSTDIR/\$ID"
+chown -R "\$USER_:\$USER_" "\$DSTDIR"
+echo "  instalado: \$DSTDIR/\$ID"
+REMOTE
+
+ok "Módulo '$ID' promovido a producción: https://apps.roothard.com.ar"

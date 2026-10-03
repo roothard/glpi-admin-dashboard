@@ -4,6 +4,30 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 A user-facing version of this changelog is published at [`docs/`](docs/index.html).
 
+## [1.6.0] — 2026-09-29 — Staging/production split & deploy scripts
+### Added
+- **Two-mode deploy** (`deploy/`): `deploy-pda <branch>` ships to **staging**
+  (`pda`) and `promote-apps <tag>` ships to **production** (`apps`). Each runs
+  `php -l` on the server, takes a tarball backup of the live site and installs
+  as the site user. `promote-apps --rollback` restores the last backup.
+- **Pda-first guard** in `promote-apps`: production only accepts a **tag**, and
+  only when that tag's commit is exactly what is currently running on staging —
+  the "staging first" rule is now enforced by tooling instead of memory.
+- **Per-site environment marker**: `Settings::env()` reads `config/version.json`
+  (above the docroot) and `config.php` exposes it; the panel shows a **STAGING
+  badge** only when `env=staging`. No marker → production (badge hidden).
+- **Drop-in module promotion** (`deploy/promote-module <id>`): copies a site-local
+  drop-in module (`public_html/modules/<id>`, not part of the repo) from staging to
+  production, with `php -l`, a backup and no deletion of other modules. `--list`
+  shows the modules on each site.
+- **Release runbook** in [`docs/DEPLOY.md`](docs/DEPLOY.md): the staging → tag →
+  production flow, drop-in module promotion, rollback, the server layout and
+  troubleshooting.
+### Changed
+- Deploy copies **without `--delete`**, preserving each site's own files that are
+  not in the repo (`assets/`, `icon/`, `modules/`, `vendor/`, runtime `config/`
+  state): the docroot is not a mirror of the repository.
+
 ## [1.5.0] — 2026-09-26 — macOS UI, per-user themes & login polish
 ### Added
 - **Per-user accent palette** — a palette button in the toolbar (visible to
