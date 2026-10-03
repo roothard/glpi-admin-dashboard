@@ -36,6 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $url  = trim($in['glpi_url'] ?? $cfg['glpi']['url']);
         $app  = trim($in['glpi_app_token'] ?? '') ?: $cfg['glpi']['app_token'];
         $user = trim($in['glpi_user_token'] ?? '') ?: $cfg['glpi']['user_token'];
+        // Modelo por-sesión: sin user_token, probar con la sesión del admin logueado (como types/entities).
+        if ($user === '') {
+            $tok = $_SESSION['glpi_token'] ?? '';
+            if ($tok === '') { echo json_encode(['ok' => false, 'msg' => 'sesión requerida — entrá al tablero primero']); exit; }
+            list($ct, $st) = glpi_fetch('/ProjectState', ['range' => '0-1000'], $tok);
+            if ($ct >= 400) { echo json_encode(['ok' => false, 'msg' => "GLPI HTTP $ct"]); exit; }
+            echo json_encode(['ok' => true, 'n' => is_array($st) ? count($st) : 0]);
+            exit;
+        }
         try {
             $c = new GlpiClient([
                 'url' => $url, 'app_token' => $app, 'user_token' => $user,
@@ -57,6 +66,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $url  = trim($in['glpi_url'] ?? $cfg['glpi']['url']);
         $app  = trim($in['glpi_app_token'] ?? '') ?: $cfg['glpi']['app_token'];
         $user = trim($in['glpi_user_token'] ?? '') ?: $cfg['glpi']['user_token'];
+        // Modelo por-sesión: sin user_token, usar la sesión del admin logueado (como types/entities).
+        if ($user === '') {
+            $tok = $_SESSION['glpi_token'] ?? '';
+            if ($tok === '') { echo json_encode(['ok' => false, 'msg' => 'sesión requerida — entrá al tablero primero']); exit; }
+            list($ce, $ent) = glpi_fetch('/Entity/0', [], $tok);
+            if ($ce >= 400) { echo json_encode(['ok' => false, 'msg' => "GLPI HTTP $ce"]); exit; }
+            $name = is_array($ent) ? trim((string)($ent['name'] ?? $ent['completename'] ?? '')) : '';
+            echo json_encode(['ok' => $name !== '', 'name' => $name]);
+            exit;
+        }
         try {
             $c = new GlpiClient([
                 'url' => $url, 'app_token' => $app, 'user_token' => $user,
@@ -229,21 +248,33 @@ header('Content-Type: text/html; charset=utf-8');
 ?><!doctype html>
 <html><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script>(function(){var s=localStorage.getItem('pd-theme');if(s)document.documentElement.setAttribute('data-theme',s);})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script>(function(){try{
+ var s=localStorage.getItem('rh-theme');if(s)document.documentElement.setAttribute('data-theme',s);
+ var p=JSON.parse(localStorage.getItem('rh-pal')||'{}');
+ var dark=(document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))==='dark';
+ var acc=(dark&&p.ad)?p.ad:p.a; if(acc)document.documentElement.style.setProperty('--ac',acc);
+ if(p.t!=null&&p.t!=='')document.documentElement.style.setProperty('--tint',p.t);
+}catch(e){}})();</script>
 <title>Setup · <?= $h($b['app_name']) ?></title>
 <style>
-:root{--bg:#f3f6fc;--card:#fff;--bd:#e3e8f4;--bd2:#d3dbee;--tx:#141b30;--mu:#57627e;--ac:<?= $h($b['accent']) ?>}
-@media(prefers-color-scheme:dark){:root:not([data-theme]){--bg:#0a0f1e;--card:#121a30;--bd:#24314f;--bd2:#31406a;--tx:#e9eef9;--mu:#96a2c1}}
-:root[data-theme=dark]{--bg:#0a0f1e;--card:#121a30;--bd:#24314f;--bd2:#31406a;--tx:#e9eef9;--mu:#96a2c1}
-:root[data-theme=light]{--bg:#f3f6fc;--card:#fff;--bd:#e3e8f4;--bd2:#d3dbee;--tx:#141b30;--mu:#57627e}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.wrap{max-width:900px;margin:0 auto;padding:24px 20px 90px}
+:root{--tint:0%;--bg:color-mix(in srgb,var(--ac) calc(var(--tint)*.8),#e3e3e4);--card:color-mix(in srgb,var(--ac) var(--tint),#fff);--bd:color-mix(in srgb,var(--ac) calc(var(--tint)*2),#d6d6da);--bd2:color-mix(in srgb,var(--ac) calc(var(--tint)*2),#c9c9cf);--tx:#141416;--mu:#6f7178;--ac:<?= $h($b['accent']) ?>;--vig1:rgba(255,255,255,.85);--vig2:rgba(185,187,196,.55);--disp:'Space Grotesk',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){--bg:color-mix(in srgb,var(--ac) calc(var(--tint)*.8),#161618);--card:color-mix(in srgb,var(--ac) var(--tint),#1f1f23);--bd:color-mix(in srgb,var(--ac) calc(var(--tint)*2),#2c2c31);--bd2:color-mix(in srgb,var(--ac) calc(var(--tint)*2),#3a3a41);--tx:#ececef;--mu:#9a9ca4;--vig1:rgba(255,255,255,.05);--vig2:rgba(0,0,0,.5)}}
+:root[data-theme=dark]{--bg:color-mix(in srgb,var(--ac) calc(var(--tint)*.8),#161618);--card:color-mix(in srgb,var(--ac) var(--tint),#1f1f23);--bd:color-mix(in srgb,var(--ac) calc(var(--tint)*2),#2c2c31);--bd2:color-mix(in srgb,var(--ac) calc(var(--tint)*2),#3a3a41);--tx:#ececef;--mu:#9a9ca4;--vig1:rgba(255,255,255,.05);--vig2:rgba(0,0,0,.5)}
+:root[data-theme=light]{--tint:0%;--bg:color-mix(in srgb,var(--ac) calc(var(--tint)*.8),#e3e3e4);--card:color-mix(in srgb,var(--ac) var(--tint),#fff);--bd:color-mix(in srgb,var(--ac) calc(var(--tint)*2),#d6d6da);--bd2:color-mix(in srgb,var(--ac) calc(var(--tint)*2),#c9c9cf);--tx:#141416;--mu:#6f7178;--vig1:rgba(255,255,255,.85);--vig2:rgba(185,187,196,.55)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;position:relative;min-height:100vh}
+body::before{content:"";position:fixed;width:70vw;height:70vw;top:-30%;left:-18%;border-radius:50%;background:radial-gradient(circle,var(--vig1),transparent 65%);filter:blur(90px);pointer-events:none;z-index:0}
+body::after{content:"";position:fixed;width:55vw;height:55vw;bottom:-25%;right:-14%;border-radius:50%;background:radial-gradient(circle,var(--vig2),transparent 65%);filter:blur(90px);pointer-events:none;z-index:0}
+.wrap{max-width:1500px;margin:0 auto;padding:24px 20px 90px;position:relative;z-index:1}
 .topbar{display:flex;align-items:center;gap:8px;margin:0 0 18px}
-.topbar h1{font-size:22px;margin:0}.topbar .sp{flex:1}
+.topbar h1{font:700 22px/1.2 var(--disp);margin:0;letter-spacing:-.01em}.topbar .sp{flex:1}
 .tbtn{width:52px;height:34px;display:grid;place-items:center;border:1px solid var(--bd2);border-radius:9px;background:var(--card);cursor:pointer;font-size:15px}
+.backbtn{display:inline-flex;align-items:center;height:34px;padding:0 14px;font:600 12px system-ui;color:var(--tx);background:var(--card);border:1px solid var(--bd2);border-radius:9px;text-decoration:none;white-space:nowrap}
+.backbtn:hover{border-color:var(--ac);color:var(--ac)}
 .tbtn:hover{border-color:var(--ac)}
 #lang{width:52px;height:34px;flex:none;font:600 11px system-ui;color:var(--tx);background:var(--card);border:1px solid var(--bd2);border-radius:9px;padding:0 6px 0 9px;cursor:pointer}
-.appsbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 20px;padding:11px 13px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
+.appsbar{display:flex;width:fit-content;max-width:100%;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 20px;padding:11px 13px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
 .appsbar-lbl{font:700 10px system-ui;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-right:2px}
 .appchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd2);border-radius:999px;padding:5px 11px;font-size:13px;cursor:pointer;color:var(--mu);background:transparent;user-select:none;transition:background .15s,border-color .15s,color .15s}
 .appchip svg{width:16px;height:16px;stroke:currentColor}
@@ -255,7 +286,7 @@ input:focus,select:focus{border-color:var(--ac)}
 input[type=color]{width:48px;height:36px;padding:2px}
 .step{border:1px solid var(--bd);border-radius:14px;margin:0 0 16px;background:var(--card)}
 .step.req{border:2px solid var(--ac)}
-.step>summary,.step>.head{cursor:pointer;padding:15px 20px;font-weight:700;font-size:15px;list-style:none;display:flex;align-items:center;gap:9px}
+.step>summary,.step>.head{cursor:pointer;padding:15px 20px;font:700 15px var(--disp);list-style:none;display:flex;align-items:center;gap:9px}
 .step>summary::-webkit-details-marker{display:none}
 details.step>summary::before{content:"▸";color:var(--mu);font-size:13px;transition:transform .15s}
 details.step[open]>summary::before{transform:rotate(90deg)}
@@ -297,6 +328,7 @@ button.act{font:700 14px inherit;border:none;border-radius:10px;padding:11px 18p
 <body><div class="wrap">
 <div class="topbar">
   <h1 data-i="title">Configuración</h1><span class="sp"></span>
+  <a href="index.html" class="backbtn" data-i="back">← Volver al tablero</a>
   <button class="tbtn" id="theme" title="Tema">🌙</button>
   <select id="lang">
     <option value="es">ES</option><option value="en">EN</option><option value="fr">FR</option><option value="de">DE</option><option value="pt">PT</option>
@@ -513,7 +545,7 @@ foreach (glob(__DIR__ . '/modules/*/module.json') as $mf) {
 <script>
 const DEF=<?= json_encode($deflang) ?>;
 const I18N={
- es:{title:'Configuración',intro:'Solo necesitás la <b>URL de tu GLPI</b> y <b>dos tokens</b>. Lo demás es opcional y ya tiene valores por defecto. Los campos de contraseña son de solo-escritura: dejalos vacíos para conservar lo guardado.',
+ es:{title:'Configuración',back:'← Volver al tablero',intro:'Solo necesitás la <b>URL de tu GLPI</b> y <b>dos tokens</b>. Lo demás es opcional y ya tiene valores por defecto. Los campos de contraseña son de solo-escritura: dejalos vacíos para conservar lo guardado.',
   s1:'Conectar con GLPI',l_url:'URL de GLPI',h_url:'La dirección donde entrás a tu GLPI (sin <code>/apirest.php</code> — se agrega solo).',
   h_app:'En GLPI: <b>Configuración → General → pestaña «API»</b>. Activá <b>«Habilitar la API REST»</b>, después <b>«Agregar un cliente API»</b> y copiá el <b>«Token de aplicación (app_token)»</b>.',
   l_user:'Token de usuario',h_user:'Lo usa la <b>sincronización automática</b> para leer los proyectos. En GLPI: arriba a la derecha <b>tu nombre → Preferencias → «Claves de acceso remoto»</b> → generá un <b>«Token API»</b>. Usá un usuario con permiso de lectura de Proyectos.',
@@ -529,7 +561,7 @@ const I18N={
   h_gpsdb:'<b>Base de datos:</b> este módulo lee tickets «Visita técnica» directo de la base de GLPI. Los datos de conexión están en el archivo <code>config/config_db.php</code> de tu GLPI.',
   l_dbhost:'Host de la DB',l_dbname:'Nombre de la DB',l_dbuser:'Usuario de la DB',l_dbpass:'Contraseña de la DB',adv2:'Avanzado',l_tz:'Zona horaria',h_tz:'Ej: <code>America/Argentina/Buenos_Aires</code>. Para el sello de «Actualizado».',
   b_test:'Probar conexión',b_save:'Guardar',m_testing:'Probando…',m_saving:'Guardando y sincronizando…',m_ok:'✓ Conectado · {n} estados visibles',m_saved:'✓ Guardado · {n} proyectos',m_savefail:'Error al guardar',m_reqfail:'Falló la solicitud',m_syncfail:'Guardado, pero la sincronización falló: '},
- en:{title:'Settings',intro:'You only need your <b>GLPI URL</b> and <b>two tokens</b>. Everything else is optional and pre-filled. Password fields are write-only: leave blank to keep the stored value.',
+ en:{title:'Settings',back:'← Back to dashboard',intro:'You only need your <b>GLPI URL</b> and <b>two tokens</b>. Everything else is optional and pre-filled. Password fields are write-only: leave blank to keep the stored value.',
   s1:'Connect to GLPI',l_url:'GLPI URL',h_url:'The address where you open GLPI (without <code>/apirest.php</code> — added automatically).',
   h_app:'In GLPI: <b>Setup → General → «API» tab</b>. Enable <b>«Enable REST API»</b>, then <b>«Add API client»</b> and copy its <b>«Application token (app_token)»</b>.',
   l_user:'User token',h_user:'Used by the <b>background sync</b> to read projects. In GLPI: top-right <b>your name → Preferences → «Remote access keys»</b> → generate an <b>«API token»</b>. Use a user with read access to Projects.',
@@ -545,7 +577,7 @@ const I18N={
   h_gpsdb:'<b>Database:</b> this module reads «Visita técnica» tickets straight from the GLPI database. The connection details are in your GLPI <code>config/config_db.php</code> file.',
   l_dbhost:'DB host',l_dbname:'DB name',l_dbuser:'DB user',l_dbpass:'DB password',adv2:'Advanced',l_tz:'Timezone',h_tz:'e.g. <code>America/Argentina/Buenos_Aires</code>. For the «Updated» stamp.',
   b_test:'Test connection',b_save:'Save',m_testing:'Testing…',m_saving:'Saving & syncing…',m_ok:'✓ Connected · {n} states visible',m_saved:'✓ Saved · {n} projects',m_savefail:'Save failed',m_reqfail:'Request failed',m_syncfail:'Saved, but sync failed: '},
- fr:{title:'Configuration',intro:'Il vous faut seulement l’<b>URL de votre GLPI</b> et <b>deux jetons</b>. Le reste est optionnel et pré-rempli. Les champs mot de passe sont en écriture seule : laissez vide pour conserver la valeur.',
+ fr:{title:'Configuration',back:'← Retour au tableau',intro:'Il vous faut seulement l’<b>URL de votre GLPI</b> et <b>deux jetons</b>. Le reste est optionnel et pré-rempli. Les champs mot de passe sont en écriture seule : laissez vide pour conserver la valeur.',
   s1:'Se connecter à GLPI',l_url:'URL de GLPI',h_url:'L’adresse où vous ouvrez GLPI (sans <code>/apirest.php</code> — ajouté automatiquement).',
   h_app:'Dans GLPI : <b>Configuration → Général → onglet «API»</b>. Activez <b>«Activer l’API REST»</b>, puis <b>«Ajouter un client API»</b> et copiez le <b>«Jeton d’application (app_token)»</b>.',
   l_user:'Jeton utilisateur',h_user:'Utilisé par la <b>synchronisation automatique</b>. Dans GLPI : en haut à droite <b>votre nom → Préférences → «Clés d’accès distant»</b> → générez un <b>«Jeton API»</b>. Utilisez un compte ayant accès en lecture aux Projets.',
@@ -561,7 +593,7 @@ const I18N={
   h_gpsdb:'<b>Base de données :</b> ce module lit les tickets «Visita técnica» directement dans la base GLPI. Les identifiants sont dans le fichier <code>config/config_db.php</code> de votre GLPI.',
   l_dbhost:'Hôte de la BD',l_dbname:'Nom de la BD',l_dbuser:'Utilisateur BD',l_dbpass:'Mot de passe BD',adv2:'Avancé',l_tz:'Fuseau horaire',h_tz:'ex : <code>America/Argentina/Buenos_Aires</code>. Pour l’horodatage «Mis à jour».',
   b_test:'Tester la connexion',b_save:'Enregistrer',m_testing:'Test…',m_saving:'Enregistrement et sync…',m_ok:'✓ Connecté · {n} états visibles',m_saved:'✓ Enregistré · {n} projets',m_savefail:'Échec de l’enregistrement',m_reqfail:'Échec de la requête',m_syncfail:'Enregistré, mais la sync a échoué : '},
- de:{title:'Konfiguration',intro:'Sie brauchen nur Ihre <b>GLPI-URL</b> und <b>zwei Tokens</b>. Der Rest ist optional und vorbelegt. Passwortfelder sind schreibgeschützt: leer lassen, um den Wert zu behalten.',
+ de:{title:'Konfiguration',back:'← Zurück zum Dashboard',intro:'Sie brauchen nur Ihre <b>GLPI-URL</b> und <b>zwei Tokens</b>. Der Rest ist optional und vorbelegt. Passwortfelder sind schreibgeschützt: leer lassen, um den Wert zu behalten.',
   s1:'Mit GLPI verbinden',l_url:'GLPI-URL',h_url:'Die Adresse, unter der Sie GLPI öffnen (ohne <code>/apirest.php</code> — wird automatisch ergänzt).',
   h_app:'In GLPI: <b>Konfiguration → Allgemein → Reiter «API»</b>. Aktivieren Sie <b>«REST-API aktivieren»</b>, dann <b>«API-Client hinzufügen»</b> und kopieren Sie das <b>«Anwendungs-Token (app_token)»</b>.',
   l_user:'Benutzer-Token',h_user:'Wird von der <b>automatischen Synchronisierung</b> genutzt. In GLPI: oben rechts <b>Ihr Name → Einstellungen → «Fernzugriffsschlüssel»</b> → ein <b>«API-Token»</b> erzeugen. Nutzer mit Lesezugriff auf Projekte verwenden.',
@@ -577,7 +609,7 @@ const I18N={
   h_gpsdb:'<b>Datenbank:</b> dieses Modul liest «Visita técnica»-Tickets direkt aus der GLPI-Datenbank. Die Zugangsdaten stehen in der Datei <code>config/config_db.php</code> Ihres GLPI.',
   l_dbhost:'DB-Host',l_dbname:'DB-Name',l_dbuser:'DB-Benutzer',l_dbpass:'DB-Passwort',adv2:'Erweitert',l_tz:'Zeitzone',h_tz:'z. B. <code>America/Argentina/Buenos_Aires</code>. Für den «Aktualisiert»-Stempel.',
   b_test:'Verbindung testen',b_save:'Speichern',m_testing:'Teste…',m_saving:'Speichern & Sync…',m_ok:'✓ Verbunden · {n} Status sichtbar',m_saved:'✓ Gespeichert · {n} Projekte',m_savefail:'Speichern fehlgeschlagen',m_reqfail:'Anfrage fehlgeschlagen',m_syncfail:'Gespeichert, aber Sync fehlgeschlagen: '},
- pt:{title:'Configuração',intro:'Você só precisa da <b>URL do seu GLPI</b> e <b>dois tokens</b>. O resto é opcional e já vem preenchido. Campos de senha são de escrita apenas: deixe em branco para manter o valor.',
+ pt:{title:'Configuração',back:'← Voltar ao painel',intro:'Você só precisa da <b>URL do seu GLPI</b> e <b>dois tokens</b>. O resto é opcional e já vem preenchido. Campos de senha são de escrita apenas: deixe em branco para manter o valor.',
   s1:'Conectar ao GLPI',l_url:'URL do GLPI',h_url:'O endereço onde você abre o GLPI (sem <code>/apirest.php</code> — adicionado sozinho).',
   h_app:'No GLPI: <b>Configuração → Geral → aba «API»</b>. Ative <b>«Habilitar a API REST»</b>, depois <b>«Adicionar cliente API»</b> e copie o <b>«Token de aplicação (app_token)»</b>.',
   l_user:'Token de usuário',h_user:'Usado pela <b>sincronização automática</b>. No GLPI: canto superior direito <b>seu nome → Preferências → «Chaves de acesso remoto»</b> → gere um <b>«Token API»</b>. Use um usuário com leitura de Projetos.',
@@ -637,11 +669,33 @@ const $=s=>document.querySelector(s);
 $('#lang').value=LANG;
 $('#lang').addEventListener('change',e=>{LANG=e.target.value;localStorage.setItem('pd-lang',LANG);applyI18n();});
 document.querySelectorAll('.appchip input').forEach(i=>i.addEventListener('change',()=>i.closest('.appchip').classList.toggle('on',i.checked)));
-// theme
+// Acordeón: al abrir una sección, cerrar las demás (solo una expandida a la vez). No toca el details anidado.
+document.querySelectorAll('#f > details.step').forEach(d=>d.addEventListener('toggle',()=>{
+  if(d.open) document.querySelectorAll('#f > details.step').forEach(o=>{ if(o!==d) o.open=false; });
+}));
+// theme (clave rh-theme, compartida con el dashboard)
 const themeNow=()=>document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
 const updTheme=()=>$('#theme').textContent=themeNow()==='dark'?'☀️':'🌙';
-$('#theme').addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('pd-theme',n);updTheme();});
+$('#theme').addEventListener('click',()=>{const n=themeNow()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('rh-theme',n);updTheme();});
 updTheme(); applyI18n();
+// Acento y tinte unificados con el dashboard: de la config pública + acento del usuario (localStorage), reaplicados en vivo.
+(function(){
+  let CFG=null;
+  function applyAccent(cfg){
+    try{ cfg=cfg||{}; const pals=cfg.palettes||{};
+      const k=localStorage.getItem('rh-accent');
+      const src=(k&&pals[k])?pals[k]:(cfg.branding||{});
+      const dark=(document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))==='dark';
+      const acc=(dark&&src.accent_dark)?src.accent_dark:src.accent;
+      if(acc)document.documentElement.style.setProperty('--ac',acc);
+      document.documentElement.style.setProperty('--tint', src.tint!=null?src.tint:'0%');
+      try{localStorage.setItem('rh-pal',JSON.stringify({a:src.accent||'',ad:src.accent_dark||'',t:(src.tint!=null?src.tint:'0%')}));}catch(e){}
+    }catch(e){}
+  }
+  fetch('config.php?_='+Date.now(),{credentials:'same-origin'}).then(r=>r.ok?r.json():null).then(c=>{CFG=c||{};applyAccent(CFG);}).catch(()=>{});
+  window.addEventListener('storage',e=>{ if(e.key==='rh-theme'){const v=localStorage.getItem('rh-theme'); v?document.documentElement.setAttribute('data-theme',v):document.documentElement.removeAttribute('data-theme'); updTheme();} applyAccent(CFG); });
+  try{ new MutationObserver(()=>applyAccent(CFG)).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']}); }catch(e){}
+})();
 // form
 const f=$('#f'), msg=$('#msg');
 const data=()=>{const o={};new FormData(f).forEach((v,k)=>{if(k==='crm_parents')return;o[k]=v;});
