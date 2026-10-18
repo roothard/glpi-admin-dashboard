@@ -435,6 +435,39 @@ main{padding-top:46px;padding-bottom:60px}
 .cmpchk input{width:15px;height:15px;accent-color:#405cde}
 .cmpcard .bdel{border:1px solid var(--border2);background:var(--surface);color:#e2506e;border-radius:8px;padding:8px 11px;cursor:pointer;font-size:14px;height:35px}
 .cmpedbar{display:flex;gap:10px;align-items:center;margin-top:10px}
+/* ---- Compliance: vista Por norma ---- */
+.cmpseg{display:inline-flex;gap:2px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:3px;margin-bottom:16px}
+.cmpsegb{font:600 13px var(--sans);color:var(--muted);background:transparent;border:0;border-radius:8px;padding:7px 16px;cursor:pointer}
+.cmpsegb.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.nmbar{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+.nmf{display:flex;flex-direction:column;gap:4px}
+.nmf>span{font:700 10px var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.nmf select{font:600 13.5px var(--sans);color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:9px;padding:8px 12px;min-width:200px}
+.nmnote{font:500 11.5px var(--sans);color:var(--dim);font-style:italic;align-self:center}
+.nmsum{display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.nmpct{display:flex;flex-direction:column;align-items:center;min-width:150px}
+.nmcounts{display:flex;gap:10px;flex-wrap:wrap}
+.nmchip{display:inline-flex;align-items:center;gap:7px;font:600 12px var(--mono);color:var(--muted);background:var(--surface2);border:1px solid var(--border2);border-radius:99px;padding:6px 12px}
+.nmchip i{width:9px;height:9px;border-radius:50%;flex:none}
+.nst-cubierto{background:#2fa671}.nst-parcial{background:#c88c00}.nst-brecha{background:#d9434f}.nst-sincontrol{background:var(--dim)}.nst-na{background:transparent;border:2px dashed var(--border2);width:7px;height:7px}
+.nmdom{margin-top:16px}
+.nmdom-h{font:700 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:0 0 8px;display:flex;justify-content:space-between}
+.nmreqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.nmreq{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;background:var(--surface);min-width:0}
+.nmreq i.nd{width:9px;height:9px;border-radius:50%;flex:none}
+.nmreq .nref{font:700 11px var(--mono);color:var(--dim);flex:none}
+.nmreq .ntit{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nmreq.gap{border-style:dashed}
+.nmpend{margin-top:18px}
+.nmpend-row{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--border)}
+.nmpend-row:last-child{border-bottom:none}
+.nmpend-row .pb{font:800 13px var(--mono);color:var(--accent);min-width:46px}
+.nmov{margin-top:18px;overflow:auto}
+.nmov table{border-collapse:collapse;font:600 12px var(--mono)}
+.nmov th,.nmov td{border:1px solid var(--border);padding:7px 11px;text-align:center}
+.nmov th{color:var(--dim);font-weight:700;background:var(--surface2)}
+.nmov td.d{background:var(--surface2);color:var(--dim)}
+.nmov .ovhi{color:#2fa671;font-weight:800}
 /* ---- app Tickets ---- */
 .kpis.k6{grid-template-columns:repeat(6,1fr)}
 @media(max-width:1100px){.kpis.k6{grid-template-columns:repeat(3,1fr)}}
@@ -693,16 +726,30 @@ body.dockon.dock-hidden #dockshow{transform:translate(0,-50%) rotate(-90deg)}
   </section>
 
   <section id="v-cumplimiento" class="appview">
-    <div class="kpis k5" id="cmp-kpis"></div>
-    <div class="panel anpanel">
-      <div class="cmphead"><h4 id="cmp-h" style="margin:0"></h4><button class="clr" id="cmp-edit" style="display:none"></button></div>
-      <div id="cmp-list"></div>
+    <div class="cmpseg" id="cmp-seg">
+      <button class="cmpsegb on" data-cv="procesos" id="cmpseg-procesos"></button>
+      <button class="cmpsegb" data-cv="normas" id="cmpseg-normas"></button>
     </div>
-    <div class="panel anpanel" id="cmp-detail" style="display:none"></div>
-    <div class="panel anpanel" id="cmp-editor" style="display:none">
-      <h4 id="cmp-ed-h"></h4>
-      <div id="cmp-ed-rows"></div>
-      <div class="cmpedbar"><button class="clr" id="cmp-add"></button><button class="clr on" id="cmp-save"></button><span id="cmp-ed-st"></span></div>
+    <div id="cmpv-procesos">
+      <div class="kpis k5" id="cmp-kpis"></div>
+      <div class="panel anpanel">
+        <div class="cmphead"><h4 id="cmp-h" style="margin:0"></h4><button class="clr" id="cmp-edit" style="display:none"></button></div>
+        <div id="cmp-list"></div>
+      </div>
+      <div class="panel anpanel" id="cmp-detail" style="display:none"></div>
+      <div class="panel anpanel" id="cmp-editor" style="display:none">
+        <h4 id="cmp-ed-h"></h4>
+        <div id="cmp-ed-rows"></div>
+        <div class="cmpedbar"><button class="clr" id="cmp-add"></button><button class="clr on" id="cmp-save"></button><span id="cmp-ed-st"></span></div>
+      </div>
+    </div>
+    <div id="cmpv-normas" style="display:none">
+      <div class="nmbar">
+        <label class="nmf"><span id="nm-l-fw"></span><select id="nm-fw"></select></label>
+        <label class="nmf"><span id="nm-l-ent"></span><select id="nm-ent"></select></label>
+        <span class="nmnote" id="nm-note"></span>
+      </div>
+      <div id="nm-body"></div>
     </div>
   </section>
   <section id="v-crm" class="appview">
@@ -898,6 +945,12 @@ Object.assign(I18N.en,{cmp_k_find:'With findings',cmp_lg_ok:'Up to date',cmp_lg_
 Object.assign(I18N.fr,{cmp_k_find:'Avec constats',cmp_lg_ok:'À jour',cmp_lg_find:'À jour, avec constats',cmp_lg_crit:'À jour, critique',cmp_lg_run:'En cours',cmp_lg_late:'Dépassé',cmp_lg_nodata:'Sans données',cmp_c_result:'Résultat',cmp_res_none:'non renseigné'});
 Object.assign(I18N.de,{cmp_k_find:'Mit Feststellungen',cmp_lg_ok:'Aktuell',cmp_lg_find:'Aktuell, mit Feststellungen',cmp_lg_crit:'Aktuell, kritisch',cmp_lg_run:'Laufend',cmp_lg_late:'Überfällig',cmp_lg_nodata:'Keine Daten',cmp_c_result:'Ergebnis',cmp_res_none:'nicht erfasst'});
 Object.assign(I18N.pt,{cmp_k_find:'Com apontamentos',cmp_lg_ok:'Em dia',cmp_lg_find:'Em dia, com apontamentos',cmp_lg_crit:'Em dia, crítico',cmp_lg_run:'Em curso',cmp_lg_late:'Vencido',cmp_lg_nodata:'Sem dados',cmp_c_result:'Resultado',cmp_res_none:'não registrado'});
+// Vista "Por norma" (mapeo ISO 27001 / ISO 9001 / NIS2).
+Object.assign(I18N.es,{cmp_tab_proc:'Procesos',cmp_tab_norm:'Por norma',nm_fw:'Norma',nm_ent:'Entidad',nm_note:'Mapeo interno — validar con el auditor',nm_pct:'cumplimiento',nm_reqs:'requisitos',nm_pending_h:'Qué implantar primero',nm_pending_none:'Todo cubierto o sin controles pendientes',nm_overlap_h:'Solapamiento entre normas',nm_overlap_sub:'Si cumplís la fila, cubrís este % de la columna',nm_controls:'Controles',nm_nocontrol:'sin control asignado',nm_empty:'Sin normas en alcance para esta entidad',nm_covers:'cubriría',nm_s_cubierto:'Cubierto',nm_s_parcial:'Parcial',nm_s_brecha:'Brecha',nm_s_sincontrol:'Sin control',nm_s_na:'No aplica'});
+Object.assign(I18N.en,{cmp_tab_proc:'Processes',cmp_tab_norm:'By standard',nm_fw:'Standard',nm_ent:'Entity',nm_note:'Internal mapping — validate with your auditor',nm_pct:'compliance',nm_reqs:'requirements',nm_pending_h:'What to implement first',nm_pending_none:'All covered or no pending controls',nm_overlap_h:'Overlap between standards',nm_overlap_sub:'If you meet the row, you cover this % of the column',nm_controls:'Controls',nm_nocontrol:'no control assigned',nm_empty:'No standards in scope for this entity',nm_covers:'would cover',nm_s_cubierto:'Covered',nm_s_parcial:'Partial',nm_s_brecha:'Gap',nm_s_sincontrol:'No control',nm_s_na:'N/A'});
+Object.assign(I18N.fr,{cmp_tab_proc:'Processus',cmp_tab_norm:'Par norme',nm_fw:'Norme',nm_ent:'Entité',nm_note:'Mapping interne — à valider avec l\'auditeur',nm_pct:'conformité',nm_reqs:'exigences',nm_pending_h:'Quoi mettre en place d\'abord',nm_pending_none:'Tout couvert ou aucun contrôle en attente',nm_overlap_h:'Chevauchement entre normes',nm_overlap_sub:'Si vous respectez la ligne, vous couvrez ce % de la colonne',nm_controls:'Contrôles',nm_nocontrol:'aucun contrôle assigné',nm_empty:'Aucune norme dans le périmètre de cette entité',nm_covers:'couvrirait',nm_s_cubierto:'Couvert',nm_s_parcial:'Partiel',nm_s_brecha:'Écart',nm_s_sincontrol:'Sans contrôle',nm_s_na:'N/A'});
+Object.assign(I18N.de,{cmp_tab_proc:'Prozesse',cmp_tab_norm:'Nach Norm',nm_fw:'Norm',nm_ent:'Entität',nm_note:'Interne Zuordnung — mit dem Auditor validieren',nm_pct:'Erfüllung',nm_reqs:'Anforderungen',nm_pending_h:'Was zuerst umsetzen',nm_pending_none:'Alles abgedeckt oder keine offenen Kontrollen',nm_overlap_h:'Überschneidung zwischen Normen',nm_overlap_sub:'Erfüllst du die Zeile, deckst du diesen % der Spalte ab',nm_controls:'Kontrollen',nm_nocontrol:'keine Kontrolle zugewiesen',nm_empty:'Keine Normen im Geltungsbereich dieser Entität',nm_covers:'würde abdecken',nm_s_cubierto:'Abgedeckt',nm_s_parcial:'Teilweise',nm_s_brecha:'Lücke',nm_s_sincontrol:'Keine Kontrolle',nm_s_na:'N/z'});
+Object.assign(I18N.pt,{cmp_tab_proc:'Processos',cmp_tab_norm:'Por norma',nm_fw:'Norma',nm_ent:'Entidade',nm_note:'Mapeamento interno — validar com o auditor',nm_pct:'conformidade',nm_reqs:'requisitos',nm_pending_h:'O que implementar primeiro',nm_pending_none:'Tudo coberto ou sem controles pendentes',nm_overlap_h:'Sobreposição entre normas',nm_overlap_sub:'Se cumprir a linha, cobre este % da coluna',nm_controls:'Controles',nm_nocontrol:'sem controle atribuído',nm_empty:'Sem normas no escopo desta entidade',nm_covers:'cobriria',nm_s_cubierto:'Coberto',nm_s_parcial:'Parcial',nm_s_brecha:'Lacuna',nm_s_sincontrol:'Sem controle',nm_s_na:'N/A'});
 Object.assign(I18N.es,{seeing:'Viendo',of:'de',why_h:'¿Qué proyectos veo?',why_p:'Ves los proyectos que tu usuario puede ver en GLPI, según tu perfil y tu entidad activa. El administrador puede además filtrar el tablero por tipo de proyecto. Si esperás un proyecto y no aparece, revisá esas tres cosas en GLPI: permisos del perfil, entidad y tipo.',why_filter:'Filtro de tipo',untyped:'Sin tipo',nt_note:'proyecto(s) sin tipo en GLPI — se muestran con el aviso «Sin tipo»'});
 Object.assign(I18N.en,{seeing:'Showing',of:'of',why_h:'Which projects do I see?',why_p:'You see the projects your user can see in GLPI, based on your profile and active entity. The administrator can also filter the board by project type. If a project you expect is missing, check those three things in GLPI: profile permissions, entity and type.',why_filter:'Type filter',untyped:'Untyped',nt_note:'project(s) with no type in GLPI — shown with an “Untyped” notice'});
 Object.assign(I18N.fr,{seeing:'Affichage',of:'sur',why_h:'Quels projets est-ce que je vois ?',why_p:'Vous voyez les projets que votre utilisateur peut voir dans GLPI, selon votre profil et votre entité active. L\'administrateur peut aussi filtrer le tableau par type de projet. S\'il manque un projet attendu, vérifiez ces trois points dans GLPI : permissions du profil, entité et type.',why_filter:'Filtre de type',untyped:'Sans type',nt_note:'projet(s) sans type dans GLPI — affichés avec la mention « Sans type »'});
@@ -940,7 +993,7 @@ if($leye&&$lpass){
 
 // ---- idioma (sincroniza header + login) ----
 const $lang=$('#lang'), $llang=$('#l-lang'); $lang.value=LANG; if($llang)$llang.value=LANG;
-function setLang(v){LANG=v;localStorage.setItem('rh-lang',LANG);$lang.value=LANG;if($llang)$llang.value=LANG;applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();if(TK.data)renderTickets();if(CMP.data)renderCmp();}
+function setLang(v){LANG=v;localStorage.setItem('rh-lang',LANG);$lang.value=LANG;if($llang)$llang.value=LANG;applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();if(TK.data)renderTickets();if(CMP.data)renderCmp();if(typeof cmpSegLabels==='function')cmpSegLabels();if(NM.data)renderNormas();}
 $lang.addEventListener('change',()=>setLang($lang.value));
 if($llang)$llang.addEventListener('change',()=>setLang($llang.value));
 function applyStatic(){
@@ -1919,6 +1972,99 @@ $('#cmp-save').addEventListener('click',()=>{
     .then(r=>r.json()).then(j=>{ if(j&&j.ok){$('#cmp-ed-st').textContent=T('cmp_saved');CMP.editing=false;CMP.draft=null;fetchCumplimiento();} else $('#cmp-ed-st').textContent=T('cmp_err'); })
     .catch(()=>{$('#cmp-ed-st').textContent=T('cmp_err');});
 });
+
+// ---- Compliance: vista "Por norma" (mapeo ISO 27001 / ISO 9001 / NIS2) ----
+// Consume data-normas.php: % por norma, estado por requisito, controles
+// pendientes y matriz de solapamiento. El mapeo es criterio propio.
+let NM={data:null,fw:null,ent:null,sub:'procesos'};
+function cmpSegLabels(){const a=$('#cmpseg-procesos'),b=$('#cmpseg-normas');if(a)a.textContent=T('cmp_tab_proc');if(b)b.textContent=T('cmp_tab_norm');}
+function cmpSetSub(v){
+  NM.sub=v;
+  document.querySelectorAll('.cmpsegb').forEach(b=>b.classList.toggle('on',b.dataset.cv===v));
+  const pv=$('#cmpv-procesos'),nv=$('#cmpv-normas'); if(pv)pv.style.display=v==='procesos'?'':'none'; if(nv)nv.style.display=v==='normas'?'':'none';
+  if(v==='normas'&&!NM.data) fetchNormas();
+}
+document.querySelectorAll('.cmpsegb').forEach(b=>b.addEventListener('click',()=>cmpSetSub(b.dataset.cv)));
+function fetchNormas(ent){
+  const q=ent!=null&&ent!==''?('?ent='+encodeURIComponent(ent)):'';
+  $('#nm-body').innerHTML='<div class="empty">…</div>';
+  fetch('data-normas.php'+q,{credentials:'same-origin'})
+    .then(r=>{if(r.status===401){showLogin();return null;}return r.json();})
+    .then(d=>{if(!d)return;NM.data=d;NM.ent=d.entId;if(!NM.fw||!(d.fwKeys||[]).includes(NM.fw))NM.fw=(d.fwKeys||[])[0]||null;renderNormas();})
+    .catch(()=>{$('#nm-body').innerHTML='<div class="empty">'+T('noData')+'</div>';});
+}
+if($('#nm-fw'))$('#nm-fw').addEventListener('change',e=>{NM.fw=e.target.value;renderNormas();});
+if($('#nm-ent'))$('#nm-ent').addEventListener('change',e=>{NM.fw=null;fetchNormas(e.target.value);});
+function renderNormas(){
+  const d=NM.data; if(!d)return;
+  $('#nm-l-fw').textContent=T('nm_fw'); $('#nm-l-ent').textContent=T('nm_ent'); $('#nm-note').textContent=T('nm_note');
+  const fws=d.fwKeys||[];
+  $('#nm-fw').innerHTML=fws.map(k=>'<option value="'+k+'"'+(k===NM.fw?' selected':'')+'>'+esc((d.frameworks[k]||{}).short||k)+'</option>').join('');
+  const ents=d.scope||[];
+  $('#nm-ent').innerHTML=ents.map(e=>'<option value="'+e.id+'"'+(e.id===d.entId?' selected':'')+'>'+esc(e.name)+'</option>').join('');
+  $('#nm-ent').parentElement.style.display=ents.length>1?'':'none';
+  const body=$('#nm-body');
+  if(!fws.length){body.innerHTML='<div class="empty">'+T('nm_empty')+'</div>';return;}
+  const fw=d.frameworks[NM.fw]; if(!fw){body.innerHTML='';return;}
+  const c=fw.counts||{};
+  let h='<div class="panel anpanel"><div class="nmsum">';
+  h+='<div class="nmpct">'+nmRadial(fw)+'</div>';
+  h+='<div style="flex:1;min-width:220px"><div style="font:700 15px var(--sans);margin-bottom:8px">'+esc(fw.name)+'</div><div class="nmcounts">'
+    +nmChip('cubierto',T('nm_s_cubierto'),c.cubierto||0)
+    +nmChip('parcial',T('nm_s_parcial'),c.parcial||0)
+    +nmChip('brecha',T('nm_s_brecha'),Math.max(0,(c.brecha||0)-(c.sincontrol||0)))
+    +nmChip('sincontrol',T('nm_s_sincontrol'),c.sincontrol||0)
+    +'</div><div style="font:500 11.5px var(--sans);color:var(--dim);margin-top:10px;max-width:560px;line-height:1.5">'+esc(fw.note||'')+'</div></div>';
+  h+='</div></div>';
+  (fw.domains||[]).forEach(dom=>{
+    const reqs=dom.reqs||[];
+    const cub=reqs.filter(r=>r.status==='cubierto').length;
+    h+='<div class="panel anpanel nmdom"><div class="nmdom-h"><span>'+esc(dom.name)+'</span><span>'+cub+' / '+reqs.length+'</span></div><div class="nmreqs">';
+    h+=reqs.map(r=>{
+      const tip=(r.controls||[]).length?(T('nm_controls')+': '+r.controls.map(x=>x.name).join(', ')):T('nm_nocontrol');
+      return '<div class="nmreq'+(r.status==='sincontrol'||r.status==='brecha'?' gap':'')+'" title="'+esc(tip)+'"><i class="nd nst-'+r.status+'"></i><span class="nref">'+esc(r.ref)+'</span><span class="ntit">'+esc(r.title)+'</span></div>';
+    }).join('');
+    h+='</div></div>';
+  });
+  const pend=d.pending||[];
+  h+='<div class="panel anpanel nmpend"><h4 style="margin:0 0 6px">'+T('nm_pending_h')+'</h4>';
+  if(!pend.length) h+='<div class="empty">'+T('nm_pending_none')+'</div>';
+  else h+=pend.map(p=>{
+    const per=Object.entries(p.byFw||{}).map(([k,n])=>esc(((d.frameworks[k]||{}).short||k)+' '+n)).join(' · ');
+    const dot=p.state==='ok_crit'?'ok_crit':p.state==='ok_find'?'ok_find':p.state;
+    return '<div class="nmpend-row"><span class="pb">+'+p.total+'</span><div class="cmpname" style="flex:1"><b>'+esc(p.name)+'</b><small>'+T('nm_covers')+' '+p.total+' '+T('nm_reqs')+(per?' · '+per:'')+'</small></div><span class="cmplg"><i class="'+dot+'"></i></span></div>';
+  }).join('');
+  h+='</div>';
+  if(fws.length>1){
+    h+='<div class="panel anpanel nmov"><h4 style="margin:0 0 2px">'+T('nm_overlap_h')+'</h4><div style="font:500 11.5px var(--sans);color:var(--dim);margin-bottom:10px">'+T('nm_overlap_sub')+'</div>';
+    h+='<table><thead><tr><th></th>'+fws.map(k=>'<th>'+esc((d.frameworks[k]||{}).short||k)+'</th>').join('')+'</tr></thead><tbody>';
+    h+=fws.map(a=>'<tr><th>'+esc((d.frameworks[a]||{}).short||a)+'</th>'+fws.map(b=>{
+      if(a===b)return '<td class="d">—</td>';
+      const v=((d.overlap||{})[a]||{})[b];
+      return '<td'+(v>=50?' class="ovhi"':'')+'>'+(v==null?'–':v+'%')+'</td>';
+    }).join('')+'</tr>').join('');
+    h+='</tbody></table></div>';
+  }
+  body.innerHTML=h;
+}
+function nmChip(st,label,n){return '<span class="nmchip"><i class="nst-'+st+'"></i>'+esc(label)+' '+n+'</span>';}
+function nmRadial(fw){
+  const reqs=[]; (fw.domains||[]).forEach(dom=>(dom.reqs||[]).forEach(r=>reqs.push(r)));
+  const N=reqs.length||1, cx=86,cy=86,ri=52,ro=80;
+  const col={cubierto:'#2fa671',parcial:'#c88c00',brecha:'#d9434f',sincontrol:'#6b7280',na:'#2b2b31'};
+  const pol=(a,r)=>[(cx+r*Math.cos(a)).toFixed(2),(cy+r*Math.sin(a)).toFixed(2)];
+  let segs='';
+  reqs.forEach((r,i)=>{
+    const a0=-Math.PI/2+(i/N)*2*Math.PI, a1=-Math.PI/2+((i+1)/N)*2*Math.PI-(N>40?0.004:0.02);
+    const [x0,y0]=pol(a0,ri),[x1,y1]=pol(a0,ro),[x2,y2]=pol(a1,ro),[x3,y3]=pol(a1,ri);
+    segs+='<path d="M'+x0+' '+y0+' L'+x1+' '+y1+' A'+ro+' '+ro+' 0 0 1 '+x2+' '+y2+' L'+x3+' '+y3+' A'+ri+' '+ri+' 0 0 0 '+x0+' '+y0+' Z" fill="'+(col[r.status]||'#6b7280')+'"><title>'+esc(r.ref+' · '+r.title)+'</title></path>';
+  });
+  return '<svg viewBox="0 0 172 172" width="150" height="150" role="img">'+segs
+    +'<circle cx="86" cy="86" r="50" fill="var(--surface)"/>'
+    +'<text x="86" y="82" text-anchor="middle" style="font:800 30px var(--sans);fill:var(--text)">'+fw.pct+'%</text>'
+    +'<text x="86" y="102" text-anchor="middle" style="font:600 9px var(--mono);fill:var(--dim);letter-spacing:.08em">'+esc((T('nm_pct')||'').toUpperCase())+'</text></svg>';
+}
+cmpSegLabels();
 
 // ---- navegación: apps (hub/proyectos/fichadas) + tabs de proyectos ----
 // recordar dónde estaba el usuario (app y pestaña) para que recargar no lo mueva
