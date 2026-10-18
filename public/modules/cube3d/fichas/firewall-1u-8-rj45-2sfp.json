@@ -1,0 +1,47 @@
+{
+ "version": 1,
+ "id": "firewall-1u-8-rj45-2sfp",
+ "nombre": "Firewall 1U · 8 RJ45 + 2 SFP",
+ "tipo": "firewall",
+ "montaje": "rack",
+ "alto_u": 1,
+ "profundidad_mm": 250,
+ "ancho_chasis_mm": 440,
+ "acabado": "grafito",
+ "cuerpo": "chapa",
+ "cara_conectores": "frontal",
+ "frente": {
+  "tipo": "puertos",
+  "orejas_mm": 21.3,
+  "puertos": {
+   "rj45": {
+    "cantidad": 8,
+    "filas": 1,
+    "numeracion": "secuencial",
+    "x_ini_mm": 150,
+    "paso_mm": 18,
+    "y_mm": [
+     24
+    ]
+   },
+   "extra": {
+    "tipo": "sfp",
+    "cantidad": 2,
+    "x_ini_mm": 320,
+    "paso_mm": 24,
+    "filas": 1,
+    "y_mm": [
+     24
+    ]
+   },
+   "leds": true,
+   "area_izq": {
+    "x_mm": 28,
+    "barras": false
+   }
+  }
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

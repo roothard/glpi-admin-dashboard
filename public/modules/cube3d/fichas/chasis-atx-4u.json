@@ -1,0 +1,46 @@
+{
+ "version": 1,
+ "id": "chasis-atx-4u",
+ "nombre": "Chasis ATX 4U",
+ "tipo": "chasis",
+ "montaje": "rack",
+ "alto_u": 4,
+ "profundidad_mm": 650,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "#1a1c21",
+ "cara_conectores": "trasera",
+ "frente": {
+  "tipo": "chasis",
+  "bahias_5_25": 3,
+  "orejas_mm": 20,
+  "rejilla": true
+ },
+ "trasera": {
+  "estilo": "chasis",
+  "puertos": [
+   {
+    "id": "onboard",
+    "tipo": "rj45",
+    "fx": 0.16,
+    "fy": 0.22
+   },
+   {
+    "id": "pcie",
+    "tipo": "rj45",
+    "fx": 0.2,
+    "fy": 0.62
+   }
+  ],
+  "defecto": "onboard",
+  "alias": [
+   {
+    "patron": "corosync|pcie|nic0",
+    "id": "pcie"
+   }
+  ]
+ },
+ "supuestos": [
+  "Chasis genérico: la disposición real de bahías y ranuras no está en el inventario."
+ ]
+}

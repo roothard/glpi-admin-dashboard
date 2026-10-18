@@ -1,0 +1,22 @@
+{
+ "version": 1,
+ "id": "equipo-generico",
+ "nombre": "Equipo genérico (alto según inventario)",
+ "tipo": "generico",
+ "montaje": "rack",
+ "alto_u": null,
+ "profundidad_mm": 400,
+ "ancho_chasis_mm": 447,
+ "acabado": "grafito",
+ "cuerpo": "#1a1c21",
+ "frente": {
+  "tipo": "panel",
+  "variante": "generico"
+ },
+ "trasera": {
+  "estilo": "plano"
+ },
+ "supuestos": [
+  "No hay una ficha para este equipo: se dibuja una caja genérica con el alto del inventario."
+ ]
+}

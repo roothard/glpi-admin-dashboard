@@ -1,0 +1,39 @@
+{
+ "version": 1,
+ "id": "firewall-sobremesa-10-rj45",
+ "nombre": "Firewall de sobremesa · 10 RJ45",
+ "tipo": "firewall",
+ "montaje": "sobremesa",
+ "dimensiones_mm": [
+  216,
+  33,
+  160
+ ],
+ "acabado": "grafito",
+ "cuerpo": "#c9cdd3",
+ "cara_conectores": "frontal",
+ "frente": {
+  "tipo": "puertos",
+  "orejas_mm": 0,
+  "puertos": {
+   "rj45": {
+    "cantidad": 10,
+    "filas": 1,
+    "numeracion": "secuencial",
+    "x_ini_mm": 20,
+    "paso_mm": 18,
+    "y_mm": [
+     21
+    ]
+   },
+   "leds": true,
+   "area_izq": {
+    "x_mm": 6,
+    "barras": false
+   }
+  }
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

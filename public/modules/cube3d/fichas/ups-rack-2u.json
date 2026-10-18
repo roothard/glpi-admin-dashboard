@@ -1,0 +1,20 @@
+{
+ "version": 1,
+ "id": "ups-rack-2u",
+ "nombre": "UPS de rack 2U",
+ "tipo": "ups",
+ "montaje": "rack",
+ "alto_u": 2,
+ "profundidad_mm": 450,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "#16181d",
+ "frente": {
+  "tipo": "ups",
+  "forma": "rack",
+  "pantalla": true
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

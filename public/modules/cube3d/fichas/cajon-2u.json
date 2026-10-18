@@ -1,0 +1,19 @@
+{
+ "version": 1,
+ "id": "cajon-2u",
+ "nombre": "Cajón de rack 2U",
+ "tipo": "cajon",
+ "montaje": "rack",
+ "alto_u": 2,
+ "profundidad_mm": 500,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "#16181d",
+ "frente": {
+  "tipo": "panel",
+  "variante": "cajon"
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

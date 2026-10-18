@@ -1,0 +1,16 @@
+{
+  "id": "cube3d",
+  "nombre": "Datacenter 3D",
+  "nombre_i18n": {
+    "es": "Datacenter 3D",
+    "en": "3D Datacenter",
+    "fr": "Datacenter 3D",
+    "de": "3D-Rechenzentrum",
+    "pt": "Datacenter 3D"
+  },
+  "descripcion": "Vista 3D del rack a partir del inventario de GLPI.",
+  "icono": "box",
+  "entrada": "index.php",
+  "orden": 60,
+  "entidades": []
+}

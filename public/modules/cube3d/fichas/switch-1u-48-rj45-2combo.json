@@ -1,0 +1,48 @@
+{
+ "version": 1,
+ "id": "switch-1u-48-rj45-2combo",
+ "nombre": "Switch 1U · 48 RJ45 + 2 combo",
+ "tipo": "switch",
+ "montaje": "rack",
+ "alto_u": 1,
+ "profundidad_mm": 257,
+ "ancho_chasis_mm": 440,
+ "acabado": "negro",
+ "cuerpo": "chapa",
+ "cara_conectores": "frontal",
+ "frente": {
+  "tipo": "puertos",
+  "orejas_mm": 21.3,
+  "puertos": {
+   "rj45": {
+    "cantidad": 48,
+    "filas": 2,
+    "numeracion": "alterna",
+    "x_ini_mm": 96,
+    "paso_mm": 13.2,
+    "y_mm": [
+     13.2,
+     28.2
+    ]
+   },
+   "extra": {
+    "tipo": "combo",
+    "cantidad": 2,
+    "x_ini_mm": 421,
+    "paso_mm": 22,
+    "filas": 1,
+    "y_mm": [
+     20.7
+    ]
+   },
+   "leds": true,
+   "area_izq": {
+    "x_mm": 28,
+    "barras": true
+   }
+  }
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}
