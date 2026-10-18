@@ -405,11 +405,21 @@ main{padding-top:46px;padding-bottom:60px}
 .cmprow:hover{background:var(--surface2)}
 .cmpdot{width:10px;height:10px;border-radius:50%;flex:none}
 .cmpdot.ok{background:#2fa671}.cmpdot.run{background:#405cde}.cmpdot.late{background:#e2506e}.cmpdot.nodata{background:transparent;border:2px dashed var(--dim);width:8px;height:8px}
+.cmpdot.ok_find{background:#c88c00}.cmpdot.ok_crit{background:#d9434f}
+.kpis.k5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:900px){.kpis.k5{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.kpis.k5{grid-template-columns:repeat(2,1fr)}}
+.cmplegend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:2px 4px 12px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.cmplg{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--mono);color:var(--muted);white-space:nowrap}
+.cmplg i{width:9px;height:9px;border-radius:50%;flex:none}
+.cmplg i.ok{background:#2fa671}.cmplg i.ok_find{background:#c88c00}.cmplg i.ok_crit{background:#d9434f}.cmplg i.run{background:#405cde}.cmplg i.late{background:#e2506e}.cmplg i.nodata{background:transparent;border:2px dashed var(--dim);width:7px;height:7px}
 .cmpname b{font-size:14px}.cmpname small{display:block;color:var(--dim);font-size:11px;margin-top:2px}
 .cmpwhen{font:600 12px var(--mono);color:var(--muted);text-align:right;white-space:nowrap}
 .cmpwhen.late{color:#e2506e;font-weight:800}
+.cmpwhen.ok_find{color:#c88c00;font-weight:700}.cmpwhen.ok_crit{color:#d9434f;font-weight:800}
 .cyc{display:flex;gap:3px}
 .cyc i{width:9px;height:20px;border-radius:3px;background:#2fa671}
+.cyc i.find{background:#c88c00}.cyc i.crit{background:#d9434f}
 .cyc i.miss{background:var(--surface2);border:1px solid #e2506e88}
 .cyc i.cur{background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 3px,var(--border2) 3px,var(--border2) 6px)}
 .cmpent{font:700 10.5px var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.6px;padding:14px 4px 4px;border-bottom:1px solid var(--border2)}
@@ -683,7 +693,7 @@ body.dockon.dock-hidden #dockshow{transform:translate(0,-50%) rotate(-90deg)}
   </section>
 
   <section id="v-cumplimiento" class="appview">
-    <div class="kpis" id="cmp-kpis" style="grid-template-columns:repeat(4,1fr)"></div>
+    <div class="kpis k5" id="cmp-kpis"></div>
     <div class="panel anpanel">
       <div class="cmphead"><h4 id="cmp-h" style="margin:0"></h4><button class="clr" id="cmp-edit" style="display:none"></button></div>
       <div id="cmp-list"></div>
@@ -882,6 +892,12 @@ Object.assign(I18N.en,{app_cmp:'Compliance',cmp_h:'Critical processes',cmp_none:
 Object.assign(I18N.fr,{app_cmp:'Conformité',cmp_h:'Processus critiques',cmp_none:'Aucun processus défini — un administrateur peut les créer via « Gérer les processus »',cmp_k_ok:'À jour',cmp_k_late:'Dépassés',cmp_k_soon:'Échéance cette semaine',cmp_k_total:'Processus',cmp_last:'il y a',cmp_due:'échéance dans',cmp_overdue:'DÉPASSÉ depuis',cmp_never:'sans données',cmp_cycles:'12 derniers cycles',cmp_ev:'Preuves',cmp_ev_none:'Aucun ticket associé',cmp_done:'Résolu',cmp_edit:'Gérer les processus',cmp_add:'+ Processus',cmp_save:'Enregistrer',cmp_saved:'Enregistré ✓',cmp_err:'Échec de l\'enregistrement',cmp_del:'Supprimer',cmp_ed_name:'Nom',cmp_ed_every:'Fréquence',cmp_ed_cat:'Catégorie',cmp_ed_ent:'Entité',cmp_ent_all:'Toutes les entités',cmp_ed_grace:'Marge (j)',cmp_ed_owner:'Responsable',cmp_ed_group:'Groupe responsable',cmp_ed_ents:'Entités (clients)',ev_daily:'Quotidien',ev_weekly:'Hebdomadaire',ev_monthly:'Mensuel',ev_quarterly:'Trimestriel',ev_halfyearly:'Semestriel',ev_yearly:'Annuel'});
 Object.assign(I18N.de,{app_cmp:'Compliance',cmp_h:'Kritische Prozesse',cmp_none:'Keine Prozesse definiert — ein Administrator kann sie unter „Prozesse verwalten" anlegen',cmp_k_ok:'Aktuell',cmp_k_late:'Überfällig',cmp_k_soon:'Diese Woche fällig',cmp_k_total:'Prozesse',cmp_last:'vor',cmp_due:'fällig in',cmp_overdue:'ÜBERFÄLLIG seit',cmp_never:'keine Daten',cmp_cycles:'Letzte 12 Zyklen',cmp_ev:'Nachweise',cmp_ev_none:'Keine Tickets vorhanden',cmp_done:'Gelöst',cmp_edit:'Prozesse verwalten',cmp_add:'+ Prozess',cmp_save:'Speichern',cmp_saved:'Gespeichert ✓',cmp_err:'Speichern fehlgeschlagen',cmp_del:'Löschen',cmp_ed_name:'Name',cmp_ed_every:'Häufigkeit',cmp_ed_cat:'Kategorie',cmp_ed_ent:'Entität',cmp_ent_all:'Alle Entitäten',cmp_ed_grace:'Frist (T)',cmp_ed_owner:'Verantwortlich',cmp_ed_group:'Verantwortliche Gruppe',cmp_ed_ents:'Entitäten (Kunden)',ev_daily:'Täglich',ev_weekly:'Wöchentlich',ev_monthly:'Monatlich',ev_quarterly:'Vierteljährlich',ev_halfyearly:'Halbjährlich',ev_yearly:'Jährlich'});
 Object.assign(I18N.pt,{app_cmp:'Conformidade',cmp_h:'Processos críticos',cmp_none:'Nenhum processo definido — um administrador pode criá-los em "Gerenciar processos"',cmp_k_ok:'Em dia',cmp_k_late:'Vencidos',cmp_k_soon:'Vencem esta semana',cmp_k_total:'Processos',cmp_last:'há',cmp_due:'vence em',cmp_overdue:'VENCIDO há',cmp_never:'sem dados',cmp_cycles:'Últimos 12 ciclos',cmp_ev:'Evidência',cmp_ev_none:'Sem tickets de respaldo',cmp_done:'Resolvido',cmp_edit:'Gerenciar processos',cmp_add:'+ Processo',cmp_save:'Salvar',cmp_saved:'Salvo ✓',cmp_err:'Falha ao salvar',cmp_del:'Excluir',cmp_ed_name:'Nome',cmp_ed_every:'Frequência',cmp_ed_cat:'Categoria',cmp_ed_ent:'Entidade',cmp_ent_all:'Todas as entidades',cmp_ed_grace:'Tolerância (d)',cmp_ed_owner:'Responsável',cmp_ed_group:'Grupo responsável',cmp_ed_ents:'Entidades (clientes)',ev_daily:'Diário',ev_weekly:'Semanal',ev_monthly:'Mensal',ev_quarterly:'Trimestral',ev_halfyearly:'Semestral',ev_yearly:'Anual'});
+// Resultado del proceso (no solo ejecución): tipos de solución del ticket.
+Object.assign(I18N.es,{cmp_k_find:'Con hallazgos',cmp_lg_ok:'Al día',cmp_lg_find:'Al día con hallazgos',cmp_lg_crit:'Al día, crítico',cmp_lg_run:'En curso',cmp_lg_late:'Vencido',cmp_lg_nodata:'Sin datos',cmp_c_result:'Resultado',cmp_res_none:'sin registrar'});
+Object.assign(I18N.en,{cmp_k_find:'With findings',cmp_lg_ok:'Up to date',cmp_lg_find:'Up to date, with findings',cmp_lg_crit:'Up to date, critical',cmp_lg_run:'In progress',cmp_lg_late:'Overdue',cmp_lg_nodata:'No data',cmp_c_result:'Result',cmp_res_none:'not recorded'});
+Object.assign(I18N.fr,{cmp_k_find:'Avec constats',cmp_lg_ok:'À jour',cmp_lg_find:'À jour, avec constats',cmp_lg_crit:'À jour, critique',cmp_lg_run:'En cours',cmp_lg_late:'Dépassé',cmp_lg_nodata:'Sans données',cmp_c_result:'Résultat',cmp_res_none:'non renseigné'});
+Object.assign(I18N.de,{cmp_k_find:'Mit Feststellungen',cmp_lg_ok:'Aktuell',cmp_lg_find:'Aktuell, mit Feststellungen',cmp_lg_crit:'Aktuell, kritisch',cmp_lg_run:'Laufend',cmp_lg_late:'Überfällig',cmp_lg_nodata:'Keine Daten',cmp_c_result:'Ergebnis',cmp_res_none:'nicht erfasst'});
+Object.assign(I18N.pt,{cmp_k_find:'Com apontamentos',cmp_lg_ok:'Em dia',cmp_lg_find:'Em dia, com apontamentos',cmp_lg_crit:'Em dia, crítico',cmp_lg_run:'Em curso',cmp_lg_late:'Vencido',cmp_lg_nodata:'Sem dados',cmp_c_result:'Resultado',cmp_res_none:'não registrado'});
 Object.assign(I18N.es,{seeing:'Viendo',of:'de',why_h:'¿Qué proyectos veo?',why_p:'Ves los proyectos que tu usuario puede ver en GLPI, según tu perfil y tu entidad activa. El administrador puede además filtrar el tablero por tipo de proyecto. Si esperás un proyecto y no aparece, revisá esas tres cosas en GLPI: permisos del perfil, entidad y tipo.',why_filter:'Filtro de tipo',untyped:'Sin tipo',nt_note:'proyecto(s) sin tipo en GLPI — se muestran con el aviso «Sin tipo»'});
 Object.assign(I18N.en,{seeing:'Showing',of:'of',why_h:'Which projects do I see?',why_p:'You see the projects your user can see in GLPI, based on your profile and active entity. The administrator can also filter the board by project type. If a project you expect is missing, check those three things in GLPI: profile permissions, entity and type.',why_filter:'Type filter',untyped:'Untyped',nt_note:'project(s) with no type in GLPI — shown with an “Untyped” notice'});
 Object.assign(I18N.fr,{seeing:'Affichage',of:'sur',why_h:'Quels projets est-ce que je vois ?',why_p:'Vous voyez les projets que votre utilisateur peut voir dans GLPI, selon votre profil et votre entité active. L\'administrateur peut aussi filtrer le tableau par type de projet. S\'il manque un projet attendu, vérifiez ces trois points dans GLPI : permissions du profil, entité et type.',why_filter:'Filtre de type',untyped:'Sans type',nt_note:'projet(s) sans type dans GLPI — affichés avec la mention « Sans type »'});
@@ -1790,7 +1806,7 @@ function fetchCumplimiento(){
 function renderCmp(){
   const d=CMP.data; if(!d)return;
   const k=d.kpis||{};
-  $('#cmp-kpis').innerHTML=[[(k.ok||0)+' / '+(k.total||0),T('cmp_k_ok')],[k.late||0,T('cmp_k_late')],[k.soon||0,T('cmp_k_soon')],[k.total||0,T('cmp_k_total')]]
+  $('#cmp-kpis').innerHTML=[[(k.ok||0)+' / '+(k.total||0),T('cmp_k_ok')],[k.find||0,T('cmp_k_find')],[k.late||0,T('cmp_k_late')],[k.soon||0,T('cmp_k_soon')],[k.total||0,T('cmp_k_total')]]
     .map(x=>`<div class="kpi"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('');
   $('#cmp-h').textContent=T('cmp_h');
   const eb=$('#cmp-edit'); eb.style.display=d.canEdit?'':'none'; eb.textContent=T('cmp_edit');
@@ -1799,17 +1815,21 @@ function renderCmp(){
   const procs=(d.procs||[]).slice().sort((a,b)=>String(a.ent||'').localeCompare(String(b.ent||''))||String(a.name).localeCompare(String(b.name)));
   const multiEnt=new Set(procs.map(p=>p.ent||'')).size>1;
   if(!procs.length) box.innerHTML='<div class="empty">'+T('cmp_none')+'</div>';
+  if(procs.length) box.appendChild(el('div','cmplegend',
+    [['ok','cmp_lg_ok'],['ok_find','cmp_lg_find'],['ok_crit','cmp_lg_crit'],['run','cmp_lg_run'],['late','cmp_lg_late'],['nodata','cmp_lg_nodata']]
+      .map(g=>'<span class="cmplg"><i class="'+g[0]+'"></i>'+esc(T(g[1]))+'</span>').join('')));
   let curEnt=null;
   procs.forEach(p=>{
     if(multiEnt&&(p.ent||'')!==curEnt){curEnt=p.ent||'';box.appendChild(el('div','cmpent',esc(curEnt||T('cmp_ent_all'))));}
     const row=el('div','cmprow');
     const when = p.state==='late' ? `<div class="cmpwhen late">${T('cmp_overdue')} ${Math.abs(p.dueIn)} d</div>`
       : p.state==='nodata' ? `<div class="cmpwhen">${T('cmp_never')}</div>`
-      : `<div class="cmpwhen">${p.days!=null?T('cmp_last')+' '+p.days+' d':''}${p.dueIn!=null?' · '+T('cmp_due')+' '+p.dueIn+' d':''}</div>`;
+      : `<div class="cmpwhen ${p.state==='ok_find'||p.state==='ok_crit'?p.state:''}">${p.days!=null?T('cmp_last')+' '+p.days+' d':''}${p.dueIn!=null?' · '+T('cmp_due')+' '+p.dueIn+' d':''}</div>`;
     // barra de ciclos: el histórico es lo que convierte un semáforo en un argumento de auditoría
+    // cada ciclo cumplido se tiñe según su resultado (verde / ámbar hallazgos / rojo crítico)
     const segs=p.cycles.map((c,i)=>{
       const last=i===p.cycles.length-1;
-      const cls=c?'':(last?(p.state==='late'?'miss':'cur'):'miss');
+      const cls=c?(c==='find'?'find':c==='crit'?'crit':''):(last?(p.state==='late'?'miss':'cur'):'miss');
       return `<i class="${cls}"></i>`;
     }).join('');
     const resp=[p.owner,p.grp].filter(Boolean).join(' · ');
@@ -1826,14 +1846,17 @@ function renderCmpDetail(){
   const p=d&&(d.procs||[]).find(x=>x.id===CMP.sel);
   if(!p){box.style.display='none';return;}
   box.style.display='';
+  const resCls=s=>{const x=(s||'').toLowerCase().replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i').replace(/[óòö]/g,'o').replace(/[úùü]/g,'u');
+    return x.indexOf('critic')>=0?'ok_crit':(x.indexOf('hallazgo')>=0&&x.indexOf('sin')<0?'ok_find':'');};
   const rows=(p.ev||[]).map(e=>{
     const st=TKST[e.s]||['st1','#888'];
+    const rc=resCls(e.stype), res=e.stype?`<span class="cmplg"><i class="${rc||'ok'}"></i>${esc(e.stype)}</span>`:`<i class="crmna">${T('cmp_res_none')}</i>`;
     return `<tr class="tk-row" data-id="${e.id}"><td>${e.id}</td><td>${esc(e.t)}</td>
       <td><span class="tkst" style="background:${st[1]}22;color:${st[1]}">${T(st[0])}</span></td>
-      <td>${fmtDT(e.date)}</td><td>${fmtDT(e.done)}</td><td>${esc(e.tech||'—')}</td></tr>`;
+      <td>${res}</td><td>${fmtDT(e.date)}</td><td>${fmtDT(e.done)}</td><td>${esc(e.tech||'—')}</td></tr>`;
   }).join('');
   box.innerHTML=`<h4>${T('cmp_ev')} — ${esc(p.name)}</h4>`+(rows
-    ?`<table class="ftable"><thead><tr><th>#</th><th>${T('tk_c_title')}</th><th>${T('tk_c_st')}</th><th>${T('tk_c_open')}</th><th>${T('cmp_done')}</th><th>${T('tk_c_tech')}</th></tr></thead><tbody>${rows}</tbody></table>`
+    ?`<table class="ftable"><thead><tr><th>#</th><th>${T('tk_c_title')}</th><th>${T('tk_c_st')}</th><th>${T('cmp_c_result')}</th><th>${T('tk_c_open')}</th><th>${T('cmp_done')}</th><th>${T('tk_c_tech')}</th></tr></thead><tbody>${rows}</tbody></table>`
     :`<div class="empty">${T('cmp_ev_none')}</div>`);
   if(d.glpi_url) box.querySelectorAll('tr.tk-row').forEach(tr=>
     tr.addEventListener('click',()=>window.open(d.glpi_url+'/front/ticket.form.php?id='+tr.dataset.id,'_blank','noopener')));

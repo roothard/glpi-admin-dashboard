@@ -7,9 +7,11 @@
  * queried with the logged-in user's session. The panel does not verify the
  * backups — it verifies that somebody verified the backups.
  *
- * States: ok (last done within period+grace) / run (open ticket, not due) /
- * late (due date passed) / nodata (never happened). The cycle history bar is
- * what turns a traffic light into an audit argument.
+ * States: ok (last done within period+grace, clean result) / ok_find (al día
+ * con hallazgos) / ok_crit (al día, resultado crítico) / run (open ticket, not
+ * due) / late (due date passed) / nodata (never happened). The result tier is
+ * read from the ticket's Solution type (search field 23). The cycle history bar
+ * is what turns a traffic light into an audit argument.
  * @license MIT
  */
 require dirname(__DIR__) . '/lib.php';
@@ -19,7 +21,7 @@ header('Content-Type: application/json; charset=utf-8');
 if (empty($_SESSION['glpi_token'])) { http_response_code(401); echo json_encode(['auth' => false]); exit; }
 $tok = $_SESSION['glpi_token'];
 
-const CF      = ['id' => 2, 'title' => 1, 'status' => 12, 'date' => 15, 'close' => 16, 'solve' => 17, 'cat' => 7, 'tech' => 5, 'ent' => 80];
+const CF      = ['id' => 2, 'title' => 1, 'status' => 12, 'date' => 15, 'close' => 16, 'solve' => 17, 'cat' => 7, 'tech' => 5, 'ent' => 80, 'stype' => 23];
 const PERIODS = ['daily' => 1, 'weekly' => 7, 'monthly' => 30, 'quarterly' => 91, 'halfyearly' => 182, 'yearly' => 365];
 const CYCLES  = 12; // segments in the history bar
 
@@ -52,6 +54,21 @@ function cv($row, $f) { $v = $row[(string)CF[$f]] ?? ($row[CF[$f]] ?? null);
     if (is_array($v)) { $v = implode(', ', array_filter(array_map('strval', $v))); }
     return $v === '' ? null : $v; }
 
+// El panel no solo mira si se ejecutó: mira el RESULTADO. Lo lee del Tipo de
+// solución del ticket (campo 23, que devuelve el nombre). Convención RootHard:
+// "Sin hallazgos" = al día, "Con hallazgos" = ámbar, "Con hallazgos críticos" = rojo.
+function cmpFinding(?string $stype): string
+{
+    $s = $stype === null ? '' : mb_strtolower(trim($stype));
+    if ($s === '') { return 'ok'; }                       // sin resultado = al día (como antes)
+    $s = strtr($s, ['á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u']);
+    if (strpos($s, 'critic') !== false)                    { return 'ok_crit'; }
+    if (strpos($s, 'hallazgo') !== false && strpos($s, 'sin') === false) { return 'ok_find'; }
+    return 'ok';
+}
+// Orden de severidad, para quedarse con el peor resultado de un ciclo.
+function cmpRank(string $lvl): int { return ['ok' => 0, 'find' => 1, 'crit' => 2][$lvl] ?? 0; }
+
 $now = time();
 $result = []; $techIds = [];
 
@@ -78,28 +95,35 @@ function evalProc(array $p, ?int $entId, string $entName, int $now, array &$tech
         ['link' => 'AND', 'field' => CF['status'], 'searchtype' => 'equals', 'value' => 'notold'],
     ]), $tok);
 
-    $done = [];
+    $done = []; // cada evidencia con su fecha y su tipo de solución
     foreach ($old as $r) {
         $d = cv($r, 'solve') ?: cv($r, 'close') ?: cv($r, 'date');
         $ts = $d ? strtotime($d) : null;
-        if ($ts) { $done[] = $ts; }
+        if ($ts) { $done[] = ['ts' => $ts, 'stype' => cv($r, 'stype')]; }
     }
-    rsort($done);
-    $lastDone = $done[0] ?? null;
+    usort($done, fn($a, $b) => $b['ts'] <=> $a['ts']);
+    $lastDone  = $done[0]['ts'] ?? null;
+    $lastStype = $done[0]['stype'] ?? null;
 
     $due = $lastDone ? $lastDone + $P + $grace : null;
     if ($lastDone === null && !$open) { $state = 'nodata'; }
     elseif ($lastDone === null)       { $state = 'run'; }
     elseif ($now > $due)              { $state = 'late'; }
     elseif ($open)                    { $state = 'run'; }
-    else                              { $state = 'ok'; }
+    else                              { $state = cmpFinding($lastStype); } // ok | ok_find | ok_crit
 
     $cycles = [];
+    $lvlOf  = ['ok' => 'ok', 'ok_find' => 'find', 'ok_crit' => 'crit'];
     for ($i = CYCLES - 1; $i >= 0; $i--) {
         $from = $now - ($i + 1) * $P; $to = $now - $i * $P;
-        $hit = false;
-        foreach ($done as $ts) { if ($ts >= $from && $ts < $to) { $hit = true; break; } }
-        $cycles[] = $hit ? 1 : 0;
+        $hit = null; // peor resultado del ciclo (null = ciclo sin evidencia)
+        foreach ($done as $x) {
+            if ($x['ts'] >= $from && $x['ts'] < $to) {
+                $lvl = $lvlOf[cmpFinding($x['stype'])];
+                if ($hit === null || cmpRank($lvl) > cmpRank($hit)) { $hit = $lvl; }
+            }
+        }
+        $cycles[] = $hit ?? 0; // 0 = sin evidencia · 'ok'|'find'|'crit' = cumplido con ese resultado
     }
 
     $ev = [];
@@ -111,6 +135,7 @@ function evalProc(array $p, ?int $entId, string $entName, int $now, array &$tech
             'id'   => (int)cv($r, 'id'), 't' => (string)cv($r, 'title'),
             's'    => (int)cv($r, 'status'), 'date' => cv($r, 'date'),
             'done' => cv($r, 'solve') ?: cv($r, 'close'), 'tech' => $tech,
+            'stype' => cv($r, 'stype'), // resultado (Tipo de solución)
         ];
     }
 
@@ -178,8 +203,10 @@ if ($techIds) {
     unset($pr);
 }
 
-$late = count(array_filter($result, fn($r) => $r['state'] === 'late'));
-$ok   = count(array_filter($result, fn($r) => $r['state'] === 'ok' || $r['state'] === 'run'));
+$cnt  = fn($s) => count(array_filter($result, fn($r) => $r['state'] === $s));
+$ok   = $cnt('ok') + $cnt('run');               // al día (limpio) o en curso
+$find = $cnt('ok_find') + $cnt('ok_crit');      // ejecutado pero con hallazgos
+$late = $cnt('late');
 $soon = count(array_filter($result, fn($r) => $r['dueIn'] !== null && $r['dueIn'] >= 0 && $r['dueIn'] <= 7 && $r['state'] !== 'late'));
 
 echo json_encode([
@@ -187,5 +214,5 @@ echo json_encode([
     'user'     => $_SESSION['user'] ?? '',
     'canEdit'  => !empty($_SESSION['isAdmin']),
     'procs'    => $result,
-    'kpis'     => ['total' => count($result), 'ok' => $ok, 'late' => $late, 'soon' => $soon],
+    'kpis'     => ['total' => count($result), 'ok' => $ok, 'find' => $find, 'late' => $late, 'soon' => $soon],
 ], JSON_UNESCAPED_UNICODE);
