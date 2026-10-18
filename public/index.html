@@ -446,12 +446,29 @@ main{padding-top:46px;padding-bottom:60px}
 .nmnote{font:500 11.5px var(--sans);color:var(--dim);font-style:italic;align-self:center}
 .nmsum{display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .nmpct{display:flex;flex-direction:column;align-items:center;min-width:150px}
+/* hero: la rueda es la protagonista */
+.nmhero{display:flex;gap:34px;align-items:center;flex-wrap:wrap;justify-content:center;padding:22px 18px}
+.nmhero .nmradial{flex:none;display:flex;justify-content:center}
+.nmhero-info{flex:1;min-width:240px}
+.nmhero-info h3{font:800 20px var(--sans);margin:0 0 12px}
+@media(max-width:620px){.nmhero{gap:18px;padding:14px 4px}.nmhero-info{min-width:0}}
 .nmcounts{display:flex;gap:10px;flex-wrap:wrap}
 .nmchip{display:inline-flex;align-items:center;gap:7px;font:600 12px var(--mono);color:var(--muted);background:var(--surface2);border:1px solid var(--border2);border-radius:99px;padding:6px 12px}
 .nmchip i{width:9px;height:9px;border-radius:50%;flex:none}
 .nst-cubierto{background:#2fa671}.nst-parcial{background:#c88c00}.nst-brecha{background:#d9434f}.nst-sincontrol{background:var(--dim)}.nst-na{background:transparent;border:2px dashed var(--border2);width:7px;height:7px}
 .nmdom{margin-top:16px}
 .nmdom-h{font:700 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:0 0 8px;display:flex;justify-content:space-between}
+/* acordeón de dominios: colapsado por defecto, con mini-barra de estado */
+.nmacc{border:1px solid var(--border2);border-radius:11px;background:var(--surface);margin-bottom:8px;overflow:hidden}
+.nmacc-h{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;background:transparent;border:0;cursor:pointer;text-align:left;color:var(--text)}
+.nmacc-h:hover{background:var(--surface2)}
+.nmacc-t{font:700 12.5px var(--sans);flex:none;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nmacc-bar{flex:1;display:flex;gap:1.5px;height:12px;min-width:60px}
+.nmacc-bar i{flex:1;border-radius:1px;min-width:0}
+.nmacc-n{font:700 12px var(--mono);color:var(--muted);flex:none}
+.nmacc-chev{flex:none;color:var(--dim);transition:transform .2s;font-size:15px}
+.nmacc[open] .nmacc-chev,.nmacc.on .nmacc-chev{transform:rotate(90deg)}
+.nmacc-body{padding:4px 14px 14px}
 .nmreqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
 .nmreq{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;background:var(--surface);min-width:0}
 .nmreq i.nd{width:9px;height:9px;border-radius:50%;flex:none}
@@ -1995,6 +2012,13 @@ function fetchNormas(ent){
 }
 if($('#nm-fw'))$('#nm-fw').addEventListener('change',e=>{NM.fw=e.target.value;renderNormas();});
 if($('#nm-ent'))$('#nm-ent').addEventListener('change',e=>{NM.fw=null;fetchNormas(e.target.value);});
+// acordeón de dominios (delegado, porque el cuerpo se re-dibuja)
+if($('#nm-body'))$('#nm-body').addEventListener('click',e=>{
+  const b=e.target.closest('.nmacc-h'); if(!b)return;
+  const acc=b.parentElement, body=acc.querySelector('.nmacc-body');
+  const open=acc.classList.toggle('on'); b.setAttribute('aria-expanded',open?'true':'false');
+  if(body)body.hidden=!open;
+});
 function renderNormas(){
   const d=NM.data; if(!d)return;
   $('#nm-l-fw').textContent=T('nm_fw'); $('#nm-l-ent').textContent=T('nm_ent'); $('#nm-note').textContent=T('nm_note');
@@ -2007,24 +2031,28 @@ function renderNormas(){
   if(!fws.length){body.innerHTML='<div class="empty">'+T('nm_empty')+'</div>';return;}
   const fw=d.frameworks[NM.fw]; if(!fw){body.innerHTML='';return;}
   const c=fw.counts||{};
-  let h='<div class="panel anpanel"><div class="nmsum">';
-  h+='<div class="nmpct">'+nmRadial(fw)+'</div>';
-  h+='<div style="flex:1;min-width:220px"><div style="font:700 15px var(--sans);margin-bottom:8px">'+esc(fw.name)+'</div><div class="nmcounts">'
+  // hero: la rueda de cumplimiento es la protagonista
+  let h='<div class="panel anpanel nmhero">';
+  h+='<div class="nmradial">'+nmRadial(fw,232)+'</div>';
+  h+='<div class="nmhero-info"><h3>'+esc(fw.name)+'</h3><div class="nmcounts">'
     +nmChip('cubierto',T('nm_s_cubierto'),c.cubierto||0)
     +nmChip('parcial',T('nm_s_parcial'),c.parcial||0)
     +nmChip('brecha',T('nm_s_brecha'),Math.max(0,(c.brecha||0)-(c.sincontrol||0)))
     +nmChip('sincontrol',T('nm_s_sincontrol'),c.sincontrol||0)
-    +'</div><div style="font:500 11.5px var(--sans);color:var(--dim);margin-top:10px;max-width:560px;line-height:1.5">'+esc(fw.note||'')+'</div></div>';
-  h+='</div></div>';
-  (fw.domains||[]).forEach(dom=>{
+    +'</div><div style="font:500 11.5px var(--sans);color:var(--dim);margin-top:14px;max-width:560px;line-height:1.5">'+esc(fw.note||'')+'</div></div>';
+  h+='</div>';
+  // detalle de requisitos: un acordeón por dominio (colapsado), con mini-barra de estado
+  (fw.domains||[]).forEach((dom,di)=>{
     const reqs=dom.reqs||[];
     const cub=reqs.filter(r=>r.status==='cubierto').length;
-    h+='<div class="panel anpanel nmdom"><div class="nmdom-h"><span>'+esc(dom.name)+'</span><span>'+cub+' / '+reqs.length+'</span></div><div class="nmreqs">';
+    const bar=reqs.map(r=>'<i class="nst-'+r.status+'"></i>').join('');
+    h+='<div class="nmacc"><button class="nmacc-h" aria-expanded="false"><span class="nmacc-t">'+esc(dom.name)+'</span><span class="nmacc-bar">'+bar+'</span><span class="nmacc-n">'+cub+'/'+reqs.length+'</span><span class="nmacc-chev">&#8250;</span></button>';
+    h+='<div class="nmacc-body" hidden><div class="nmreqs">';
     h+=reqs.map(r=>{
       const tip=(r.controls||[]).length?(T('nm_controls')+': '+r.controls.map(x=>x.name).join(', ')):T('nm_nocontrol');
       return '<div class="nmreq'+(r.status==='sincontrol'||r.status==='brecha'?' gap':'')+'" title="'+esc(tip)+'"><i class="nd nst-'+r.status+'"></i><span class="nref">'+esc(r.ref)+'</span><span class="ntit">'+esc(r.title)+'</span></div>';
     }).join('');
-    h+='</div></div>';
+    h+='</div></div></div>';
   });
   const pend=d.pending||[];
   h+='<div class="panel anpanel nmpend"><h4 style="margin:0 0 6px">'+T('nm_pending_h')+'</h4>';
@@ -2048,7 +2076,8 @@ function renderNormas(){
   body.innerHTML=h;
 }
 function nmChip(st,label,n){return '<span class="nmchip"><i class="nst-'+st+'"></i>'+esc(label)+' '+n+'</span>';}
-function nmRadial(fw){
+function nmRadial(fw,px){
+  px=px||150;
   const reqs=[]; (fw.domains||[]).forEach(dom=>(dom.reqs||[]).forEach(r=>reqs.push(r)));
   const N=reqs.length||1, cx=86,cy=86,ri=52,ro=80;
   const col={cubierto:'#2fa671',parcial:'#c88c00',brecha:'#d9434f',sincontrol:'#6b7280',na:'#2b2b31'};
@@ -2059,7 +2088,7 @@ function nmRadial(fw){
     const [x0,y0]=pol(a0,ri),[x1,y1]=pol(a0,ro),[x2,y2]=pol(a1,ro),[x3,y3]=pol(a1,ri);
     segs+='<path d="M'+x0+' '+y0+' L'+x1+' '+y1+' A'+ro+' '+ro+' 0 0 1 '+x2+' '+y2+' L'+x3+' '+y3+' A'+ri+' '+ri+' 0 0 0 '+x0+' '+y0+' Z" fill="'+(col[r.status]||'#6b7280')+'"><title>'+esc(r.ref+' · '+r.title)+'</title></path>';
   });
-  return '<svg viewBox="0 0 172 172" width="150" height="150" role="img">'+segs
+  return '<svg viewBox="0 0 172 172" width="'+px+'" height="'+px+'" style="max-width:100%" role="img">'+segs
     +'<circle cx="86" cy="86" r="50" fill="var(--surface)"/>'
     +'<text x="86" y="82" text-anchor="middle" style="font:800 30px var(--sans);fill:var(--text)">'+fw.pct+'%</text>'
     +'<text x="86" y="102" text-anchor="middle" style="font:600 9px var(--mono);fill:var(--dim);letter-spacing:.08em">'+esc((T('nm_pct')||'').toUpperCase())+'</text></svg>';
