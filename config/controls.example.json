@@ -1,0 +1,14 @@
+{
+  "_comment": "EJEMPLO (demo Acme IT) — NO son datos reales. El mapeo de cada instalación vive en config/controls.json (fuera de git), que no se pisa en el deploy. Un control = lo que la organización hace; su estado sale de los procesos de GLPI (config/processes.json). 'maps' relaciona el control con requisitos de cada norma (ver config/frameworks.json). El mapeo es criterio propio, a validar con el auditor.",
+  "scope": {
+    "1": { "name": "Acme IT", "frameworks": ["iso27001", "iso9001", "nis2"] }
+  },
+  "controls": [
+    { "id": "ctrl-backup",  "name": "Copias de seguridad verificadas",        "kind": "recurring", "processes": ["backup-vm"],   "maps": { "iso27001": ["A.8.13"],                          "nis2": ["21.2.c"] } },
+    { "id": "ctrl-restore", "name": "Restauración probada",                   "kind": "recurring", "processes": ["restore-test"],"maps": { "iso27001": ["A.8.13", "A.5.30"],                "nis2": ["21.2.c"] } },
+    { "id": "ctrl-drp",     "name": "Continuidad y DRP",                      "kind": "recurring", "processes": ["drp-test"],    "maps": { "iso27001": ["A.5.29", "A.5.30"],                "nis2": ["21.2.c"] } },
+    { "id": "ctrl-patch",   "name": "Gestión de vulnerabilidades y parches",  "kind": "recurring", "processes": ["patch-review"],"maps": { "iso27001": ["A.8.8"],                           "nis2": ["21.2.e"] } },
+    { "id": "ctrl-alerts",  "name": "Monitoreo y respuesta a incidentes",     "kind": "recurring", "processes": ["sec-alerts"],  "maps": { "iso27001": ["A.8.15", "A.8.16", "A.5.25", "A.5.26"], "nis2": ["21.2.b"] } },
+    { "id": "ctrl-fw",      "name": "Seguridad de red y firewall",            "kind": "recurring", "processes": ["fw-audit"],    "maps": { "iso27001": ["A.8.20", "A.8.22", "A.8.9"],       "nis2": ["21.2.g"] } }
+  ]
+}

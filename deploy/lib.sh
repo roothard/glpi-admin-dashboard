@@ -71,9 +71,14 @@ build_image() {
   [ -f "$ex/docs/docDash.js" ] && cp -a "$ex/docs/docDash.js" "$img/public_html/docDash.js"
   cp -a "$ex/src/." "$img/src/"
   cp -a "$ex/lib.php" "$img/lib.php"
+  [ -f "$ex/cmp-lib.php" ] && cp -a "$ex/cmp-lib.php" "$img/cmp-lib.php"
   cp -a "$ex/rh-auth.php" "$img/rh-auth.php"
   [ -f "$ex/bin/generate.php" ] && cp -a "$ex/bin/generate.php" "$img/bin/generate.php"
   [ -f "$ex/config/settings.example.json" ] && cp -a "$ex/config/settings.example.json" "$img/config/settings.example.json"
+  # Catálogo de normas (shipped) y ejemplo de controles. El mapeo real vive en
+  # config/controls.json (server-only) y NO se incluye: nunca se pisa.
+  [ -f "$ex/config/frameworks.json" ] && cp -a "$ex/config/frameworks.json" "$img/config/frameworks.json"
+  [ -f "$ex/config/controls.example.json" ] && cp -a "$ex/config/controls.example.json" "$img/config/controls.example.json"
 
   # Environment marker (read by Settings::env() -> STAGING badge).
   cat > "$img/config/version.json" <<JSON
@@ -134,13 +139,19 @@ cp -a "\$REMOTE/image/public_html/." "\$HOME_/public_html/"
 cp -a "\$REMOTE/image/src/."         "\$HOME_/src/"
 [ -d "\$REMOTE/image/bin" ] && cp -a "\$REMOTE/image/bin/." "\$HOME_/bin/"
 cp -a "\$REMOTE/image/lib.php"       "\$HOME_/lib.php"
+[ -f "\$REMOTE/image/cmp-lib.php" ] && cp -a "\$REMOTE/image/cmp-lib.php" "\$HOME_/cmp-lib.php"
 cp -a "\$REMOTE/image/rh-auth.php"   "\$HOME_/rh-auth.php"
 [ -f "\$REMOTE/image/config/settings.example.json" ] && cp -a "\$REMOTE/image/config/settings.example.json" "\$HOME_/config/settings.example.json"
+# Catálogo de normas (shipped) + ejemplo de controles. NO se toca controls.json (real, server-only).
+[ -f "\$REMOTE/image/config/frameworks.json" ] && cp -a "\$REMOTE/image/config/frameworks.json" "\$HOME_/config/frameworks.json"
+[ -f "\$REMOTE/image/config/controls.example.json" ] && cp -a "\$REMOTE/image/config/controls.example.json" "\$HOME_/config/controls.example.json"
 cp -a "\$REMOTE/image/config/version.json" "\$HOME_/config/version.json"
 
 # --- dueño correcto del sitio ---
 chown -R "\$USER_:\$USER_" "\$HOME_/public_html" "\$HOME_/src" "\$HOME_/bin" \
         "\$HOME_/lib.php" "\$HOME_/rh-auth.php" "\$HOME_/config/version.json" "\$HOME_/config/settings.example.json" 2>/dev/null || true
+[ -f "\$HOME_/cmp-lib.php" ] && chown "\$USER_:\$USER_" "\$HOME_/cmp-lib.php" 2>/dev/null || true
+for f in frameworks.json controls.example.json; do [ -f "\$HOME_/config/\$f" ] && chown "\$USER_:\$USER_" "\$HOME_/config/\$f" 2>/dev/null || true; done
 
 rm -rf "\$REMOTE"
 echo "  instalado en \$HOME_"

@@ -1,0 +1,840 @@
+{
+  "_comment": "Catalogo de normas para el panel Compliance. Solo referencias y titulos propios (no se reproduce el texto de las normas). El mapeo control->requisito vive en controls.json y es criterio interno, a validar con el auditor.",
+  "frameworks": {
+    "iso27001": {
+      "name": "ISO/IEC 27001:2022",
+      "short": "ISO 27001",
+      "note": "Referencias del Anexo A y de las clausulas 4-10. Titulos propios; el mapeo a controles es criterio interno, a validar con el auditor.",
+      "domains": [
+        "Organizacional",
+        "Personas",
+        "Fisico",
+        "Tecnologico",
+        "Sistema de gestion"
+      ],
+      "requirements": [
+        {
+          "ref": "A.5.1",
+          "title": "Politicas de seguridad de la informacion",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.2",
+          "title": "Roles y responsabilidades de seguridad",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.3",
+          "title": "Segregacion de funciones",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.4",
+          "title": "Responsabilidades de la direccion",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.5",
+          "title": "Contacto con autoridades",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.6",
+          "title": "Contacto con grupos de interes especial",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.7",
+          "title": "Inteligencia de amenazas",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.8",
+          "title": "Seguridad en la gestion de proyectos",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.9",
+          "title": "Inventario de informacion y activos",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.10",
+          "title": "Uso aceptable de los activos",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.11",
+          "title": "Devolucion de activos",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.12",
+          "title": "Clasificacion de la informacion",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.13",
+          "title": "Etiquetado de la informacion",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.14",
+          "title": "Transferencia de informacion",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.15",
+          "title": "Control de acceso",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.16",
+          "title": "Gestion de identidades",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.17",
+          "title": "Informacion de autenticacion",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.18",
+          "title": "Derechos de acceso",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.19",
+          "title": "Seguridad en relaciones con proveedores",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.20",
+          "title": "Seguridad en acuerdos con proveedores",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.21",
+          "title": "Seguridad en la cadena de suministro TIC",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.22",
+          "title": "Seguimiento de servicios de proveedores",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.23",
+          "title": "Seguridad en servicios en la nube",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.24",
+          "title": "Planificacion de la gestion de incidentes",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.25",
+          "title": "Evaluacion y decision sobre eventos de seguridad",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.26",
+          "title": "Respuesta a incidentes de seguridad",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.27",
+          "title": "Aprendizaje de los incidentes",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.28",
+          "title": "Recoleccion de evidencia",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.29",
+          "title": "Seguridad durante la interrupcion",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.30",
+          "title": "Continuidad TIC",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.31",
+          "title": "Requisitos legales, regulatorios y contractuales",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.32",
+          "title": "Derechos de propiedad intelectual",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.33",
+          "title": "Proteccion de registros",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.34",
+          "title": "Privacidad y proteccion de datos personales",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.35",
+          "title": "Revision independiente de la seguridad",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.36",
+          "title": "Cumplimiento de politicas y normas",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.5.37",
+          "title": "Procedimientos operativos documentados",
+          "domain": "Organizacional"
+        },
+        {
+          "ref": "A.6.1",
+          "title": "Investigacion de antecedentes",
+          "domain": "Personas"
+        },
+        {
+          "ref": "A.6.2",
+          "title": "Terminos y condiciones de empleo",
+          "domain": "Personas"
+        },
+        {
+          "ref": "A.6.3",
+          "title": "Concientizacion y formacion en seguridad",
+          "domain": "Personas"
+        },
+        {
+          "ref": "A.6.4",
+          "title": "Proceso disciplinario",
+          "domain": "Personas"
+        },
+        {
+          "ref": "A.6.5",
+          "title": "Responsabilidades tras el cese o cambio",
+          "domain": "Personas"
+        },
+        {
+          "ref": "A.6.6",
+          "title": "Acuerdos de confidencialidad",
+          "domain": "Personas"
+        },
+        {
+          "ref": "A.6.7",
+          "title": "Trabajo remoto",
+          "domain": "Personas"
+        },
+        {
+          "ref": "A.6.8",
+          "title": "Reporte de eventos de seguridad",
+          "domain": "Personas"
+        },
+        {
+          "ref": "A.7.1",
+          "title": "Perimetros de seguridad fisica",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.2",
+          "title": "Controles de entrada fisica",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.3",
+          "title": "Seguridad de oficinas y recintos",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.4",
+          "title": "Vigilancia de seguridad fisica",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.5",
+          "title": "Proteccion frente a amenazas fisicas y ambientales",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.6",
+          "title": "Trabajo en areas seguras",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.7",
+          "title": "Escritorio y pantalla despejados",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.8",
+          "title": "Ubicacion y proteccion de equipos",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.9",
+          "title": "Seguridad de activos fuera de las instalaciones",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.10",
+          "title": "Medios de almacenamiento",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.11",
+          "title": "Servicios de soporte (energia, clima)",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.12",
+          "title": "Seguridad del cableado",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.13",
+          "title": "Mantenimiento de equipos",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.7.14",
+          "title": "Eliminacion o reutilizacion segura de equipos",
+          "domain": "Fisico"
+        },
+        {
+          "ref": "A.8.1",
+          "title": "Dispositivos de usuario final",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.2",
+          "title": "Derechos de acceso privilegiado",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.3",
+          "title": "Restriccion de acceso a la informacion",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.4",
+          "title": "Acceso al codigo fuente",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.5",
+          "title": "Autenticacion segura",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.6",
+          "title": "Gestion de capacidad",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.7",
+          "title": "Proteccion contra malware",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.8",
+          "title": "Gestion de vulnerabilidades tecnicas",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.9",
+          "title": "Gestion de la configuracion",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.10",
+          "title": "Borrado de informacion",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.11",
+          "title": "Enmascaramiento de datos",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.12",
+          "title": "Prevencion de fuga de datos",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.13",
+          "title": "Copias de seguridad",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.14",
+          "title": "Redundancia de los recursos de procesamiento",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.15",
+          "title": "Registro de eventos (logs)",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.16",
+          "title": "Monitoreo de actividades",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.17",
+          "title": "Sincronizacion de relojes",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.18",
+          "title": "Uso de programas utilitarios privilegiados",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.19",
+          "title": "Software en sistemas operativos",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.20",
+          "title": "Seguridad de redes",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.21",
+          "title": "Seguridad de servicios de red",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.22",
+          "title": "Segregacion de redes",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.23",
+          "title": "Filtrado web",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.24",
+          "title": "Uso de criptografia",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.25",
+          "title": "Ciclo de vida de desarrollo seguro",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.26",
+          "title": "Requisitos de seguridad de las aplicaciones",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.27",
+          "title": "Arquitectura y principios de sistemas seguros",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.28",
+          "title": "Codificacion segura",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.29",
+          "title": "Pruebas de seguridad en desarrollo y aceptacion",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.30",
+          "title": "Desarrollo contratado externamente",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.31",
+          "title": "Separacion de entornos de desarrollo y produccion",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.32",
+          "title": "Gestion de cambios",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.33",
+          "title": "Informacion de prueba",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "A.8.34",
+          "title": "Proteccion de sistemas durante auditorias",
+          "domain": "Tecnologico"
+        },
+        {
+          "ref": "4.1",
+          "title": "Contexto de la organizacion",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "4.2",
+          "title": "Partes interesadas y sus requisitos",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "4.3",
+          "title": "Alcance del SGSI",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "4.4",
+          "title": "Sistema de gestion de seguridad",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "5.1",
+          "title": "Liderazgo y compromiso",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "5.2",
+          "title": "Politica de seguridad",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "5.3",
+          "title": "Roles, responsabilidades y autoridades",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "6.1.1",
+          "title": "Acciones frente a riesgos - generalidades",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "6.1.2",
+          "title": "Apreciacion de riesgos de seguridad",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "6.1.3",
+          "title": "Tratamiento de riesgos de seguridad",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "6.2",
+          "title": "Objetivos de seguridad y planificacion",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "6.3",
+          "title": "Planificacion de cambios",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "7.1",
+          "title": "Recursos",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "7.2",
+          "title": "Competencia",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "7.3",
+          "title": "Toma de conciencia",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "7.4",
+          "title": "Comunicacion",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "7.5",
+          "title": "Informacion documentada",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "8.1",
+          "title": "Planificacion y control operacional",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "8.2",
+          "title": "Apreciacion de riesgos (operacion)",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "8.3",
+          "title": "Tratamiento de riesgos (operacion)",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "9.1",
+          "title": "Seguimiento, medicion, analisis y evaluacion",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "9.2",
+          "title": "Auditoria interna",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "9.3",
+          "title": "Revision por la direccion",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "10.1",
+          "title": "Mejora continua",
+          "domain": "Sistema de gestion"
+        },
+        {
+          "ref": "10.2",
+          "title": "No conformidad y accion correctiva",
+          "domain": "Sistema de gestion"
+        }
+      ]
+    },
+    "iso9001": {
+      "name": "ISO 9001:2015",
+      "short": "ISO 9001",
+      "note": "Gestion de la calidad. Titulos propios. RootHard la aplica desde ahora para madurarla; sin certificacion por el momento.",
+      "domains": [
+        "Contexto",
+        "Liderazgo",
+        "Planificacion",
+        "Apoyo",
+        "Operacion",
+        "Evaluacion",
+        "Mejora"
+      ],
+      "requirements": [
+        {
+          "ref": "4.1",
+          "title": "Contexto de la organizacion",
+          "domain": "Contexto"
+        },
+        {
+          "ref": "4.2",
+          "title": "Partes interesadas y sus requisitos",
+          "domain": "Contexto"
+        },
+        {
+          "ref": "4.3",
+          "title": "Alcance del sistema de gestion de calidad",
+          "domain": "Contexto"
+        },
+        {
+          "ref": "4.4",
+          "title": "Procesos del sistema de gestion de calidad",
+          "domain": "Contexto"
+        },
+        {
+          "ref": "5.1",
+          "title": "Liderazgo y compromiso",
+          "domain": "Liderazgo"
+        },
+        {
+          "ref": "5.1.2",
+          "title": "Enfoque al cliente",
+          "domain": "Liderazgo"
+        },
+        {
+          "ref": "5.2",
+          "title": "Politica de calidad",
+          "domain": "Liderazgo"
+        },
+        {
+          "ref": "5.3",
+          "title": "Roles, responsabilidades y autoridades",
+          "domain": "Liderazgo"
+        },
+        {
+          "ref": "6.1",
+          "title": "Riesgos y oportunidades",
+          "domain": "Planificacion"
+        },
+        {
+          "ref": "6.2",
+          "title": "Objetivos de calidad y planificacion",
+          "domain": "Planificacion"
+        },
+        {
+          "ref": "6.3",
+          "title": "Planificacion de los cambios",
+          "domain": "Planificacion"
+        },
+        {
+          "ref": "7.1",
+          "title": "Recursos",
+          "domain": "Apoyo"
+        },
+        {
+          "ref": "7.1.5",
+          "title": "Recursos de seguimiento y medicion",
+          "domain": "Apoyo"
+        },
+        {
+          "ref": "7.2",
+          "title": "Competencia",
+          "domain": "Apoyo"
+        },
+        {
+          "ref": "7.3",
+          "title": "Toma de conciencia",
+          "domain": "Apoyo"
+        },
+        {
+          "ref": "7.4",
+          "title": "Comunicacion",
+          "domain": "Apoyo"
+        },
+        {
+          "ref": "7.5",
+          "title": "Informacion documentada",
+          "domain": "Apoyo"
+        },
+        {
+          "ref": "8.1",
+          "title": "Planificacion y control operacional",
+          "domain": "Operacion"
+        },
+        {
+          "ref": "8.2",
+          "title": "Requisitos para productos y servicios",
+          "domain": "Operacion"
+        },
+        {
+          "ref": "8.3",
+          "title": "Diseno y desarrollo",
+          "domain": "Operacion"
+        },
+        {
+          "ref": "8.4",
+          "title": "Control de procesos y proveedores externos",
+          "domain": "Operacion"
+        },
+        {
+          "ref": "8.5",
+          "title": "Produccion y provision del servicio",
+          "domain": "Operacion"
+        },
+        {
+          "ref": "8.6",
+          "title": "Liberacion de productos y servicios",
+          "domain": "Operacion"
+        },
+        {
+          "ref": "8.7",
+          "title": "Control de salidas no conformes",
+          "domain": "Operacion"
+        },
+        {
+          "ref": "9.1",
+          "title": "Seguimiento, medicion y analisis",
+          "domain": "Evaluacion"
+        },
+        {
+          "ref": "9.1.2",
+          "title": "Satisfaccion del cliente",
+          "domain": "Evaluacion"
+        },
+        {
+          "ref": "9.2",
+          "title": "Auditoria interna",
+          "domain": "Evaluacion"
+        },
+        {
+          "ref": "9.3",
+          "title": "Revision por la direccion",
+          "domain": "Evaluacion"
+        },
+        {
+          "ref": "10.1",
+          "title": "Mejora - generalidades",
+          "domain": "Mejora"
+        },
+        {
+          "ref": "10.2",
+          "title": "No conformidad y accion correctiva",
+          "domain": "Mejora"
+        },
+        {
+          "ref": "10.3",
+          "title": "Mejora continua",
+          "domain": "Mejora"
+        }
+      ]
+    },
+    "nis2": {
+      "name": "Directiva (UE) 2022/2555 (NIS2)",
+      "short": "NIS2",
+      "note": "Medidas de gestion de riesgos de ciberseguridad del art. 21.2. Titulos propios.",
+      "domains": [
+        "Medidas de gestion de riesgos (art. 21.2)"
+      ],
+      "requirements": [
+        {
+          "ref": "21.2.a",
+          "title": "Politicas de analisis de riesgos y seguridad de sistemas",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        },
+        {
+          "ref": "21.2.b",
+          "title": "Gestion de incidentes",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        },
+        {
+          "ref": "21.2.c",
+          "title": "Continuidad del negocio y gestion de copias de seguridad",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        },
+        {
+          "ref": "21.2.d",
+          "title": "Seguridad de la cadena de suministro",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        },
+        {
+          "ref": "21.2.e",
+          "title": "Seguridad en adquisicion, desarrollo y mantenimiento (vulnerabilidades)",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        },
+        {
+          "ref": "21.2.f",
+          "title": "Evaluacion de la eficacia de las medidas",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        },
+        {
+          "ref": "21.2.g",
+          "title": "Ciberhigiene basica y formacion",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        },
+        {
+          "ref": "21.2.h",
+          "title": "Criptografia y cifrado",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        },
+        {
+          "ref": "21.2.i",
+          "title": "Seguridad de RR.HH. y control de acceso",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        },
+        {
+          "ref": "21.2.j",
+          "title": "Autenticacion multifactor y comunicaciones seguras",
+          "domain": "Medidas de gestion de riesgos (art. 21.2)"
+        }
+      ]
+    }
+  }
+}
