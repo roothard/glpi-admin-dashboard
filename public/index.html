@@ -470,7 +470,14 @@ main{padding-top:46px;padding-bottom:60px}
 .nmacc[open] .nmacc-chev,.nmacc.on .nmacc-chev{transform:rotate(90deg)}
 .nmacc-body{padding:4px 14px 14px}
 .nmreqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
-.nmreq{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;background:var(--surface);min-width:0}
+.nmreq{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;background:var(--surface);min-width:0;cursor:pointer}
+.nmreq:hover{border-color:var(--accent);background:var(--surface2)}
+.nmtrace-req{font:800 15px var(--sans);display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 12px}
+.nmtrace-req .nref{font:700 13px var(--mono);color:var(--dim)}
+.nmtrace-ctrl{border-left:3px solid var(--border2);padding:2px 0 2px 14px;margin:0 0 16px}
+.nmtrace-ctrl.c-cubierto{border-left-color:#2fa671}.nmtrace-ctrl.c-parcial{border-left-color:#c88c00}.nmtrace-ctrl.c-brecha{border-left-color:#d9434f}.nmtrace-ctrl.c-sincontrol{border-left-color:var(--dim)}
+.nmtrace-ch{font:700 13px var(--sans);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.nmtrace-proc{font:600 12px var(--sans);color:var(--muted);margin:8px 0 4px;display:flex;align-items:center;gap:7px}
 .nmreq i.nd{width:9px;height:9px;border-radius:50%;flex:none}
 .nmreq .nref{font:700 11px var(--mono);color:var(--dim);flex:none}
 .nmreq .ntit{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -767,6 +774,7 @@ body.dockon.dock-hidden #dockshow{transform:translate(0,-50%) rotate(-90deg)}
         <span class="nmnote" id="nm-note"></span>
       </div>
       <div id="nm-body"></div>
+      <div class="panel anpanel" id="nm-detail" style="display:none"></div>
     </div>
   </section>
   <section id="v-crm" class="appview">
@@ -968,6 +976,12 @@ Object.assign(I18N.en,{cmp_tab_proc:'Processes',cmp_tab_norm:'By standard',nm_fw
 Object.assign(I18N.fr,{cmp_tab_proc:'Processus',cmp_tab_norm:'Par norme',nm_fw:'Norme',nm_ent:'Entité',nm_note:'Mapping interne — à valider avec l\'auditeur',nm_pct:'conformité',nm_reqs:'exigences',nm_pending_h:'Quoi mettre en place d\'abord',nm_pending_none:'Tout couvert ou aucun contrôle en attente',nm_overlap_h:'Chevauchement entre normes',nm_overlap_sub:'Si vous respectez la ligne, vous couvrez ce % de la colonne',nm_controls:'Contrôles',nm_nocontrol:'aucun contrôle assigné',nm_empty:'Aucune norme dans le périmètre de cette entité',nm_covers:'couvrirait',nm_s_cubierto:'Couvert',nm_s_parcial:'Partiel',nm_s_brecha:'Écart',nm_s_sincontrol:'Sans contrôle',nm_s_na:'N/A'});
 Object.assign(I18N.de,{cmp_tab_proc:'Prozesse',cmp_tab_norm:'Nach Norm',nm_fw:'Norm',nm_ent:'Entität',nm_note:'Interne Zuordnung — mit dem Auditor validieren',nm_pct:'Erfüllung',nm_reqs:'Anforderungen',nm_pending_h:'Was zuerst umsetzen',nm_pending_none:'Alles abgedeckt oder keine offenen Kontrollen',nm_overlap_h:'Überschneidung zwischen Normen',nm_overlap_sub:'Erfüllst du die Zeile, deckst du diesen % der Spalte ab',nm_controls:'Kontrollen',nm_nocontrol:'keine Kontrolle zugewiesen',nm_empty:'Keine Normen im Geltungsbereich dieser Entität',nm_covers:'würde abdecken',nm_s_cubierto:'Abgedeckt',nm_s_parcial:'Teilweise',nm_s_brecha:'Lücke',nm_s_sincontrol:'Keine Kontrolle',nm_s_na:'N/z'});
 Object.assign(I18N.pt,{cmp_tab_proc:'Processos',cmp_tab_norm:'Por norma',nm_fw:'Norma',nm_ent:'Entidade',nm_note:'Mapeamento interno — validar com o auditor',nm_pct:'conformidade',nm_reqs:'requisitos',nm_pending_h:'O que implementar primeiro',nm_pending_none:'Tudo coberto ou sem controles pendentes',nm_overlap_h:'Sobreposição entre normas',nm_overlap_sub:'Se cumprir a linha, cobre este % da coluna',nm_controls:'Controles',nm_nocontrol:'sem controle atribuído',nm_empty:'Sem normas no escopo desta entidade',nm_covers:'cobriria',nm_s_cubierto:'Coberto',nm_s_parcial:'Parcial',nm_s_brecha:'Lacuna',nm_s_sincontrol:'Sem controle',nm_s_na:'N/A'});
+// Drill-down: cadena de evidencia de un requisito (control -> proceso -> tickets).
+Object.assign(I18N.es,{nm_how:'Cómo se sostiene',nm_proc:'Proceso',nm_noproc:'Sin proceso asociado',nm_nocov:'Ningún control cubre este requisito — brecha sin cubrir',nm_close:'Cerrar'});
+Object.assign(I18N.en,{nm_how:'How it is backed',nm_proc:'Process',nm_noproc:'No linked process',nm_nocov:'No control covers this requirement — open gap',nm_close:'Close'});
+Object.assign(I18N.fr,{nm_how:'Sur quoi ça repose',nm_proc:'Processus',nm_noproc:'Aucun processus associé',nm_nocov:'Aucun contrôle ne couvre cette exigence — écart non couvert',nm_close:'Fermer'});
+Object.assign(I18N.de,{nm_how:'Worauf es beruht',nm_proc:'Prozess',nm_noproc:'Kein verknüpfter Prozess',nm_nocov:'Keine Kontrolle deckt diese Anforderung ab — offene Lücke',nm_close:'Schließen'});
+Object.assign(I18N.pt,{nm_how:'Como se sustenta',nm_proc:'Processo',nm_noproc:'Sem processo associado',nm_nocov:'Nenhum controle cobre este requisito — lacuna em aberto',nm_close:'Fechar'});
 Object.assign(I18N.es,{seeing:'Viendo',of:'de',why_h:'¿Qué proyectos veo?',why_p:'Ves los proyectos que tu usuario puede ver en GLPI, según tu perfil y tu entidad activa. El administrador puede además filtrar el tablero por tipo de proyecto. Si esperás un proyecto y no aparece, revisá esas tres cosas en GLPI: permisos del perfil, entidad y tipo.',why_filter:'Filtro de tipo',untyped:'Sin tipo',nt_note:'proyecto(s) sin tipo en GLPI — se muestran con el aviso «Sin tipo»'});
 Object.assign(I18N.en,{seeing:'Showing',of:'of',why_h:'Which projects do I see?',why_p:'You see the projects your user can see in GLPI, based on your profile and active entity. The administrator can also filter the board by project type. If a project you expect is missing, check those three things in GLPI: profile permissions, entity and type.',why_filter:'Type filter',untyped:'Untyped',nt_note:'project(s) with no type in GLPI — shown with an “Untyped” notice'});
 Object.assign(I18N.fr,{seeing:'Affichage',of:'sur',why_h:'Quels projets est-ce que je vois ?',why_p:'Vous voyez les projets que votre utilisateur peut voir dans GLPI, selon votre profil et votre entité active. L\'administrateur peut aussi filtrer le tableau par type de projet. S\'il manque un projet attendu, vérifiez ces trois points dans GLPI : permissions du profil, entité et type.',why_filter:'Filtre de type',untyped:'Sans type',nt_note:'projet(s) sans type dans GLPI — affichés avec la mention « Sans type »'});
@@ -2014,13 +2028,54 @@ if($('#nm-fw'))$('#nm-fw').addEventListener('change',e=>{NM.fw=e.target.value;re
 if($('#nm-ent'))$('#nm-ent').addEventListener('change',e=>{NM.fw=null;fetchNormas(e.target.value);});
 // acordeón de dominios (delegado, porque el cuerpo se re-dibuja)
 if($('#nm-body'))$('#nm-body').addEventListener('click',e=>{
-  const b=e.target.closest('.nmacc-h'); if(!b)return;
-  const acc=b.parentElement, body=acc.querySelector('.nmacc-body');
-  const open=acc.classList.toggle('on'); b.setAttribute('aria-expanded',open?'true':'false');
-  if(body)body.hidden=!open;
+  const b=e.target.closest('.nmacc-h');
+  if(b){const acc=b.parentElement, body=acc.querySelector('.nmacc-body');
+    const open=acc.classList.toggle('on'); b.setAttribute('aria-expanded',open?'true':'false');
+    if(body)body.hidden=!open; return;}
+  const rq=e.target.closest('.nmreq'); if(rq&&rq.dataset.ref){renderNmReqDetail(rq.dataset.ref);}
 });
+// estado (proceso/control) -> etiqueta + punto de color
+const NMLG={ok:'cmp_lg_ok',ok_find:'cmp_lg_find',ok_crit:'cmp_lg_crit',run:'cmp_lg_run',late:'cmp_lg_late',nodata:'cmp_lg_nodata'};
+function nmStateChip(st){return '<span class="cmplg"><i class="'+(st||'nodata')+'"></i>'+esc(T(NMLG[st]||'cmp_lg_nodata'))+'</span>';}
+// drill-down: la cadena completa que sostiene un requisito (requisito -> control -> proceso -> tickets)
+function renderNmReqDetail(ref){
+  const d=NM.data, box=$('#nm-detail'); if(!d||!box)return;
+  const fw=d.frameworks[NM.fw]; if(!fw){box.style.display='none';return;}
+  let req=null; (fw.domains||[]).forEach(dom=>(dom.reqs||[]).forEach(r=>{if(r.ref===ref)req=r;}));
+  if(!req){box.style.display='none';return;}
+  const resCls=s=>{const x=(s||'').toLowerCase().replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i').replace(/[óòö]/g,'o').replace(/[úùü]/g,'u');
+    return x.indexOf('critic')>=0?'ok_crit':(x.indexOf('hallazgo')>=0&&x.indexOf('sin')<0?'ok_find':'ok');};
+  let h='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
+    +'<div class="nmtrace-req"><i class="nd nst-'+req.status+'" style="width:12px;height:12px;border-radius:50%"></i><span class="nref">'+esc(req.ref)+'</span>'+esc(req.title)+' <span class="nmchip"><i class="nst-'+req.status+'"></i>'+esc(T('nm_s_'+req.status))+'</span></div>'
+    +'<button class="clr" id="nm-det-close">'+esc(T('nm_close'))+'</button></div>';
+  h+='<div style="font:700 11px var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px">'+esc(T('nm_how'))+'</div>';
+  const ctrls=req.controls||[];
+  if(!ctrls.length){ h+='<div class="empty">'+esc(T('nm_nocov'))+'</div>'; }
+  else ctrls.forEach(ci=>{
+    const cd=(d.cproc||{})[ci.id]||{name:ci.name,state:ci.state,processes:[]};
+    h+='<div class="nmtrace-ctrl c-'+req.status+'"><div class="nmtrace-ch">'+esc(cd.name||ci.name)+' '+nmStateChip(cd.state||ci.state)+'</div>';
+    const procs=cd.processes||[];
+    if(!procs.length) h+='<div class="dim" style="font-size:12px;color:var(--dim)">'+esc(T('nm_noproc'))+'</div>';
+    procs.forEach(p=>{
+      const when=p.state==='nodata'?T('cmp_never'):(p.days!=null?T('cmp_last')+' '+p.days+' d':'');
+      h+='<div class="nmtrace-proc">'+esc(T('nm_proc'))+': <b style="color:var(--text)">'+esc(p.name)+'</b> · '+esc(T('ev_'+p.every))+' '+nmStateChip(p.state)+(when?'<span style="color:var(--dim)">· '+esc(when)+'</span>':'')+'</div>';
+      const rows=(p.ev||[]).map(e=>{
+        const st=TKST[e.s]||['st1','#888']; const rc=e.stype?resCls(e.stype):'';
+        const res=e.stype?'<span class="cmplg"><i class="'+(rc||'ok')+'"></i>'+esc(e.stype)+'</span>':'<i class="crmna">'+T('cmp_res_none')+'</i>';
+        return '<tr class="tk-row" data-id="'+e.id+'"><td>'+e.id+'</td><td>'+esc(e.t)+'</td><td><span class="tkst" style="background:'+st[1]+'22;color:'+st[1]+'">'+T(st[0])+'</span></td><td>'+res+'</td><td>'+fmtDT(e.date)+'</td><td>'+fmtDT(e.done)+'</td></tr>';
+      }).join('');
+      h+=rows?('<table class="ftable" style="margin:2px 0 6px"><thead><tr><th>#</th><th>'+T('tk_c_title')+'</th><th>'+T('tk_c_st')+'</th><th>'+T('cmp_c_result')+'</th><th>'+T('tk_c_open')+'</th><th>'+T('cmp_done')+'</th></tr></thead><tbody>'+rows+'</tbody></table>'):('<div class="empty" style="padding:6px 0">'+T('cmp_ev_none')+'</div>');
+    });
+    h+='</div>';
+  });
+  box.innerHTML=h; box.style.display='';
+  const cb=$('#nm-det-close'); if(cb)cb.addEventListener('click',()=>{box.style.display='none';});
+  if(d.glpi_url) box.querySelectorAll('tr.tk-row').forEach(tr=>tr.addEventListener('click',()=>window.open(d.glpi_url+'/front/ticket.form.php?id='+tr.dataset.id,'_blank','noopener')));
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 function renderNormas(){
   const d=NM.data; if(!d)return;
+  const _dt=$('#nm-detail'); if(_dt)_dt.style.display='none';
   $('#nm-l-fw').textContent=T('nm_fw'); $('#nm-l-ent').textContent=T('nm_ent'); $('#nm-note').textContent=T('nm_note');
   const fws=d.fwKeys||[];
   $('#nm-fw').innerHTML=fws.map(k=>'<option value="'+k+'"'+(k===NM.fw?' selected':'')+'>'+esc((d.frameworks[k]||{}).short||k)+'</option>').join('');
@@ -2050,7 +2105,7 @@ function renderNormas(){
     h+='<div class="nmacc-body" hidden><div class="nmreqs">';
     h+=reqs.map(r=>{
       const tip=(r.controls||[]).length?(T('nm_controls')+': '+r.controls.map(x=>x.name).join(', ')):T('nm_nocontrol');
-      return '<div class="nmreq'+(r.status==='sincontrol'||r.status==='brecha'?' gap':'')+'" title="'+esc(tip)+'"><i class="nd nst-'+r.status+'"></i><span class="nref">'+esc(r.ref)+'</span><span class="ntit">'+esc(r.title)+'</span></div>';
+      return '<div class="nmreq'+(r.status==='sincontrol'||r.status==='brecha'?' gap':'')+'" data-ref="'+esc(r.ref)+'" title="'+esc(tip)+'"><i class="nd nst-'+r.status+'"></i><span class="nref">'+esc(r.ref)+'</span><span class="ntit">'+esc(r.title)+'</span></div>';
     }).join('');
     h+='</div></div></div>';
   });

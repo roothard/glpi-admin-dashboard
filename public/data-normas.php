@@ -50,15 +50,21 @@ $fwKeys = $scope[(string)$entId]['frameworks'] ?? array_keys($fw);
 $fwKeys = array_values(array_filter($fwKeys, fn($k) => isset($fw[$k])));
 
 // --- estado de cada proceso referido por los controles (una sola vez) ----
-$now = time(); $techIds = []; $procState = [];
+$now = time(); $techIds = []; $procFull = [];
 foreach ($controls as $c) {
     foreach ((array)($c['processes'] ?? []) as $pid) {
         $pid = (string)$pid;
-        if (isset($procState[$pid]) || !isset($procDefs[$pid])) { continue; }
-        $row = evalProc($procDefs[$pid], $entId ?: null, $entName, $now, $techIds, $tok);
-        $procState[$pid] = $row['state'];
+        if (isset($procFull[$pid]) || !isset($procDefs[$pid])) { continue; }
+        $procFull[$pid] = evalProc($procDefs[$pid], $entId ?: null, $entName, $now, $techIds, $tok);
     }
 }
+// resolver ids de técnico a nombres en la evidencia (para el drill-down)
+$allRows = array_values($procFull);
+cmpResolveTechs($allRows, $techIds, $tok);
+$procFull = [];
+foreach ($allRows as $r) { $procFull[$r['pid']] = $r; }
+$procState = []; // atajo pid -> estado para el cálculo de cobertura
+foreach ($procFull as $pid => $r) { $procState[$pid] = $r['state']; }
 
 // --- cobertura de un control (recurring = el peor de sus procesos) -------
 // valor de cobertura por estado: cuánto "cubre" un requisito ese control.
@@ -81,6 +87,20 @@ foreach ($controls as $c) {
     }
     $controlCov[$id]   = $worst === null ? ($kind === 'na' ? null : 0.0) : $worst;
     $controlState[$id] = $worstState;
+}
+
+// cadena de evidencia por control: sus procesos con estado y tickets (drill-down)
+$cproc = [];
+foreach ($controls as $c) {
+    $id = (string)($c['id'] ?? ''); if ($id === '') { continue; }
+    $ps = [];
+    foreach ((array)($c['processes'] ?? []) as $pid) {
+        $r = $procFull[(string)$pid] ?? null;
+        if (!$r) { continue; }
+        $ps[] = ['pid' => $r['pid'], 'name' => $r['name'], 'state' => $r['state'], 'every' => $r['every'],
+                 'last' => $r['last'], 'days' => $r['days'], 'dueIn' => $r['dueIn'], 'ev' => $r['ev']];
+    }
+    $cproc[$id] = ['name' => cName($controls, $id), 'kind' => $c['kind'] ?? 'recurring', 'state' => $controlState[$id], 'processes' => $ps];
 }
 
 // índice requisito -> controles que lo mapean, por norma
@@ -180,6 +200,7 @@ echo json_encode([
     'scope'    => $scopeList,
     'fwKeys'   => $fwKeys,
     'frameworks' => $fwOut,
+    'cproc'    => $cproc,
     'pending'  => $pending,
     'overlap'  => $overlap,
 ], JSON_UNESCAPED_UNICODE);
