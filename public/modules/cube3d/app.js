@@ -71,7 +71,7 @@ sun.position.set(2, 6, 1); sun.target.position.set(0, 1, -1.6); sun.castShadow =
 sun.shadow.mapSize.set(4096, 4096); sun.shadow.bias = -.0003; sun.shadow.normalBias = .02;
 Object.assign(sun.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: .5, far: 16 });
 scene.add(sun, sun.target);
-scene.add(Object.assign(new THREE.PointLight(0x9fb4ff, 6, 9, 1.6), { position: new THREE.Vector3(-2.2, 1.8, RACK_Z + 2.6) }));
+const relleno = new THREE.PointLight(0x9fb4ff, 6, 9, 1.6); relleno.position.set(-2.2, 1.8, RACK_Z + 2.6); scene.add(relleno);
 
 // piso técnico (baldosas de 60 cm) y paredes lejanas
 const texPiso = (() => {
