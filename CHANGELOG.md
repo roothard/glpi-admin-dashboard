@@ -4,6 +4,30 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 A user-facing version of this changelog is published at [`docs/`](docs/index.html).
 
+## [1.8.0] — 2026-10-18 — Compliance by standard (ISO 27001 / 9001 / NIS2)
+### Added
+- **Result, not just execution**: the Compliance panel reads the ticket's
+  **Solution type** (search field 23) and tells apart *up to date*, *up to date
+  with findings* (amber) and *up to date, critical* (red). A process with a bad
+  result is no longer shown green. New "With findings" counter and a legend; the
+  cycle history bar is tinted by result, and the evidence detail shows the result
+  per ticket.
+- **"By standard" view**: a compliance wheel with the per-standard percentage,
+  requirements grouped by domain in collapsible accordions (each header carries a
+  status mini-bar), the controls to implement first (ranked by coverage) and an
+  overlap matrix between standards.
+- **Evidence drill-down**: clicking a requirement shows how it is backed —
+  requirement → control(s) → process(es) with their state → the real GLPI tickets
+  (status, result, dates) with a link to each ticket.
+- **Standards catalog** `config/frameworks.json` (ISO 27001:2022 Annex A +
+  clauses 4–10, ISO 9001:2015, NIS2 art. 21.2) — clause numbers and our own short
+  titles only, never the standards' text. Own controls live in
+  `config/controls.json` (per-install, git-ignored), with a demo example shipped.
+- Shared evaluator `cmp-lib.php` so the panel and the per-standard view derive
+  process state from the same source. New endpoint `data-normas.php`.
+- All new UI strings in 5 languages (ES/EN/FR/DE/PT). The standard↔control mapping
+  is shown as internal criteria, to be validated with an auditor.
+
 ## [1.7.2] — 2026-10-03 — Multilingual consistency pass
 ### Added
 - **Localized drop-in module names**: a module manifest can declare

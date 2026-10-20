@@ -27,3 +27,4 @@ config/settings.json
 .gstack/
 config/login-throttle.json
 config/processes.json
+config/controls.json

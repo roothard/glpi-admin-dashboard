@@ -112,7 +112,7 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
   <span class="hdr-divider"></span>
   <span class="hdr-title">Centro de Administración GLPI · Documentación</span>
   <div class="hdr-right">
-    <span class="hdr-ver">v1.7.2</span>
+    <span class="hdr-ver">v1.8.0</span>
     <a class="hdr-gh" href="https://github.com/roothard/glpi-admin-dashboard" target="_blank" rel="noopener">GitHub</a>
   </div>
 </header>
@@ -421,7 +421,24 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
       <h2 class="doc-h2" id="changelog">Registro de versiones</h2>
 
       <div class="ver">
-        <div class="ver-head"><span class="ver-tag cur">v1.7.2</span>
+        <div class="ver-head"><span class="ver-tag cur">v1.8.0</span>
+          <span class="ver-date">2026-10-18</span><span class="ver-name">Compliance por norma: ISO 27001 / 9001 / NIS2</span></div>
+        <ul class="doc-ul">
+          <li><strong>Resultado, no solo ejecución</strong>: el panel de Cumplimiento lee el
+            <em>Tipo de solución</em> del ticket y distingue «al día», «al día con hallazgos» (ámbar)
+            y «al día, crítico» (rojo). Deja de pintar en verde un proceso con mal resultado.</li>
+          <li><strong>Vista «Por norma»</strong>: una rueda de cumplimiento con el porcentaje por
+            norma, los requisitos agrupados por dominio en acordeones desplegables, los controles a
+            implantar primero y una matriz de solapamiento entre normas.</li>
+          <li><strong>Cadena de evidencia</strong>: al hacer clic en un requisito se ve cómo se
+            sostiene — control → proceso → tickets reales de GLPI con su fecha y resultado.</li>
+          <li><strong>Catálogo de referencias</strong> de ISO 27001:2022, ISO 9001:2015 y NIS2
+            (art. 21.2); el mapeo a controles es criterio propio, a validar con el auditor.</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="ver-head"><span class="ver-tag">v1.7.2</span>
           <span class="ver-date">2026-10-03</span><span class="ver-name">Todo multi-idioma: módulos, Firma y un solo idioma en la app</span></div>
         <ul class="doc-ul">
           <li><strong>Un solo idioma en toda la app</strong>: el panel de Configuración comparte el

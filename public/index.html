@@ -405,11 +405,21 @@ main{padding-top:46px;padding-bottom:60px}
 .cmprow:hover{background:var(--surface2)}
 .cmpdot{width:10px;height:10px;border-radius:50%;flex:none}
 .cmpdot.ok{background:#2fa671}.cmpdot.run{background:#405cde}.cmpdot.late{background:#e2506e}.cmpdot.nodata{background:transparent;border:2px dashed var(--dim);width:8px;height:8px}
+.cmpdot.ok_find{background:#c88c00}.cmpdot.ok_crit{background:#d9434f}
+.kpis.k5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:900px){.kpis.k5{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.kpis.k5{grid-template-columns:repeat(2,1fr)}}
+.cmplegend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:2px 4px 12px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.cmplg{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--mono);color:var(--muted);white-space:nowrap}
+.cmplg i{width:9px;height:9px;border-radius:50%;flex:none}
+.cmplg i.ok{background:#2fa671}.cmplg i.ok_find{background:#c88c00}.cmplg i.ok_crit{background:#d9434f}.cmplg i.run{background:#405cde}.cmplg i.late{background:#e2506e}.cmplg i.nodata{background:transparent;border:2px dashed var(--dim);width:7px;height:7px}
 .cmpname b{font-size:14px}.cmpname small{display:block;color:var(--dim);font-size:11px;margin-top:2px}
 .cmpwhen{font:600 12px var(--mono);color:var(--muted);text-align:right;white-space:nowrap}
 .cmpwhen.late{color:#e2506e;font-weight:800}
+.cmpwhen.ok_find{color:#c88c00;font-weight:700}.cmpwhen.ok_crit{color:#d9434f;font-weight:800}
 .cyc{display:flex;gap:3px}
 .cyc i{width:9px;height:20px;border-radius:3px;background:#2fa671}
+.cyc i.find{background:#c88c00}.cyc i.crit{background:#d9434f}
 .cyc i.miss{background:var(--surface2);border:1px solid #e2506e88}
 .cyc i.cur{background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 3px,var(--border2) 3px,var(--border2) 6px)}
 .cmpent{font:700 10.5px var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.6px;padding:14px 4px 4px;border-bottom:1px solid var(--border2)}
@@ -425,6 +435,63 @@ main{padding-top:46px;padding-bottom:60px}
 .cmpchk input{width:15px;height:15px;accent-color:#405cde}
 .cmpcard .bdel{border:1px solid var(--border2);background:var(--surface);color:#e2506e;border-radius:8px;padding:8px 11px;cursor:pointer;font-size:14px;height:35px}
 .cmpedbar{display:flex;gap:10px;align-items:center;margin-top:10px}
+/* ---- Compliance: vista Por norma ---- */
+.cmpseg{display:inline-flex;gap:2px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:3px;margin-bottom:16px}
+.cmpsegb{font:600 13px var(--sans);color:var(--muted);background:transparent;border:0;border-radius:8px;padding:7px 16px;cursor:pointer}
+.cmpsegb.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.nmbar{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+.nmf{display:flex;flex-direction:column;gap:4px}
+.nmf>span{font:700 10px var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.nmf select{font:600 13.5px var(--sans);color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:9px;padding:8px 12px;min-width:200px}
+.nmnote{font:500 11.5px var(--sans);color:var(--dim);font-style:italic;align-self:center}
+.nmsum{display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.nmpct{display:flex;flex-direction:column;align-items:center;min-width:150px}
+/* hero: la rueda es la protagonista */
+.nmhero{display:flex;gap:34px;align-items:center;flex-wrap:wrap;justify-content:center;padding:22px 18px}
+.nmhero .nmradial{flex:none;display:flex;justify-content:center}
+.nmhero-info{flex:1;min-width:240px}
+.nmhero-info h3{font:800 20px var(--sans);margin:0 0 12px}
+@media(max-width:620px){.nmhero{gap:18px;padding:14px 4px}.nmhero-info{min-width:0}}
+.nmcounts{display:flex;gap:10px;flex-wrap:wrap}
+.nmchip{display:inline-flex;align-items:center;gap:7px;font:600 12px var(--mono);color:var(--muted);background:var(--surface2);border:1px solid var(--border2);border-radius:99px;padding:6px 12px}
+.nmchip i{width:9px;height:9px;border-radius:50%;flex:none}
+.nst-cubierto{background:#2fa671}.nst-parcial{background:#c88c00}.nst-brecha{background:#d9434f}.nst-sincontrol{background:var(--dim)}.nst-na{background:transparent;border:2px dashed var(--border2);width:7px;height:7px}
+.nmdom{margin-top:16px}
+.nmdom-h{font:700 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:0 0 8px;display:flex;justify-content:space-between}
+/* acordeón de dominios: colapsado por defecto, con mini-barra de estado */
+.nmacc{border:1px solid var(--border2);border-radius:11px;background:var(--surface);margin-bottom:8px;overflow:hidden}
+.nmacc-h{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;background:transparent;border:0;cursor:pointer;text-align:left;color:var(--text)}
+.nmacc-h:hover{background:var(--surface2)}
+.nmacc-t{font:700 12.5px var(--sans);flex:none;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nmacc-bar{flex:1;display:flex;gap:1.5px;height:12px;min-width:60px}
+.nmacc-bar i{flex:1;border-radius:1px;min-width:0}
+.nmacc-n{font:700 12px var(--mono);color:var(--muted);flex:none}
+.nmacc-chev{flex:none;color:var(--dim);transition:transform .2s;font-size:15px}
+.nmacc[open] .nmacc-chev,.nmacc.on .nmacc-chev{transform:rotate(90deg)}
+.nmacc-body{padding:4px 14px 14px}
+.nmreqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.nmreq{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;background:var(--surface);min-width:0;cursor:pointer}
+.nmreq:hover{border-color:var(--accent);background:var(--surface2)}
+.nmtrace-req{font:800 15px var(--sans);display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 12px}
+.nmtrace-req .nref{font:700 13px var(--mono);color:var(--dim)}
+.nmtrace-ctrl{border-left:3px solid var(--border2);padding:2px 0 2px 14px;margin:0 0 16px}
+.nmtrace-ctrl.c-cubierto{border-left-color:#2fa671}.nmtrace-ctrl.c-parcial{border-left-color:#c88c00}.nmtrace-ctrl.c-brecha{border-left-color:#d9434f}.nmtrace-ctrl.c-sincontrol{border-left-color:var(--dim)}
+.nmtrace-ch{font:700 13px var(--sans);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.nmtrace-proc{font:600 12px var(--sans);color:var(--muted);margin:8px 0 4px;display:flex;align-items:center;gap:7px}
+.nmreq i.nd{width:9px;height:9px;border-radius:50%;flex:none}
+.nmreq .nref{font:700 11px var(--mono);color:var(--dim);flex:none}
+.nmreq .ntit{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nmreq.gap{border-style:dashed}
+.nmpend{margin-top:18px}
+.nmpend-row{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--border)}
+.nmpend-row:last-child{border-bottom:none}
+.nmpend-row .pb{font:800 13px var(--mono);color:var(--accent);min-width:46px}
+.nmov{margin-top:18px;overflow:auto}
+.nmov table{border-collapse:collapse;font:600 12px var(--mono)}
+.nmov th,.nmov td{border:1px solid var(--border);padding:7px 11px;text-align:center}
+.nmov th{color:var(--dim);font-weight:700;background:var(--surface2)}
+.nmov td.d{background:var(--surface2);color:var(--dim)}
+.nmov .ovhi{color:#2fa671;font-weight:800}
 /* ---- app Tickets ---- */
 .kpis.k6{grid-template-columns:repeat(6,1fr)}
 @media(max-width:1100px){.kpis.k6{grid-template-columns:repeat(3,1fr)}}
@@ -683,16 +750,31 @@ body.dockon.dock-hidden #dockshow{transform:translate(0,-50%) rotate(-90deg)}
   </section>
 
   <section id="v-cumplimiento" class="appview">
-    <div class="kpis" id="cmp-kpis" style="grid-template-columns:repeat(4,1fr)"></div>
-    <div class="panel anpanel">
-      <div class="cmphead"><h4 id="cmp-h" style="margin:0"></h4><button class="clr" id="cmp-edit" style="display:none"></button></div>
-      <div id="cmp-list"></div>
+    <div class="cmpseg" id="cmp-seg">
+      <button class="cmpsegb on" data-cv="procesos" id="cmpseg-procesos"></button>
+      <button class="cmpsegb" data-cv="normas" id="cmpseg-normas"></button>
     </div>
-    <div class="panel anpanel" id="cmp-detail" style="display:none"></div>
-    <div class="panel anpanel" id="cmp-editor" style="display:none">
-      <h4 id="cmp-ed-h"></h4>
-      <div id="cmp-ed-rows"></div>
-      <div class="cmpedbar"><button class="clr" id="cmp-add"></button><button class="clr on" id="cmp-save"></button><span id="cmp-ed-st"></span></div>
+    <div id="cmpv-procesos">
+      <div class="kpis k5" id="cmp-kpis"></div>
+      <div class="panel anpanel">
+        <div class="cmphead"><h4 id="cmp-h" style="margin:0"></h4><button class="clr" id="cmp-edit" style="display:none"></button></div>
+        <div id="cmp-list"></div>
+      </div>
+      <div class="panel anpanel" id="cmp-detail" style="display:none"></div>
+      <div class="panel anpanel" id="cmp-editor" style="display:none">
+        <h4 id="cmp-ed-h"></h4>
+        <div id="cmp-ed-rows"></div>
+        <div class="cmpedbar"><button class="clr" id="cmp-add"></button><button class="clr on" id="cmp-save"></button><span id="cmp-ed-st"></span></div>
+      </div>
+    </div>
+    <div id="cmpv-normas" style="display:none">
+      <div class="nmbar">
+        <label class="nmf"><span id="nm-l-fw"></span><select id="nm-fw"></select></label>
+        <label class="nmf"><span id="nm-l-ent"></span><select id="nm-ent"></select></label>
+        <span class="nmnote" id="nm-note"></span>
+      </div>
+      <div id="nm-body"></div>
+      <div class="panel anpanel" id="nm-detail" style="display:none"></div>
     </div>
   </section>
   <section id="v-crm" class="appview">
@@ -882,6 +964,24 @@ Object.assign(I18N.en,{app_cmp:'Compliance',cmp_h:'Critical processes',cmp_none:
 Object.assign(I18N.fr,{app_cmp:'Conformité',cmp_h:'Processus critiques',cmp_none:'Aucun processus défini — un administrateur peut les créer via « Gérer les processus »',cmp_k_ok:'À jour',cmp_k_late:'Dépassés',cmp_k_soon:'Échéance cette semaine',cmp_k_total:'Processus',cmp_last:'il y a',cmp_due:'échéance dans',cmp_overdue:'DÉPASSÉ depuis',cmp_never:'sans données',cmp_cycles:'12 derniers cycles',cmp_ev:'Preuves',cmp_ev_none:'Aucun ticket associé',cmp_done:'Résolu',cmp_edit:'Gérer les processus',cmp_add:'+ Processus',cmp_save:'Enregistrer',cmp_saved:'Enregistré ✓',cmp_err:'Échec de l\'enregistrement',cmp_del:'Supprimer',cmp_ed_name:'Nom',cmp_ed_every:'Fréquence',cmp_ed_cat:'Catégorie',cmp_ed_ent:'Entité',cmp_ent_all:'Toutes les entités',cmp_ed_grace:'Marge (j)',cmp_ed_owner:'Responsable',cmp_ed_group:'Groupe responsable',cmp_ed_ents:'Entités (clients)',ev_daily:'Quotidien',ev_weekly:'Hebdomadaire',ev_monthly:'Mensuel',ev_quarterly:'Trimestriel',ev_halfyearly:'Semestriel',ev_yearly:'Annuel'});
 Object.assign(I18N.de,{app_cmp:'Compliance',cmp_h:'Kritische Prozesse',cmp_none:'Keine Prozesse definiert — ein Administrator kann sie unter „Prozesse verwalten" anlegen',cmp_k_ok:'Aktuell',cmp_k_late:'Überfällig',cmp_k_soon:'Diese Woche fällig',cmp_k_total:'Prozesse',cmp_last:'vor',cmp_due:'fällig in',cmp_overdue:'ÜBERFÄLLIG seit',cmp_never:'keine Daten',cmp_cycles:'Letzte 12 Zyklen',cmp_ev:'Nachweise',cmp_ev_none:'Keine Tickets vorhanden',cmp_done:'Gelöst',cmp_edit:'Prozesse verwalten',cmp_add:'+ Prozess',cmp_save:'Speichern',cmp_saved:'Gespeichert ✓',cmp_err:'Speichern fehlgeschlagen',cmp_del:'Löschen',cmp_ed_name:'Name',cmp_ed_every:'Häufigkeit',cmp_ed_cat:'Kategorie',cmp_ed_ent:'Entität',cmp_ent_all:'Alle Entitäten',cmp_ed_grace:'Frist (T)',cmp_ed_owner:'Verantwortlich',cmp_ed_group:'Verantwortliche Gruppe',cmp_ed_ents:'Entitäten (Kunden)',ev_daily:'Täglich',ev_weekly:'Wöchentlich',ev_monthly:'Monatlich',ev_quarterly:'Vierteljährlich',ev_halfyearly:'Halbjährlich',ev_yearly:'Jährlich'});
 Object.assign(I18N.pt,{app_cmp:'Conformidade',cmp_h:'Processos críticos',cmp_none:'Nenhum processo definido — um administrador pode criá-los em "Gerenciar processos"',cmp_k_ok:'Em dia',cmp_k_late:'Vencidos',cmp_k_soon:'Vencem esta semana',cmp_k_total:'Processos',cmp_last:'há',cmp_due:'vence em',cmp_overdue:'VENCIDO há',cmp_never:'sem dados',cmp_cycles:'Últimos 12 ciclos',cmp_ev:'Evidência',cmp_ev_none:'Sem tickets de respaldo',cmp_done:'Resolvido',cmp_edit:'Gerenciar processos',cmp_add:'+ Processo',cmp_save:'Salvar',cmp_saved:'Salvo ✓',cmp_err:'Falha ao salvar',cmp_del:'Excluir',cmp_ed_name:'Nome',cmp_ed_every:'Frequência',cmp_ed_cat:'Categoria',cmp_ed_ent:'Entidade',cmp_ent_all:'Todas as entidades',cmp_ed_grace:'Tolerância (d)',cmp_ed_owner:'Responsável',cmp_ed_group:'Grupo responsável',cmp_ed_ents:'Entidades (clientes)',ev_daily:'Diário',ev_weekly:'Semanal',ev_monthly:'Mensal',ev_quarterly:'Trimestral',ev_halfyearly:'Semestral',ev_yearly:'Anual'});
+// Resultado del proceso (no solo ejecución): tipos de solución del ticket.
+Object.assign(I18N.es,{cmp_k_find:'Con hallazgos',cmp_lg_ok:'Al día',cmp_lg_find:'Al día con hallazgos',cmp_lg_crit:'Al día, crítico',cmp_lg_run:'En curso',cmp_lg_late:'Vencido',cmp_lg_nodata:'Sin datos',cmp_c_result:'Resultado',cmp_res_none:'sin registrar'});
+Object.assign(I18N.en,{cmp_k_find:'With findings',cmp_lg_ok:'Up to date',cmp_lg_find:'Up to date, with findings',cmp_lg_crit:'Up to date, critical',cmp_lg_run:'In progress',cmp_lg_late:'Overdue',cmp_lg_nodata:'No data',cmp_c_result:'Result',cmp_res_none:'not recorded'});
+Object.assign(I18N.fr,{cmp_k_find:'Avec constats',cmp_lg_ok:'À jour',cmp_lg_find:'À jour, avec constats',cmp_lg_crit:'À jour, critique',cmp_lg_run:'En cours',cmp_lg_late:'Dépassé',cmp_lg_nodata:'Sans données',cmp_c_result:'Résultat',cmp_res_none:'non renseigné'});
+Object.assign(I18N.de,{cmp_k_find:'Mit Feststellungen',cmp_lg_ok:'Aktuell',cmp_lg_find:'Aktuell, mit Feststellungen',cmp_lg_crit:'Aktuell, kritisch',cmp_lg_run:'Laufend',cmp_lg_late:'Überfällig',cmp_lg_nodata:'Keine Daten',cmp_c_result:'Ergebnis',cmp_res_none:'nicht erfasst'});
+Object.assign(I18N.pt,{cmp_k_find:'Com apontamentos',cmp_lg_ok:'Em dia',cmp_lg_find:'Em dia, com apontamentos',cmp_lg_crit:'Em dia, crítico',cmp_lg_run:'Em curso',cmp_lg_late:'Vencido',cmp_lg_nodata:'Sem dados',cmp_c_result:'Resultado',cmp_res_none:'não registrado'});
+// Vista "Por norma" (mapeo ISO 27001 / ISO 9001 / NIS2).
+Object.assign(I18N.es,{cmp_tab_proc:'Procesos',cmp_tab_norm:'Por norma',nm_fw:'Norma',nm_ent:'Entidad',nm_note:'Mapeo interno — validar con el auditor',nm_pct:'cumplimiento',nm_reqs:'requisitos',nm_pending_h:'Qué implantar primero',nm_pending_none:'Todo cubierto o sin controles pendientes',nm_overlap_h:'Solapamiento entre normas',nm_overlap_sub:'Si cumplís la fila, cubrís este % de la columna',nm_controls:'Controles',nm_nocontrol:'sin control asignado',nm_empty:'Sin normas en alcance para esta entidad',nm_covers:'cubriría',nm_s_cubierto:'Cubierto',nm_s_parcial:'Parcial',nm_s_brecha:'Brecha',nm_s_sincontrol:'Sin control',nm_s_na:'No aplica'});
+Object.assign(I18N.en,{cmp_tab_proc:'Processes',cmp_tab_norm:'By standard',nm_fw:'Standard',nm_ent:'Entity',nm_note:'Internal mapping — validate with your auditor',nm_pct:'compliance',nm_reqs:'requirements',nm_pending_h:'What to implement first',nm_pending_none:'All covered or no pending controls',nm_overlap_h:'Overlap between standards',nm_overlap_sub:'If you meet the row, you cover this % of the column',nm_controls:'Controls',nm_nocontrol:'no control assigned',nm_empty:'No standards in scope for this entity',nm_covers:'would cover',nm_s_cubierto:'Covered',nm_s_parcial:'Partial',nm_s_brecha:'Gap',nm_s_sincontrol:'No control',nm_s_na:'N/A'});
+Object.assign(I18N.fr,{cmp_tab_proc:'Processus',cmp_tab_norm:'Par norme',nm_fw:'Norme',nm_ent:'Entité',nm_note:'Mapping interne — à valider avec l\'auditeur',nm_pct:'conformité',nm_reqs:'exigences',nm_pending_h:'Quoi mettre en place d\'abord',nm_pending_none:'Tout couvert ou aucun contrôle en attente',nm_overlap_h:'Chevauchement entre normes',nm_overlap_sub:'Si vous respectez la ligne, vous couvrez ce % de la colonne',nm_controls:'Contrôles',nm_nocontrol:'aucun contrôle assigné',nm_empty:'Aucune norme dans le périmètre de cette entité',nm_covers:'couvrirait',nm_s_cubierto:'Couvert',nm_s_parcial:'Partiel',nm_s_brecha:'Écart',nm_s_sincontrol:'Sans contrôle',nm_s_na:'N/A'});
+Object.assign(I18N.de,{cmp_tab_proc:'Prozesse',cmp_tab_norm:'Nach Norm',nm_fw:'Norm',nm_ent:'Entität',nm_note:'Interne Zuordnung — mit dem Auditor validieren',nm_pct:'Erfüllung',nm_reqs:'Anforderungen',nm_pending_h:'Was zuerst umsetzen',nm_pending_none:'Alles abgedeckt oder keine offenen Kontrollen',nm_overlap_h:'Überschneidung zwischen Normen',nm_overlap_sub:'Erfüllst du die Zeile, deckst du diesen % der Spalte ab',nm_controls:'Kontrollen',nm_nocontrol:'keine Kontrolle zugewiesen',nm_empty:'Keine Normen im Geltungsbereich dieser Entität',nm_covers:'würde abdecken',nm_s_cubierto:'Abgedeckt',nm_s_parcial:'Teilweise',nm_s_brecha:'Lücke',nm_s_sincontrol:'Keine Kontrolle',nm_s_na:'N/z'});
+Object.assign(I18N.pt,{cmp_tab_proc:'Processos',cmp_tab_norm:'Por norma',nm_fw:'Norma',nm_ent:'Entidade',nm_note:'Mapeamento interno — validar com o auditor',nm_pct:'conformidade',nm_reqs:'requisitos',nm_pending_h:'O que implementar primeiro',nm_pending_none:'Tudo coberto ou sem controles pendentes',nm_overlap_h:'Sobreposição entre normas',nm_overlap_sub:'Se cumprir a linha, cobre este % da coluna',nm_controls:'Controles',nm_nocontrol:'sem controle atribuído',nm_empty:'Sem normas no escopo desta entidade',nm_covers:'cobriria',nm_s_cubierto:'Coberto',nm_s_parcial:'Parcial',nm_s_brecha:'Lacuna',nm_s_sincontrol:'Sem controle',nm_s_na:'N/A'});
+// Drill-down: cadena de evidencia de un requisito (control -> proceso -> tickets).
+Object.assign(I18N.es,{nm_how:'Cómo se sostiene',nm_proc:'Proceso',nm_noproc:'Sin proceso asociado',nm_nocov:'Ningún control cubre este requisito — brecha sin cubrir',nm_close:'Cerrar'});
+Object.assign(I18N.en,{nm_how:'How it is backed',nm_proc:'Process',nm_noproc:'No linked process',nm_nocov:'No control covers this requirement — open gap',nm_close:'Close'});
+Object.assign(I18N.fr,{nm_how:'Sur quoi ça repose',nm_proc:'Processus',nm_noproc:'Aucun processus associé',nm_nocov:'Aucun contrôle ne couvre cette exigence — écart non couvert',nm_close:'Fermer'});
+Object.assign(I18N.de,{nm_how:'Worauf es beruht',nm_proc:'Prozess',nm_noproc:'Kein verknüpfter Prozess',nm_nocov:'Keine Kontrolle deckt diese Anforderung ab — offene Lücke',nm_close:'Schließen'});
+Object.assign(I18N.pt,{nm_how:'Como se sustenta',nm_proc:'Processo',nm_noproc:'Sem processo associado',nm_nocov:'Nenhum controle cobre este requisito — lacuna em aberto',nm_close:'Fechar'});
 Object.assign(I18N.es,{seeing:'Viendo',of:'de',why_h:'¿Qué proyectos veo?',why_p:'Ves los proyectos que tu usuario puede ver en GLPI, según tu perfil y tu entidad activa. El administrador puede además filtrar el tablero por tipo de proyecto. Si esperás un proyecto y no aparece, revisá esas tres cosas en GLPI: permisos del perfil, entidad y tipo.',why_filter:'Filtro de tipo',untyped:'Sin tipo',nt_note:'proyecto(s) sin tipo en GLPI — se muestran con el aviso «Sin tipo»'});
 Object.assign(I18N.en,{seeing:'Showing',of:'of',why_h:'Which projects do I see?',why_p:'You see the projects your user can see in GLPI, based on your profile and active entity. The administrator can also filter the board by project type. If a project you expect is missing, check those three things in GLPI: profile permissions, entity and type.',why_filter:'Type filter',untyped:'Untyped',nt_note:'project(s) with no type in GLPI — shown with an “Untyped” notice'});
 Object.assign(I18N.fr,{seeing:'Affichage',of:'sur',why_h:'Quels projets est-ce que je vois ?',why_p:'Vous voyez les projets que votre utilisateur peut voir dans GLPI, selon votre profil et votre entité active. L\'administrateur peut aussi filtrer le tableau par type de projet. S\'il manque un projet attendu, vérifiez ces trois points dans GLPI : permissions du profil, entité et type.',why_filter:'Filtre de type',untyped:'Sans type',nt_note:'projet(s) sans type dans GLPI — affichés avec la mention « Sans type »'});
@@ -924,7 +1024,7 @@ if($leye&&$lpass){
 
 // ---- idioma (sincroniza header + login) ----
 const $lang=$('#lang'), $llang=$('#l-lang'); $lang.value=LANG; if($llang)$llang.value=LANG;
-function setLang(v){LANG=v;localStorage.setItem('rh-lang',LANG);$lang.value=LANG;if($llang)$llang.value=LANG;applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();if(TK.data)renderTickets();if(CMP.data)renderCmp();}
+function setLang(v){LANG=v;localStorage.setItem('rh-lang',LANG);$lang.value=LANG;if($llang)$llang.value=LANG;applyStatic();if(DATA.projects&&DATA.projects.length){renderResumen();renderExpl();renderMapa();renderHub();if(SEL){const p=DATA.projects.find(x=>x.id===SEL);if(p)detail(p);}}renderFich();if(TK.data)renderTickets();if(CMP.data)renderCmp();if(typeof cmpSegLabels==='function')cmpSegLabels();if(NM.data)renderNormas();}
 $lang.addEventListener('change',()=>setLang($lang.value));
 if($llang)$llang.addEventListener('change',()=>setLang($llang.value));
 function applyStatic(){
@@ -1790,7 +1890,7 @@ function fetchCumplimiento(){
 function renderCmp(){
   const d=CMP.data; if(!d)return;
   const k=d.kpis||{};
-  $('#cmp-kpis').innerHTML=[[(k.ok||0)+' / '+(k.total||0),T('cmp_k_ok')],[k.late||0,T('cmp_k_late')],[k.soon||0,T('cmp_k_soon')],[k.total||0,T('cmp_k_total')]]
+  $('#cmp-kpis').innerHTML=[[(k.ok||0)+' / '+(k.total||0),T('cmp_k_ok')],[k.find||0,T('cmp_k_find')],[k.late||0,T('cmp_k_late')],[k.soon||0,T('cmp_k_soon')],[k.total||0,T('cmp_k_total')]]
     .map(x=>`<div class="kpi"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('');
   $('#cmp-h').textContent=T('cmp_h');
   const eb=$('#cmp-edit'); eb.style.display=d.canEdit?'':'none'; eb.textContent=T('cmp_edit');
@@ -1799,17 +1899,21 @@ function renderCmp(){
   const procs=(d.procs||[]).slice().sort((a,b)=>String(a.ent||'').localeCompare(String(b.ent||''))||String(a.name).localeCompare(String(b.name)));
   const multiEnt=new Set(procs.map(p=>p.ent||'')).size>1;
   if(!procs.length) box.innerHTML='<div class="empty">'+T('cmp_none')+'</div>';
+  if(procs.length) box.appendChild(el('div','cmplegend',
+    [['ok','cmp_lg_ok'],['ok_find','cmp_lg_find'],['ok_crit','cmp_lg_crit'],['run','cmp_lg_run'],['late','cmp_lg_late'],['nodata','cmp_lg_nodata']]
+      .map(g=>'<span class="cmplg"><i class="'+g[0]+'"></i>'+esc(T(g[1]))+'</span>').join('')));
   let curEnt=null;
   procs.forEach(p=>{
     if(multiEnt&&(p.ent||'')!==curEnt){curEnt=p.ent||'';box.appendChild(el('div','cmpent',esc(curEnt||T('cmp_ent_all'))));}
     const row=el('div','cmprow');
     const when = p.state==='late' ? `<div class="cmpwhen late">${T('cmp_overdue')} ${Math.abs(p.dueIn)} d</div>`
       : p.state==='nodata' ? `<div class="cmpwhen">${T('cmp_never')}</div>`
-      : `<div class="cmpwhen">${p.days!=null?T('cmp_last')+' '+p.days+' d':''}${p.dueIn!=null?' · '+T('cmp_due')+' '+p.dueIn+' d':''}</div>`;
+      : `<div class="cmpwhen ${p.state==='ok_find'||p.state==='ok_crit'?p.state:''}">${p.days!=null?T('cmp_last')+' '+p.days+' d':''}${p.dueIn!=null?' · '+T('cmp_due')+' '+p.dueIn+' d':''}</div>`;
     // barra de ciclos: el histórico es lo que convierte un semáforo en un argumento de auditoría
+    // cada ciclo cumplido se tiñe según su resultado (verde / ámbar hallazgos / rojo crítico)
     const segs=p.cycles.map((c,i)=>{
       const last=i===p.cycles.length-1;
-      const cls=c?'':(last?(p.state==='late'?'miss':'cur'):'miss');
+      const cls=c?(c==='find'?'find':c==='crit'?'crit':''):(last?(p.state==='late'?'miss':'cur'):'miss');
       return `<i class="${cls}"></i>`;
     }).join('');
     const resp=[p.owner,p.grp].filter(Boolean).join(' · ');
@@ -1826,14 +1930,17 @@ function renderCmpDetail(){
   const p=d&&(d.procs||[]).find(x=>x.id===CMP.sel);
   if(!p){box.style.display='none';return;}
   box.style.display='';
+  const resCls=s=>{const x=(s||'').toLowerCase().replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i').replace(/[óòö]/g,'o').replace(/[úùü]/g,'u');
+    return x.indexOf('critic')>=0?'ok_crit':(x.indexOf('hallazgo')>=0&&x.indexOf('sin')<0?'ok_find':'');};
   const rows=(p.ev||[]).map(e=>{
     const st=TKST[e.s]||['st1','#888'];
+    const rc=resCls(e.stype), res=e.stype?`<span class="cmplg"><i class="${rc||'ok'}"></i>${esc(e.stype)}</span>`:`<i class="crmna">${T('cmp_res_none')}</i>`;
     return `<tr class="tk-row" data-id="${e.id}"><td>${e.id}</td><td>${esc(e.t)}</td>
       <td><span class="tkst" style="background:${st[1]}22;color:${st[1]}">${T(st[0])}</span></td>
-      <td>${fmtDT(e.date)}</td><td>${fmtDT(e.done)}</td><td>${esc(e.tech||'—')}</td></tr>`;
+      <td>${res}</td><td>${fmtDT(e.date)}</td><td>${fmtDT(e.done)}</td><td>${esc(e.tech||'—')}</td></tr>`;
   }).join('');
   box.innerHTML=`<h4>${T('cmp_ev')} — ${esc(p.name)}</h4>`+(rows
-    ?`<table class="ftable"><thead><tr><th>#</th><th>${T('tk_c_title')}</th><th>${T('tk_c_st')}</th><th>${T('tk_c_open')}</th><th>${T('cmp_done')}</th><th>${T('tk_c_tech')}</th></tr></thead><tbody>${rows}</tbody></table>`
+    ?`<table class="ftable"><thead><tr><th>#</th><th>${T('tk_c_title')}</th><th>${T('tk_c_st')}</th><th>${T('cmp_c_result')}</th><th>${T('tk_c_open')}</th><th>${T('cmp_done')}</th><th>${T('tk_c_tech')}</th></tr></thead><tbody>${rows}</tbody></table>`
     :`<div class="empty">${T('cmp_ev_none')}</div>`);
   if(d.glpi_url) box.querySelectorAll('tr.tk-row').forEach(tr=>
     tr.addEventListener('click',()=>window.open(d.glpi_url+'/front/ticket.form.php?id='+tr.dataset.id,'_blank','noopener')));
@@ -1896,6 +2003,152 @@ $('#cmp-save').addEventListener('click',()=>{
     .then(r=>r.json()).then(j=>{ if(j&&j.ok){$('#cmp-ed-st').textContent=T('cmp_saved');CMP.editing=false;CMP.draft=null;fetchCumplimiento();} else $('#cmp-ed-st').textContent=T('cmp_err'); })
     .catch(()=>{$('#cmp-ed-st').textContent=T('cmp_err');});
 });
+
+// ---- Compliance: vista "Por norma" (mapeo ISO 27001 / ISO 9001 / NIS2) ----
+// Consume data-normas.php: % por norma, estado por requisito, controles
+// pendientes y matriz de solapamiento. El mapeo es criterio propio.
+let NM={data:null,fw:null,ent:null,sub:'procesos'};
+function cmpSegLabels(){const a=$('#cmpseg-procesos'),b=$('#cmpseg-normas');if(a)a.textContent=T('cmp_tab_proc');if(b)b.textContent=T('cmp_tab_norm');}
+function cmpSetSub(v){
+  NM.sub=v;
+  document.querySelectorAll('.cmpsegb').forEach(b=>b.classList.toggle('on',b.dataset.cv===v));
+  const pv=$('#cmpv-procesos'),nv=$('#cmpv-normas'); if(pv)pv.style.display=v==='procesos'?'':'none'; if(nv)nv.style.display=v==='normas'?'':'none';
+  if(v==='normas'&&!NM.data) fetchNormas();
+}
+document.querySelectorAll('.cmpsegb').forEach(b=>b.addEventListener('click',()=>cmpSetSub(b.dataset.cv)));
+function fetchNormas(ent){
+  const q=ent!=null&&ent!==''?('?ent='+encodeURIComponent(ent)):'';
+  $('#nm-body').innerHTML='<div class="empty">…</div>';
+  fetch('data-normas.php'+q,{credentials:'same-origin'})
+    .then(r=>{if(r.status===401){showLogin();return null;}return r.json();})
+    .then(d=>{if(!d)return;NM.data=d;NM.ent=d.entId;if(!NM.fw||!(d.fwKeys||[]).includes(NM.fw))NM.fw=(d.fwKeys||[])[0]||null;renderNormas();})
+    .catch(()=>{$('#nm-body').innerHTML='<div class="empty">'+T('noData')+'</div>';});
+}
+if($('#nm-fw'))$('#nm-fw').addEventListener('change',e=>{NM.fw=e.target.value;renderNormas();});
+if($('#nm-ent'))$('#nm-ent').addEventListener('change',e=>{NM.fw=null;fetchNormas(e.target.value);});
+// acordeón de dominios (delegado, porque el cuerpo se re-dibuja)
+if($('#nm-body'))$('#nm-body').addEventListener('click',e=>{
+  const b=e.target.closest('.nmacc-h');
+  if(b){const acc=b.parentElement, body=acc.querySelector('.nmacc-body');
+    const open=acc.classList.toggle('on'); b.setAttribute('aria-expanded',open?'true':'false');
+    if(body)body.hidden=!open; return;}
+  const rq=e.target.closest('.nmreq'); if(rq&&rq.dataset.ref){renderNmReqDetail(rq.dataset.ref);}
+});
+// estado (proceso/control) -> etiqueta + punto de color
+const NMLG={ok:'cmp_lg_ok',ok_find:'cmp_lg_find',ok_crit:'cmp_lg_crit',run:'cmp_lg_run',late:'cmp_lg_late',nodata:'cmp_lg_nodata'};
+function nmStateChip(st){return '<span class="cmplg"><i class="'+(st||'nodata')+'"></i>'+esc(T(NMLG[st]||'cmp_lg_nodata'))+'</span>';}
+// drill-down: la cadena completa que sostiene un requisito (requisito -> control -> proceso -> tickets)
+function renderNmReqDetail(ref){
+  const d=NM.data, box=$('#nm-detail'); if(!d||!box)return;
+  const fw=d.frameworks[NM.fw]; if(!fw){box.style.display='none';return;}
+  let req=null; (fw.domains||[]).forEach(dom=>(dom.reqs||[]).forEach(r=>{if(r.ref===ref)req=r;}));
+  if(!req){box.style.display='none';return;}
+  const resCls=s=>{const x=(s||'').toLowerCase().replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i').replace(/[óòö]/g,'o').replace(/[úùü]/g,'u');
+    return x.indexOf('critic')>=0?'ok_crit':(x.indexOf('hallazgo')>=0&&x.indexOf('sin')<0?'ok_find':'ok');};
+  let h='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
+    +'<div class="nmtrace-req"><i class="nd nst-'+req.status+'" style="width:12px;height:12px;border-radius:50%"></i><span class="nref">'+esc(req.ref)+'</span>'+esc(req.title)+' <span class="nmchip"><i class="nst-'+req.status+'"></i>'+esc(T('nm_s_'+req.status))+'</span></div>'
+    +'<button class="clr" id="nm-det-close">'+esc(T('nm_close'))+'</button></div>';
+  h+='<div style="font:700 11px var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px">'+esc(T('nm_how'))+'</div>';
+  const ctrls=req.controls||[];
+  if(!ctrls.length){ h+='<div class="empty">'+esc(T('nm_nocov'))+'</div>'; }
+  else ctrls.forEach(ci=>{
+    const cd=(d.cproc||{})[ci.id]||{name:ci.name,state:ci.state,processes:[]};
+    h+='<div class="nmtrace-ctrl c-'+req.status+'"><div class="nmtrace-ch">'+esc(cd.name||ci.name)+' '+nmStateChip(cd.state||ci.state)+'</div>';
+    const procs=cd.processes||[];
+    if(!procs.length) h+='<div class="dim" style="font-size:12px;color:var(--dim)">'+esc(T('nm_noproc'))+'</div>';
+    procs.forEach(p=>{
+      const when=p.state==='nodata'?T('cmp_never'):(p.days!=null?T('cmp_last')+' '+p.days+' d':'');
+      h+='<div class="nmtrace-proc">'+esc(T('nm_proc'))+': <b style="color:var(--text)">'+esc(p.name)+'</b> · '+esc(T('ev_'+p.every))+' '+nmStateChip(p.state)+(when?'<span style="color:var(--dim)">· '+esc(when)+'</span>':'')+'</div>';
+      const rows=(p.ev||[]).map(e=>{
+        const st=TKST[e.s]||['st1','#888']; const rc=e.stype?resCls(e.stype):'';
+        const res=e.stype?'<span class="cmplg"><i class="'+(rc||'ok')+'"></i>'+esc(e.stype)+'</span>':'<i class="crmna">'+T('cmp_res_none')+'</i>';
+        return '<tr class="tk-row" data-id="'+e.id+'"><td>'+e.id+'</td><td>'+esc(e.t)+'</td><td><span class="tkst" style="background:'+st[1]+'22;color:'+st[1]+'">'+T(st[0])+'</span></td><td>'+res+'</td><td>'+fmtDT(e.date)+'</td><td>'+fmtDT(e.done)+'</td></tr>';
+      }).join('');
+      h+=rows?('<table class="ftable" style="margin:2px 0 6px"><thead><tr><th>#</th><th>'+T('tk_c_title')+'</th><th>'+T('tk_c_st')+'</th><th>'+T('cmp_c_result')+'</th><th>'+T('tk_c_open')+'</th><th>'+T('cmp_done')+'</th></tr></thead><tbody>'+rows+'</tbody></table>'):('<div class="empty" style="padding:6px 0">'+T('cmp_ev_none')+'</div>');
+    });
+    h+='</div>';
+  });
+  box.innerHTML=h; box.style.display='';
+  const cb=$('#nm-det-close'); if(cb)cb.addEventListener('click',()=>{box.style.display='none';});
+  if(d.glpi_url) box.querySelectorAll('tr.tk-row').forEach(tr=>tr.addEventListener('click',()=>window.open(d.glpi_url+'/front/ticket.form.php?id='+tr.dataset.id,'_blank','noopener')));
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function renderNormas(){
+  const d=NM.data; if(!d)return;
+  const _dt=$('#nm-detail'); if(_dt)_dt.style.display='none';
+  $('#nm-l-fw').textContent=T('nm_fw'); $('#nm-l-ent').textContent=T('nm_ent'); $('#nm-note').textContent=T('nm_note');
+  const fws=d.fwKeys||[];
+  $('#nm-fw').innerHTML=fws.map(k=>'<option value="'+k+'"'+(k===NM.fw?' selected':'')+'>'+esc((d.frameworks[k]||{}).short||k)+'</option>').join('');
+  const ents=d.scope||[];
+  $('#nm-ent').innerHTML=ents.map(e=>'<option value="'+e.id+'"'+(e.id===d.entId?' selected':'')+'>'+esc(e.name)+'</option>').join('');
+  $('#nm-ent').parentElement.style.display=ents.length>1?'':'none';
+  const body=$('#nm-body');
+  if(!fws.length){body.innerHTML='<div class="empty">'+T('nm_empty')+'</div>';return;}
+  const fw=d.frameworks[NM.fw]; if(!fw){body.innerHTML='';return;}
+  const c=fw.counts||{};
+  // hero: la rueda de cumplimiento es la protagonista
+  let h='<div class="panel anpanel nmhero">';
+  h+='<div class="nmradial">'+nmRadial(fw,232)+'</div>';
+  h+='<div class="nmhero-info"><h3>'+esc(fw.name)+'</h3><div class="nmcounts">'
+    +nmChip('cubierto',T('nm_s_cubierto'),c.cubierto||0)
+    +nmChip('parcial',T('nm_s_parcial'),c.parcial||0)
+    +nmChip('brecha',T('nm_s_brecha'),Math.max(0,(c.brecha||0)-(c.sincontrol||0)))
+    +nmChip('sincontrol',T('nm_s_sincontrol'),c.sincontrol||0)
+    +'</div><div style="font:500 11.5px var(--sans);color:var(--dim);margin-top:14px;max-width:560px;line-height:1.5">'+esc(fw.note||'')+'</div></div>';
+  h+='</div>';
+  // detalle de requisitos: un acordeón por dominio (colapsado), con mini-barra de estado
+  (fw.domains||[]).forEach((dom,di)=>{
+    const reqs=dom.reqs||[];
+    const cub=reqs.filter(r=>r.status==='cubierto').length;
+    const bar=reqs.map(r=>'<i class="nst-'+r.status+'"></i>').join('');
+    h+='<div class="nmacc"><button class="nmacc-h" aria-expanded="false"><span class="nmacc-t">'+esc(dom.name)+'</span><span class="nmacc-bar">'+bar+'</span><span class="nmacc-n">'+cub+'/'+reqs.length+'</span><span class="nmacc-chev">&#8250;</span></button>';
+    h+='<div class="nmacc-body" hidden><div class="nmreqs">';
+    h+=reqs.map(r=>{
+      const tip=(r.controls||[]).length?(T('nm_controls')+': '+r.controls.map(x=>x.name).join(', ')):T('nm_nocontrol');
+      return '<div class="nmreq'+(r.status==='sincontrol'||r.status==='brecha'?' gap':'')+'" data-ref="'+esc(r.ref)+'" title="'+esc(tip)+'"><i class="nd nst-'+r.status+'"></i><span class="nref">'+esc(r.ref)+'</span><span class="ntit">'+esc(r.title)+'</span></div>';
+    }).join('');
+    h+='</div></div></div>';
+  });
+  const pend=d.pending||[];
+  h+='<div class="panel anpanel nmpend"><h4 style="margin:0 0 6px">'+T('nm_pending_h')+'</h4>';
+  if(!pend.length) h+='<div class="empty">'+T('nm_pending_none')+'</div>';
+  else h+=pend.map(p=>{
+    const per=Object.entries(p.byFw||{}).map(([k,n])=>esc(((d.frameworks[k]||{}).short||k)+' '+n)).join(' · ');
+    const dot=p.state==='ok_crit'?'ok_crit':p.state==='ok_find'?'ok_find':p.state;
+    return '<div class="nmpend-row"><span class="pb">+'+p.total+'</span><div class="cmpname" style="flex:1"><b>'+esc(p.name)+'</b><small>'+T('nm_covers')+' '+p.total+' '+T('nm_reqs')+(per?' · '+per:'')+'</small></div><span class="cmplg"><i class="'+dot+'"></i></span></div>';
+  }).join('');
+  h+='</div>';
+  if(fws.length>1){
+    h+='<div class="panel anpanel nmov"><h4 style="margin:0 0 2px">'+T('nm_overlap_h')+'</h4><div style="font:500 11.5px var(--sans);color:var(--dim);margin-bottom:10px">'+T('nm_overlap_sub')+'</div>';
+    h+='<table><thead><tr><th></th>'+fws.map(k=>'<th>'+esc((d.frameworks[k]||{}).short||k)+'</th>').join('')+'</tr></thead><tbody>';
+    h+=fws.map(a=>'<tr><th>'+esc((d.frameworks[a]||{}).short||a)+'</th>'+fws.map(b=>{
+      if(a===b)return '<td class="d">—</td>';
+      const v=((d.overlap||{})[a]||{})[b];
+      return '<td'+(v>=50?' class="ovhi"':'')+'>'+(v==null?'–':v+'%')+'</td>';
+    }).join('')+'</tr>').join('');
+    h+='</tbody></table></div>';
+  }
+  body.innerHTML=h;
+}
+function nmChip(st,label,n){return '<span class="nmchip"><i class="nst-'+st+'"></i>'+esc(label)+' '+n+'</span>';}
+function nmRadial(fw,px){
+  px=px||150;
+  const reqs=[]; (fw.domains||[]).forEach(dom=>(dom.reqs||[]).forEach(r=>reqs.push(r)));
+  const N=reqs.length||1, cx=86,cy=86,ri=52,ro=80;
+  const col={cubierto:'#2fa671',parcial:'#c88c00',brecha:'#d9434f',sincontrol:'#6b7280',na:'#2b2b31'};
+  const pol=(a,r)=>[(cx+r*Math.cos(a)).toFixed(2),(cy+r*Math.sin(a)).toFixed(2)];
+  let segs='';
+  reqs.forEach((r,i)=>{
+    const a0=-Math.PI/2+(i/N)*2*Math.PI, a1=-Math.PI/2+((i+1)/N)*2*Math.PI-(N>40?0.004:0.02);
+    const [x0,y0]=pol(a0,ri),[x1,y1]=pol(a0,ro),[x2,y2]=pol(a1,ro),[x3,y3]=pol(a1,ri);
+    segs+='<path d="M'+x0+' '+y0+' L'+x1+' '+y1+' A'+ro+' '+ro+' 0 0 1 '+x2+' '+y2+' L'+x3+' '+y3+' A'+ri+' '+ri+' 0 0 0 '+x0+' '+y0+' Z" fill="'+(col[r.status]||'#6b7280')+'"><title>'+esc(r.ref+' · '+r.title)+'</title></path>';
+  });
+  return '<svg viewBox="0 0 172 172" width="'+px+'" height="'+px+'" style="max-width:100%" role="img">'+segs
+    +'<circle cx="86" cy="86" r="50" fill="var(--surface)"/>'
+    +'<text x="86" y="82" text-anchor="middle" style="font:800 30px var(--sans);fill:var(--text)">'+fw.pct+'%</text>'
+    +'<text x="86" y="102" text-anchor="middle" style="font:600 9px var(--mono);fill:var(--dim);letter-spacing:.08em">'+esc((T('nm_pct')||'').toUpperCase())+'</text></svg>';
+}
+cmpSegLabels();
 
 // ---- navegación: apps (hub/proyectos/fichadas) + tabs de proyectos ----
 // recordar dónde estaba el usuario (app y pestaña) para que recargar no lo mueva
