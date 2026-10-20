@@ -36,7 +36,10 @@
     "al_rack": "En el rack / sala",
     "al_hidden": "En filas ocultas",
     "al_noloc": "Sin ubicación física conocida",
-    "al_status": "Monitoreo: {n} alertas · {h}"
+    "al_status": "Monitoreo: {n} alertas · {h}",
+    "energia_show": "Mostrar energía",
+    "energia_title": "Energía",
+    "energia_sub": "Alimentación: equipo → UPS / PDU (regleta)."
   },
   "en": {
     "title": "3D Datacenter",
@@ -75,7 +78,10 @@
     "al_rack": "In the rack / room",
     "al_hidden": "In hidden rows",
     "al_noloc": "No known physical location",
-    "al_status": "Monitoring: {n} alerts · {h}"
+    "al_status": "Monitoring: {n} alerts · {h}",
+    "energia_show": "Show power",
+    "energia_title": "Power",
+    "energia_sub": "Power: device → UPS / PDU (strip)."
   },
   "fr": {
     "title": "Datacenter 3D",
@@ -114,7 +120,10 @@
     "al_rack": "Dans la baie / salle",
     "al_hidden": "Dans les rangées masquées",
     "al_noloc": "Sans emplacement physique connu",
-    "al_status": "Supervision : {n} alertes · {h}"
+    "al_status": "Supervision : {n} alertes · {h}",
+    "energia_show": "Afficher l'alimentation",
+    "energia_title": "Alimentation",
+    "energia_sub": "Alimentation : équipement → onduleur / PDU."
   },
   "de": {
     "title": "3D-Rechenzentrum",
@@ -153,7 +162,10 @@
     "al_rack": "Im Rack / Raum",
     "al_hidden": "In ausgeblendeten Reihen",
     "al_noloc": "Kein bekannter physischer Standort",
-    "al_status": "Monitoring: {n} Meldungen · {h}"
+    "al_status": "Monitoring: {n} Meldungen · {h}",
+    "energia_show": "Strom anzeigen",
+    "energia_title": "Strom",
+    "energia_sub": "Stromversorgung: Gerät → USV / PDU."
   },
   "pt": {
     "title": "Datacenter 3D",
@@ -192,6 +204,9 @@
     "al_rack": "No rack / sala",
     "al_hidden": "Em fileiras ocultas",
     "al_noloc": "Sem localização física conhecida",
-    "al_status": "Monitoramento: {n} alertas · {h}"
+    "al_status": "Monitoramento: {n} alertas · {h}",
+    "energia_show": "Mostrar energia",
+    "energia_title": "Energia",
+    "energia_sub": "Alimentação: equipamento → UPS / PDU."
   }
 }

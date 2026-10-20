@@ -63,12 +63,15 @@ if (empty($_SESSION['glpi_token'])) {
   </div>
   <label class="chk"><input type="checkbox" id="chkInfo" checked> <span id="t-info-hide"></span></label>
   <label class="chk"><input type="checkbox" id="chkCables" checked> <span id="t-cables-show"></span></label>
+  <label class="chk"><input type="checkbox" id="chkEnergia" checked> <span id="t-energia-show"></span></label>
   <label class="chk"><span id="t-ruteo"></span>
     <select id="selRuteo"><option value="centro" id="t-ruteo-centro"></option><option value="costados" id="t-ruteo-costados"></option></select></label>
   <label class="chk"><input type="checkbox" id="chkPuerta" checked> <span id="t-door"></span></label>
   <label class="chk"><input type="checkbox" id="chkPaneles"> <span id="t-panels"></span></label>
   <details id="detCables" style="display:none"><summary class="grupo" style="cursor:pointer" id="t-cables">Cableado</summary>
     <div class="sub" style="margin-top:4px" id="t-cables-sub"></div><div id="listaCables"></div></details>
+  <details id="detEnergia" style="display:none"><summary class="grupo" style="cursor:pointer" id="t-energia">Energía</summary>
+    <div class="sub" style="margin-top:4px" id="t-energia-sub"></div><div id="listaEnergia"></div></details>
   <details id="detAvisos" style="display:none"><summary class="grupo" style="cursor:pointer" id="t-todo">Datos por completar</summary>
     <div class="sub" style="margin-top:4px" id="t-todosub"></div><div id="listaAvisos"></div></details>
   <div id="lista"></div>

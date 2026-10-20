@@ -36,6 +36,7 @@ async function cargarIdioma() {
   set('t-info-hide', 'info_hide'); set('t-cables-show', 'cables_show'); set('t-ruteo', 'ruteo');
   set('t-ruteo-centro', 'ruteo_centro'); set('t-ruteo-costados', 'ruteo_costados');
   set('t-cables-sub', 'cables_sub');
+  set('t-energia-show', 'energia_show'); set('t-energia', 'energia_title'); set('t-energia-sub', 'energia_sub');
   document.documentElement.lang = LANG;
 }
 
@@ -155,7 +156,7 @@ function aplicarDisposicion() {
   racks.forEach(r => { r.grupo.updateMatrixWorld(true); r.caja = cajaDe(r); });
   rackCaja = new THREE.Box3(); vis.forEach(r => rackCaja.union(r.caja));
   if (!racks[rackActual]?.grupo.visible) rackActual = Math.max(0, racks.findIndex(r => r.grupo.visible));
-  pintarChips(); construirCables(); dibujarAlertas();
+  pintarChips(); construirCables(); construirEnergia(); dibujarAlertas();
 }
 function pintarFilas() {
   const nombres = [...new Set(racks.map(r => r.fila))], el = $('filas'); el.replaceChildren();
@@ -473,6 +474,54 @@ function resaltarCable(puerto) {
   });
 }
 
+/* ============ Energía (capa opcional, dato de GLPI) ============
+   Cables de energía: equipo → UPS del rack, o equipo → regleta (PDU). */
+const COLOR_ENERGIA = { ups: 0x2ecc71, pdu: 0xe67e22 };
+let energiaDatos = [], energiaGrupo = null;
+function construirEnergia() {
+  if (energiaGrupo) scene.remove(energiaGrupo);
+  energiaGrupo = new THREE.Group(); scene.add(energiaGrupo);
+  energiaGrupo.visible = $('chkEnergia') ? $('chkEnergia').checked : true;
+  if (!racks.length || !energiaDatos.length) { pintarEnergia(); return; }
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  energiaDatos.forEach((e, k) => {
+    const src = equipos.get(String(e.equipo || '').toLowerCase());
+    if (!src || src.rack === undefined || !racks[src.rack].grupo.visible) return;
+    const R = racks[src.rack];
+    const aL = v => R.grupo.worldToLocal(v.clone()), aW = v => R.grupo.localToWorld(v.clone());
+    const sRear = aL(src.mesh.localToWorld(src.mesh.userData.puertoTrasero('power', 0)));
+    const lado = sRear.x < 0 ? -1 : 1, zLane = -R.obj.profundidad / 2 + .12 + (k % 6) * .01;
+    let dest;
+    if (e.destino_tipo === 'pdu') {
+      dest = V(lado * .24, sRear.y, -R.obj.profundidad / 2 + .09);
+    } else {
+      const ups = equipos.get(String(e.destino || '').toLowerCase());
+      if (!ups || ups.rack !== src.rack) return;
+      const u = aL(ups.mesh.getWorldPosition(V(0, 0, 0)));
+      dest = V(u.x, u.y + .03, -R.obj.profundidad / 2 + .12);
+    }
+    const pts = [sRear, V(sRear.x, sRear.y, zLane), V(dest.x, sRear.y, zLane), V(dest.x, dest.y, zLane), dest];
+    const malla = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(aW), false, 'catmullrom', .2), 90, .0042, 7),
+      new THREE.MeshStandardMaterial({ color: COLOR_ENERGIA[e.destino_tipo] || 0x9aa5c8, roughness: .5, metalness: .1 }));
+    malla.castShadow = true; energiaGrupo.add(malla);
+  });
+  pintarEnergia();
+}
+function pintarEnergia() {
+  const el = $('listaEnergia'); if (!el) return; el.innerHTML = '';
+  const sum = document.querySelector('#detEnergia summary'); if (sum) sum.textContent = `${t('energia_title')} (${energiaDatos.length})`;
+  if ($('detEnergia')) $('detEnergia').style.display = energiaDatos.length ? '' : 'none';
+  energiaDatos.forEach(e => {
+    const d = document.createElement('div'); d.className = 'fila'; d.style.cursor = 'default'; d.style.borderColor = hex(COLOR_ENERGIA[e.destino_tipo] || 0x9aa5c8);
+    d.append(`${e.equipo} → ${e.destino}`); el.appendChild(d);
+  });
+}
+async function cargarEnergia() {
+  const d = await pedirOpcional('energia.php'); if (!d) return;
+  energiaDatos = d.energia || [];
+  construirEnergia();
+}
+
 /* ============ Controles de la interfaz ============ */
 function cablearUI() {
   const rng = $('rngAltura');
@@ -484,12 +533,13 @@ function cablearUI() {
   $('bSala').onclick = () => vistaSala();
   $('bFrente').onclick = () => irARack(rackActual);
   $('bTrasera').onclick = () => irARack(rackActual, true);
-  $('bRefrescar').onclick = () => { actualizar(); cargarCables(); };
+  $('bRefrescar').onclick = () => { actualizar(); cargarCables(); cargarEnergia(); };
   $('selDisp').onchange = e => { disposicion = e.target.value; try { localStorage.setItem('cube3d-disp', disposicion); } catch {} aplicarDisposicion(); vistaSala(); };
   $('chkPuerta').onchange = e => racks.forEach(r => r.obj.setPuerta(e.target.checked));
   $('chkPaneles').onchange = e => racks.forEach(r => r.obj.setPaneles(e.target.checked));
   if ($('chkInfo')) $('chkInfo').onchange = dibujarAlertas;
   if ($('chkCables')) $('chkCables').onchange = e => { if (cableGrupo) cableGrupo.visible = e.target.checked; };
+  if ($('chkEnergia')) $('chkEnergia').onchange = e => { if (energiaGrupo) energiaGrupo.visible = e.target.checked; };
   if ($('selRuteo')) { try { const g = localStorage.getItem('cube3d-ruteo'); if (g) $('selRuteo').value = g; } catch {} $('selRuteo').onchange = e => { try { localStorage.setItem('cube3d-ruteo', e.target.value); } catch {} construirCables(); }; }
   renderer.domElement.addEventListener('wheel', e => { if (!e.shiftKey) return; e.preventDefault(); e.stopImmediatePropagation(); mover(-Math.sign(e.deltaY || e.deltaX) * .08); }, { capture: true, passive: false });
   const rc = new THREE.Raycaster(), pt = new THREE.Vector2();
@@ -562,5 +612,5 @@ addEventListener('resize', () => {
   renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight);
 });
 
-cargarIdioma().then(cablearUI).then(cargar).then(() => Promise.all([actualizar(), cargarCables()]));
+cargarIdioma().then(cablearUI).then(cargar).then(() => Promise.all([actualizar(), cargarCables(), cargarEnergia()]));
 loop();
