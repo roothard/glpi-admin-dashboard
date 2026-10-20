@@ -29,6 +29,12 @@
  ],
  "generica": "equipo-generico",
  "reglas": [
+  { "modelo": "SR5\\d0|SR6\\d0|SR2\\d0", "ficha": "servidor-2u-12x3.5" },
+  { "modelo": "DS2200|DS4200|DS6200", "ficha": "almacenamiento-2u-24x2.5-vertical" },
+  { "modelo": "SG200-5\\d|SG300-5\\d|SLM204\\d|SF300-4\\d", "ficha": "switch-1u-48-rj45-2combo" },
+  { "modelo": "SG200-2\\d|SG300-2\\d", "ficha": "switch-1u-24-rj45" },
+  { "modelo": "Back-UPS|Smart-UPS", "ficha": "ups-torre" },
+  { "modelo": "FGT.?60|FortiGate.?60", "ficha": "firewall-sobremesa-10-rj45" },
   { "modelo": "patch.*panel.*48|patchera.*48", "ficha": "patchera-48" },
   { "modelo": "patch.*panel.*24|patchera.*24", "ficha": "patchera-24" },
   { "modelo": "switch.*48", "ficha": "switch-1u-48-rj45-4sfp" },
