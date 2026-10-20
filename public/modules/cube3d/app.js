@@ -355,29 +355,33 @@ function acomodarEtiquetas(porDelante) {
 }
 function pintarListaAlertas(visibles, sinLugar, ocultas) {
   const el = $('lista'); if (!el) return; el.innerHTML = '';
-  const bloque = (titulo, arr, ubicadas) => {
+  const bloque = (titulo, arr, ubicadas, abierto) => {
     if (!arr.length) return;
-    const h = document.createElement('div'); h.className = 'grupo'; h.textContent = `${titulo} (${arr.length})`; el.appendChild(h);
+    const det = document.createElement('details'); det.open = abierto;
+    const sum = document.createElement('summary'); sum.className = 'grupo'; sum.style.cursor = 'pointer'; sum.textContent = `${titulo} (${arr.length})`; det.appendChild(sum);
     arr.sort((a, b) => (b.severidad ?? 0) - (a.severidad ?? 0)).forEach(p => {
       const d = document.createElement('div'); d.className = 'fila' + (ubicadas ? '' : ' noloc'); d.style.borderColor = hex(COLOR(p.severidad ?? 0));
       d.append(String(p.nombre || '')); const s = document.createElement('small');
       s.textContent = ubicadas ? p._u.titulo + (p._u.puerto ? ' · ' + t('port') + ' ' + p._u.puerto : '') : String(p.equipo ?? p.host ?? '');
       d.appendChild(s);
       if (ubicadas) d.onclick = () => enfocar(p._u.anchor, !!p._u.puerto);
-      el.appendChild(d);
+      det.appendChild(d);
     });
+    el.appendChild(det);
   };
-  bloque(t('al_rack'), visibles.filter(p => p._u), true);
+  bloque(t('al_rack'), visibles.filter(p => p._u), true, true);
   if (ocultas.length) {
-    const h = document.createElement('div'); h.className = 'grupo'; h.textContent = `${t('al_hidden')} (${ocultas.length})`; el.appendChild(h);
+    const det = document.createElement('details');
+    const sum = document.createElement('summary'); sum.className = 'grupo'; sum.style.cursor = 'pointer'; sum.textContent = `${t('al_hidden')} (${ocultas.length})`; det.appendChild(sum);
     ocultas.sort((a, b) => (b.severidad ?? 0) - (a.severidad ?? 0)).forEach(p => {
       const d = document.createElement('div'); d.className = 'fila'; d.style.borderColor = hex(COLOR(p.severidad ?? 0)); d.style.opacity = '.8';
       d.append(String(p.nombre || '')); const s = document.createElement('small'); s.textContent = `${p._h.titulo} · ${t('row')} ${racks[p._ir].fila}`; d.appendChild(s);
       d.onclick = () => { filasVisibles.add(racks[p._ir].fila); pintarFilas(); aplicarDisposicion(); enfocar(p._h.anchor, !!p._h.puerto); };
-      el.appendChild(d);
+      det.appendChild(d);
     });
+    el.appendChild(det);
   }
-  bloque(t('al_noloc'), sinLugar, false);
+  bloque(t('al_noloc'), sinLugar, false, false);
 }
 
 /* ============ Cableado (capa opcional) ============

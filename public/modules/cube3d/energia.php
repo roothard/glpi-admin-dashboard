@@ -25,8 +25,15 @@ header('X-Content-Type-Options: nosniff');
 if (empty($_SESSION['glpi_token'])) { http_response_code(401); echo json_encode(['auth' => false]); exit; }
 $tok = $_SESSION['glpi_token'];
 
-list($rc, $cables) = glpi_fetch('/Cable', ['range' => '0-2000', 'expand_dropdowns' => 'true'], $tok);
+list($rc, $cables) = glpi_fetch('/Cable', ['range' => '0-2000'], $tok);
 if ($rc === 401 || $rc === 403) { $_SESSION = []; http_response_code(401); echo json_encode(['auth' => false]); exit; }
+
+// Nombre de cada tipo de cable por id (GLPI no expande cabletypes_id en /Cable).
+list(, $tipos) = glpi_fetch('/CableType', ['range' => '0-500'], $tok);
+$tipoNombre = [];
+foreach ((is_array($tipos) ? $tipos : []) as $tt) {
+    if (is_array($tt) && isset($tt['id'])) { $tipoNombre[(int)$tt['id']] = (string)($tt['name'] ?? ''); }
+}
 
 $nombreCache = [];
 /** Nombre de un item del inventario (cacheado). */
@@ -46,7 +53,7 @@ function nombreItem($itemtype, $id, $tok, &$cache)
 $out = [];
 foreach ((is_array($cables) ? $cables : []) as $c) {
     if (!is_array($c)) { continue; }
-    $tipo = (string)($c['cabletypes_id'] ?? '');      // con expand_dropdowns es el nombre del tipo
+    $tipo = $tipoNombre[(int)($c['cabletypes_id'] ?? 0)] ?? '';   // nombre del tipo de cable
     if (!preg_match('/aliment|power|energ/i', $tipo)) { continue; }
 
     $ta = (string)($c['itemtype_endpoint_a'] ?? ''); $ia = (int)($c['items_id_endpoint_a'] ?? 0);
