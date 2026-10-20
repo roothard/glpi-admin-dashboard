@@ -54,6 +54,7 @@ if (empty($_SESSION['glpi_token'])) {
   <b id="t-title">Datacenter 3D</b> · <span id="rackNombre"></span>
   <div class="sub" id="t-hint"></div>
   <div id="info"></div>
+  <div id="selinfo" class="sub" style="color:#7b93ff;cursor:default"></div>
   <div id="detRacks" style="display:none">
     <div class="grupo" id="t-racks">Racks</div><div id="chips"></div>
     <button id="bPrev"></button><button id="bNext"></button><button id="bSala"></button>

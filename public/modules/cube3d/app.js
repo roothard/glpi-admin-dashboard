@@ -109,6 +109,7 @@ const ANCHO_MEDIO = (ANCHO_CHASIS - .008) / 2;
 const equipos = new Map();           // nombre en minúsculas -> {mesh, glpi, ficha, rack}
 let racks = [];                      // {obj, grupo, nombre, caja, fila, real}
 let catalogo = null, avisosEquipos = [], rackCaja = null, rackActual = 0;
+let equipoSel = null;   // nombre (minúsculas) del equipo seleccionado, o null = ver todo
 const filasVisibles = new Set();
 let disposicion = 'linea';
 try { disposicion = localStorage.getItem('cube3d-disp') || 'linea'; } catch {}
@@ -411,6 +412,7 @@ function construirCables() {
   const modoRuteo = $('selRuteo') ? $('selRuteo').value : 'centro';
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
   cablesDatos.forEach((c, k) => {
+    if (equipoSel && String(c.equipo || '').toLowerCase() !== equipoSel && String(c.origen || '').toLowerCase() !== equipoSel) return;
     const orig = equipos.get(String(c.origen || '').toLowerCase()), dest = equipos.get(String(c.equipo || '').toLowerCase());
     if (!orig || !dest || orig.rack === undefined) return;
     if (dest.rack !== undefined && dest.rack !== orig.rack) return;      // troncales entre racks: pendiente
@@ -489,6 +491,7 @@ function construirEnergia() {
   if (!racks.length || !energiaDatos.length) { pintarEnergia(); return; }
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
   energiaDatos.forEach((e, k) => {
+    if (equipoSel && String(e.equipo || '').toLowerCase() !== equipoSel) return;
     const src = equipos.get(String(e.equipo || '').toLowerCase());
     if (!src || src.rack === undefined || !racks[src.rack].grupo.visible) return;
     const R = racks[src.rack];
@@ -520,6 +523,10 @@ function pintarEnergia() {
     d.append(`${e.equipo} → ${e.destino}`); el.appendChild(d);
   });
 }
+function actualizarSel() {
+  const el = $('selinfo'); if (!el) return;
+  el.textContent = equipoSel ? `${t('sel_equipo')}: ${equipoSel} · ${t('sel_todo')}` : '';
+}
 async function cargarEnergia() {
   const d = await pedirOpcional('energia.php'); if (!d) return;
   energiaDatos = d.energia || [];
@@ -546,11 +553,20 @@ function cablearUI() {
   if ($('chkEnergia')) $('chkEnergia').onchange = e => { if (energiaGrupo) energiaGrupo.visible = e.target.checked; };
   if ($('selRuteo')) { try { const g = localStorage.getItem('cube3d-ruteo'); if (g) $('selRuteo').value = g; } catch {} $('selRuteo').onchange = e => { try { localStorage.setItem('cube3d-ruteo', e.target.value); } catch {} construirCables(); }; }
   renderer.domElement.addEventListener('wheel', e => { if (!e.shiftKey) return; e.preventDefault(); e.stopImmediatePropagation(); mover(-Math.sign(e.deltaY || e.deltaX) * .08); }, { capture: true, passive: false });
+  // clic simple en un equipo = seleccionarlo (muestra solo SU cableado de red y energía y enfoca);
+  // clic en vacío = ver todo. Se distingue del arrastre (rotar) por el desplazamiento del puntero.
   const rc = new THREE.Raycaster(), pt = new THREE.Vector2();
-  renderer.domElement.addEventListener('dblclick', e => {
+  let downXY = null, downT = 0;
+  renderer.domElement.addEventListener('pointerdown', e => { downXY = [e.clientX, e.clientY]; downT = performance.now(); });
+  renderer.domElement.addEventListener('pointerup', e => {
+    if (!downXY) return;
+    const moved = Math.hypot(e.clientX - downXY[0], e.clientY - downXY[1]); downXY = null;
+    if (moved > 6 || performance.now() - downT > 500) return;   // fue arrastre o mantener: no selecciona
     pt.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); rc.setFromCamera(pt, camera);
     const hit = rc.intersectObjects(racks.filter(r => r.grupo.visible).map(r => r.grupo), true).find(h => equipoDe(h.object));
-    if (hit) enfocar(equipoDe(hit.object), false);
+    if (hit) { const eq = equipoDe(hit.object); equipoSel = String(eq.userData.glpi?.nombre || '').toLowerCase() || null; enfocar(eq, false); }
+    else { equipoSel = null; }
+    construirCables(); construirEnergia(); actualizarSel();
   });
   addEventListener('keydown', e => {
     if (['SELECT', 'INPUT', 'TEXTAREA'].includes(e.target.tagName) || !racks.length) return;

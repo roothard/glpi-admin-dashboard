@@ -1,7 +1,7 @@
 {
   "es": {
     "title": "Datacenter 3D",
-    "hint": "Arrastrar: rotar · Rueda: acercar · Botón derecho o ← →: desplazar · ↑ ↓, Shift + rueda o la barra: subir y bajar · Clic en un aviso o doble clic en un equipo: ir a su frente",
+    "hint": "Arrastrar: rotar · Rueda: acercar · ← →: desplazar · ↑ ↓ / barra: subir y bajar · Clic en un equipo: ver su cableado · Clic en vacío: ver todo",
     "loading": "Cargando…",
     "loaded": "{n} equipos desde GLPI",
     "empty": "No hay racks cargados en GLPI.",
@@ -24,7 +24,7 @@
     "todo": "Datos por completar",
     "todo_sub": "Lo que el inventario no define y la vista tuvo que suponer.",
     "info_hide": "Ocultar informativas (sev. 1)",
-    "cables_show": "Mostrar cableado",
+    "cables_show": "Cableado de red",
     "ruteo": "Ordenador de cables:",
     "ruteo_centro": "por el centro",
     "ruteo_costados": "por los costados",
@@ -37,13 +37,15 @@
     "al_hidden": "En filas ocultas",
     "al_noloc": "Sin ubicación física conocida",
     "al_status": "Monitoreo: {n} alertas · {h}",
-    "energia_show": "Mostrar energía",
+    "energia_show": "Cableado de energía",
     "energia_title": "Energía",
-    "energia_sub": "Alimentación: equipo → UPS / PDU (regleta)."
+    "energia_sub": "Alimentación: equipo → UPS / PDU (regleta).",
+    "sel_equipo": "Equipo",
+    "sel_todo": "clic en vacío para ver todo"
   },
   "en": {
     "title": "3D Datacenter",
-    "hint": "Drag: rotate · Wheel: zoom · Right button or ← →: pan · ↑ ↓, Shift + wheel or the slider: move up and down · Click an alert or double-click an item: go to its front",
+    "hint": "Drag: rotate · Wheel: zoom · ← →: pan · ↑ ↓ / slider: up and down · Click a device: see its cabling · Click empty: see all",
     "loading": "Loading…",
     "loaded": "{n} items from GLPI",
     "empty": "No racks found in GLPI.",
@@ -66,7 +68,7 @@
     "todo": "Data to complete",
     "todo_sub": "What the inventory does not define and the view had to assume.",
     "info_hide": "Hide informational (sev. 1)",
-    "cables_show": "Show cabling",
+    "cables_show": "Network cabling",
     "ruteo": "Cable manager:",
     "ruteo_centro": "through the center",
     "ruteo_costados": "along the sides",
@@ -79,13 +81,15 @@
     "al_hidden": "In hidden rows",
     "al_noloc": "No known physical location",
     "al_status": "Monitoring: {n} alerts · {h}",
-    "energia_show": "Show power",
+    "energia_show": "Power cabling",
     "energia_title": "Power",
-    "energia_sub": "Power: device → UPS / PDU (strip)."
+    "energia_sub": "Power: device → UPS / PDU (strip).",
+    "sel_equipo": "Device",
+    "sel_todo": "click empty to see all"
   },
   "fr": {
     "title": "Datacenter 3D",
-    "hint": "Glisser : pivoter · Molette : zoom · Bouton droit ou ← →: déplacer · ↑ ↓, Maj + molette ou la barre : monter et descendre · Clic sur une alerte ou double-clic sur un équipement : aller à sa face",
+    "hint": "Glisser : pivoter · Molette : zoom · ← → : déplacer · ↑ ↓ / barre : monter/descendre · Clic sur un équipement : voir son câblage · Clic dans le vide : tout voir",
     "loading": "Chargement…",
     "loaded": "{n} équipements depuis GLPI",
     "empty": "Aucune baie trouvée dans GLPI.",
@@ -108,7 +112,7 @@
     "todo": "Données à compléter",
     "todo_sub": "Ce que l'inventaire ne définit pas et que la vue a dû supposer.",
     "info_hide": "Masquer informatives (sév. 1)",
-    "cables_show": "Afficher le câblage",
+    "cables_show": "Câblage réseau",
     "ruteo": "Organiseur de câbles :",
     "ruteo_centro": "par le centre",
     "ruteo_costados": "par les côtés",
@@ -121,13 +125,15 @@
     "al_hidden": "Dans les rangées masquées",
     "al_noloc": "Sans emplacement physique connu",
     "al_status": "Supervision : {n} alertes · {h}",
-    "energia_show": "Afficher l'alimentation",
+    "energia_show": "Câblage d'alimentation",
     "energia_title": "Alimentation",
-    "energia_sub": "Alimentation : équipement → onduleur / PDU."
+    "energia_sub": "Alimentation : équipement → onduleur / PDU.",
+    "sel_equipo": "Équipement",
+    "sel_todo": "cliquez dans le vide pour tout voir"
   },
   "de": {
     "title": "3D-Rechenzentrum",
-    "hint": "Ziehen: drehen · Rad: zoomen · Rechte Taste oder ← →: verschieben · ↑ ↓, Umschalt + Rad oder der Regler: hoch und runter · Klick auf eine Meldung oder Doppelklick auf ein Gerät: zur Vorderseite",
+    "hint": "Ziehen: drehen · Rad: zoomen · ← →: verschieben · ↑ ↓ / Regler: hoch/runter · Klick auf ein Gerät: seine Verkabelung · Klick ins Leere: alle",
     "loading": "Wird geladen…",
     "loaded": "{n} Geräte aus GLPI",
     "empty": "Keine Racks in GLPI gefunden.",
@@ -150,7 +156,7 @@
     "todo": "Zu ergänzende Daten",
     "todo_sub": "Was das Inventar nicht definiert und die Ansicht annehmen musste.",
     "info_hide": "Infos ausblenden (Stufe 1)",
-    "cables_show": "Verkabelung anzeigen",
+    "cables_show": "Netzwerkverkabelung",
     "ruteo": "Kabelmanager:",
     "ruteo_centro": "durch die Mitte",
     "ruteo_costados": "an den Seiten",
@@ -163,13 +169,15 @@
     "al_hidden": "In ausgeblendeten Reihen",
     "al_noloc": "Kein bekannter physischer Standort",
     "al_status": "Monitoring: {n} Meldungen · {h}",
-    "energia_show": "Strom anzeigen",
+    "energia_show": "Stromverkabelung",
     "energia_title": "Strom",
-    "energia_sub": "Stromversorgung: Gerät → USV / PDU."
+    "energia_sub": "Stromversorgung: Gerät → USV / PDU.",
+    "sel_equipo": "Gerät",
+    "sel_todo": "ins Leere klicken für alle"
   },
   "pt": {
     "title": "Datacenter 3D",
-    "hint": "Arrastar: girar · Roda: aproximar · Botão direito ou ← →: deslocar · ↑ ↓, Shift + roda ou a barra: subir e descer · Clique num alerta ou clique duplo num equipamento: ir à sua frente",
+    "hint": "Arrastar: girar · Roda: aproximar · ← →: deslocar · ↑ ↓ / barra: subir/descer · Clique num equipamento: ver seu cabeamento · Clique no vazio: ver tudo",
     "loading": "Carregando…",
     "loaded": "{n} equipamentos do GLPI",
     "empty": "Nenhum rack encontrado no GLPI.",
@@ -192,7 +200,7 @@
     "todo": "Dados a completar",
     "todo_sub": "O que o inventário não define e a vista teve de supor.",
     "info_hide": "Ocultar informativas (sev. 1)",
-    "cables_show": "Mostrar cabeamento",
+    "cables_show": "Cabeamento de rede",
     "ruteo": "Organizador de cabos:",
     "ruteo_centro": "pelo centro",
     "ruteo_costados": "pelas laterais",
@@ -205,8 +213,10 @@
     "al_hidden": "Em fileiras ocultas",
     "al_noloc": "Sem localização física conhecida",
     "al_status": "Monitoramento: {n} alertas · {h}",
-    "energia_show": "Mostrar energia",
+    "energia_show": "Cabeamento de energia",
     "energia_title": "Energia",
-    "energia_sub": "Alimentação: equipamento → UPS / PDU."
+    "energia_sub": "Alimentação: equipamento → UPS / PDU.",
+    "sel_equipo": "Equipamento",
+    "sel_todo": "clique no vazio para ver tudo"
   }
 }
