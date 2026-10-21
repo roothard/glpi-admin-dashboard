@@ -491,13 +491,16 @@ function construirEnergia() {
   if (!racks.length || !energiaDatos.length) { pintarEnergia(); return; }
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
   let di = 0;   // índice entre los cables realmente dibujados → cada uno su carril (no se solapan)
+  const fuenteUso = new Map();   // por equipo: qué fuente (PSU) usar para el próximo cable (A, B, …)
   energiaDatos.forEach(e => {
-    if (equipoSel && String(e.equipo || '').toLowerCase() !== equipoSel) return;
-    const src = equipos.get(String(e.equipo || '').toLowerCase());
+    const key = String(e.equipo || '').toLowerCase();
+    if (equipoSel && key !== equipoSel) return;
+    const src = equipos.get(key);
     if (!src || src.rack === undefined || !racks[src.rack].grupo.visible) return;
     const R = racks[src.rack];
     const aL = v => R.grupo.worldToLocal(v.clone()), aW = v => R.grupo.localToWorld(v.clone());
-    const sRear = aL(src.mesh.localToWorld(src.mesh.userData.puertoTrasero('power', 0)));
+    const fi = fuenteUso.get(key) || 0; fuenteUso.set(key, fi + 1);
+    const sRear = aL(src.mesh.localToWorld(src.mesh.userData.puertoFuente(fi)));   // arranca en la fuente (PSU), no en el puerto de red
     const lado = sRear.x < 0 ? -1 : 1;
     let dest, pts;
     if (e.destino_tipo === 'pdu') {

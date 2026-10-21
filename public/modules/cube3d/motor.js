@@ -332,6 +332,16 @@ function traseraEquipo(g, f, D) {
     const pt = REAR[idPuerto(T, conector)];
     return pt ? trasera(rw, h, d, pt.fx + rep * .035, pt.fy, .0025) : new THREE.Vector3(0, 0, -d - .002);
   };
+  // Fuentes (PSU): puntos de alimentación en la cara trasera, calculados desde el mismo dibujo
+  // de la ficha. Así la energía enchufa en la fuente y no en los puertos de red, para cualquier equipo.
+  const F = [];
+  const addF = (fx, fy) => F.push(trasera(rw, h, d, fx, fy, .0025));   // fx/fy = fracción del dibujo trasero (coincide con trasera())
+  const nf = T.fuentes || 0;
+  if (T.estilo === 'servidor') { if (nf >= 1) addF(.855, .71); if (nf >= 2) addF(.661, .71); }
+  else if (T.estilo === 'almacenamiento') { addF(.09, .5); addF(.91, .5); }
+  else if (T.estilo === 'chasis') { addF(.78, .19); }
+  g.userData.fuentes = F;
+  g.userData.puertoFuente = (idx = 0) => (F.length ? F[Math.min(idx, F.length - 1)].clone() : g.userData.puertoTrasero('power', 0));
 }
 
 /* ============ construcción ============ */
