@@ -499,19 +499,20 @@ function construirEnergia() {
     const aL = v => R.grupo.worldToLocal(v.clone()), aW = v => R.grupo.localToWorld(v.clone());
     const sRear = aL(src.mesh.localToWorld(src.mesh.userData.puertoTrasero('power', 0)));
     const lado = sRear.x < 0 ? -1 : 1;
-    let dest;
+    let dest, pts;
     if (e.destino_tipo === 'pdu') {
-      dest = V(lado * .245, R.obj.base + .06, -R.obj.profundidad / 2 + .09);   // baja a la regleta (PDU), cerca del piso del rack
+      // enchufa en la regleta (PDU) vertical trasera, a la altura del equipo
+      const zStrip = -R.obj.profundidad / 2 + .085;
+      dest = V(lado * .24, sRear.y, zStrip);
+      pts = [sRear, V(sRear.x, sRear.y, zStrip), dest];
     } else {
       const ups = equipos.get(String(e.destino || '').toLowerCase());
       if (!ups || ups.rack !== src.rack) return;
-      const u = aL(ups.mesh.getWorldPosition(V(0, 0, 0)));
-      dest = V(u.x, u.y + .05, -R.obj.profundidad / 2 + .12);
+      dest = aL(ups.mesh.localToWorld(ups.mesh.userData.puertoTrasero('power', 0)));   // toma trasera real del UPS
+      const idx = di++;
+      const xLane = lado * (.17 + (idx % 6) * .013), zLane = -R.obj.profundidad / 2 + .11 + (idx % 4) * .008;
+      pts = [sRear, V(sRear.x, sRear.y, zLane), V(xLane, sRear.y, zLane), V(xLane, dest.y + .06, zLane), V(xLane, dest.y, zLane), V(dest.x, dest.y, dest.z - .04), dest];
     }
-    const idx = di++;
-    const xLane = lado * (.17 + (idx % 6) * .013);                 // carril lateral trasero propio
-    const zLane = -R.obj.profundidad / 2 + .11 + (idx % 4) * .008;
-    const pts = [sRear, V(sRear.x, sRear.y, zLane), V(xLane, sRear.y, zLane), V(xLane, dest.y + .03, zLane), V(dest.x, dest.y, zLane), dest];
     const malla = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(aW), false, 'catmullrom', .2), 100, .0045, 7),
       new THREE.MeshStandardMaterial({ color: COLOR_ENERGIA[e.destino_tipo] || 0x9aa5c8, roughness: .5, metalness: .1 }));
     malla.castShadow = true; energiaGrupo.add(malla);
