@@ -490,25 +490,29 @@ function construirEnergia() {
   energiaGrupo.visible = $('chkEnergia') ? $('chkEnergia').checked : true;
   if (!racks.length || !energiaDatos.length) { pintarEnergia(); return; }
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
-  energiaDatos.forEach((e, k) => {
+  let di = 0;   // índice entre los cables realmente dibujados → cada uno su carril (no se solapan)
+  energiaDatos.forEach(e => {
     if (equipoSel && String(e.equipo || '').toLowerCase() !== equipoSel) return;
     const src = equipos.get(String(e.equipo || '').toLowerCase());
     if (!src || src.rack === undefined || !racks[src.rack].grupo.visible) return;
     const R = racks[src.rack];
     const aL = v => R.grupo.worldToLocal(v.clone()), aW = v => R.grupo.localToWorld(v.clone());
     const sRear = aL(src.mesh.localToWorld(src.mesh.userData.puertoTrasero('power', 0)));
-    const lado = sRear.x < 0 ? -1 : 1, zLane = -R.obj.profundidad / 2 + .12 + (k % 6) * .01;
+    const lado = sRear.x < 0 ? -1 : 1;
     let dest;
     if (e.destino_tipo === 'pdu') {
-      dest = V(lado * .24, sRear.y, -R.obj.profundidad / 2 + .09);
+      dest = V(lado * .245, R.obj.base + .06, -R.obj.profundidad / 2 + .09);   // baja a la regleta (PDU), cerca del piso del rack
     } else {
       const ups = equipos.get(String(e.destino || '').toLowerCase());
       if (!ups || ups.rack !== src.rack) return;
       const u = aL(ups.mesh.getWorldPosition(V(0, 0, 0)));
-      dest = V(u.x, u.y + .03, -R.obj.profundidad / 2 + .12);
+      dest = V(u.x, u.y + .05, -R.obj.profundidad / 2 + .12);
     }
-    const pts = [sRear, V(sRear.x, sRear.y, zLane), V(dest.x, sRear.y, zLane), V(dest.x, dest.y, zLane), dest];
-    const malla = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(aW), false, 'catmullrom', .2), 90, .0042, 7),
+    const idx = di++;
+    const xLane = lado * (.17 + (idx % 6) * .013);                 // carril lateral trasero propio
+    const zLane = -R.obj.profundidad / 2 + .11 + (idx % 4) * .008;
+    const pts = [sRear, V(sRear.x, sRear.y, zLane), V(xLane, sRear.y, zLane), V(xLane, dest.y + .03, zLane), V(dest.x, dest.y, zLane), dest];
+    const malla = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(aW), false, 'catmullrom', .2), 100, .0045, 7),
       new THREE.MeshStandardMaterial({ color: COLOR_ENERGIA[e.destino_tipo] || 0x9aa5c8, roughness: .5, metalness: .1 }));
     malla.castShadow = true; energiaGrupo.add(malla);
   });
