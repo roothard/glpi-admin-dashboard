@@ -17,8 +17,11 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { crearRack, U, ANCHO_CHASIS } from './modelos.js';
-import { cargarCatalogo, elegirFicha, construirEquipo, altoDe, fijarCalidad } from './motor.js';
+import { crearRack, U, ANCHO_CHASIS } from 'app/modelos.js';
+import { cargarCatalogo, elegirFicha, construirEquipo, altoDe, fijarCalidad } from 'app/motor.js';
+
+/* Versión de assets (la inyecta index.php): rompe el caché de los .json estáticos en cada deploy */
+const VQ = (typeof window !== 'undefined' && window.__CUBE_V) ? ('?v=' + window.__CUBE_V) : '';
 
 /* ============ Idioma (sigue al tablero por localStorage rh-lang) ============ */
 const LANG = (() => { try { return (localStorage.getItem('rh-lang') || 'es').slice(0, 2); } catch { return 'es'; } })();
@@ -26,7 +29,7 @@ let T = {};
 const t = (k, vars = {}) => String(T[k] ?? k).replace(/\{(\w+)\}/g, (_, n) => vars[n] ?? '');
 const $ = id => document.getElementById(id);
 async function cargarIdioma() {
-  try { const all = await (await fetch('i18n.json')).json(); T = all[LANG] || all.es || {}; } catch { T = {}; }
+  try { const all = await (await fetch('i18n.json' + VQ)).json(); T = all[LANG] || all.es || {}; } catch { T = {}; }
   const set = (id, k) => { const el = $(id); if (el) el.textContent = t(k); };
   set('t-title', 'title'); set('t-hint', 'hint'); set('t-racks', 'racks'); set('t-rows', 'rows');
   set('t-disp', 'disp'); set('t-displine', 'disp_line'); set('t-dispreal', 'disp_real');
@@ -593,7 +596,7 @@ async function cargar() {
     const d = await (await fetch('data.php')).json();
     if (d.auth === false) { info.textContent = t('err', { msg: '401' }); return; }
     if (!d.racks || !d.racks.length) { info.textContent = t('empty'); return; }
-    catalogo = await cargarCatalogo();
+    catalogo = await cargarCatalogo('fichas/', window.__CUBE_V || '');
     construirSala(d);
     const total = d.racks.reduce((a, x) => a + (x.equipos ? x.equipos.length : 0), 0);
     $('rackNombre').textContent = d.racks.length === 1 ? d.racks[0].nombre : '';

@@ -12,7 +12,7 @@
  */
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { U, ANCHO_19, lienzo, std, M, cuerpo, plano, led, base, fx, fy, trasera, hexagonos, rj45 } from './modelos.js';
+import { U, ANCHO_19, lienzo, std, M, cuerpo, plano, led, base, fx, fy, trasera, hexagonos, rj45 } from 'app/modelos.js';
 
 const MM = .001;
 let PXC = 2048;                                   // resolución de las caras; baja cuando hay muchos racks para cuidar la memoria
@@ -24,10 +24,11 @@ const ACABADOS = {
 };
 
 /* ============ catálogo y elección de ficha ============ */
-export async function cargarCatalogo(carpeta = 'fichas/') {
-  const cat = await (await fetch(carpeta + 'catalogo.json')).json();
+export async function cargarCatalogo(carpeta = 'fichas/', v = '') {
+  const q = v ? ('?v=' + v) : '';   // rompe el caché del navegador en cada deploy
+  const cat = await (await fetch(carpeta + 'catalogo.json' + q)).json();
   const fichas = new Map();
-  await Promise.all(cat.fichas.map(async id => fichas.set(id, await (await fetch(`${carpeta}${id}.json`)).json())));
+  await Promise.all(cat.fichas.map(async id => fichas.set(id, await (await fetch(`${carpeta}${id}.json${q}`)).json())));
   return {...cat, fichas};
 }
 const mezclar = (a, b) => {

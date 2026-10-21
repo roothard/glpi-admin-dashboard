@@ -17,6 +17,14 @@ if (empty($_SESSION['glpi_token'])) {
     echo '<!doctype html><meta charset="utf-8"><body style="margin:0;font-family:system-ui;background:#0b0f1a;color:#9fb0e8;display:grid;place-items:center;height:100vh">Iniciá sesión en el panel.</body>';
     exit;
 }
+// Versión de assets (JS/JSON estáticos): la fecha de modificación más nueva. Rompe el caché
+// del navegador en cada deploy, para que nunca se sirva una versión vieja de app.js/motor.js.
+$V = 0;
+foreach (['app.js', 'motor.js', 'modelos.js', 'fichas/catalogo.json', 'i18n.json'] as $a) {
+    $p = __DIR__ . '/' . $a;
+    if (is_file($p)) { $V = max($V, (int) filemtime($p)); }
+}
+$V = $V ?: time();
 ?><!doctype html>
 <html lang="es">
 <head>
@@ -82,8 +90,9 @@ if (empty($_SESSION['glpi_token'])) {
 <div id="capa"><svg id="lineas"></svg></div>
 <div id="nav"><button id="bArriba" title="▲">▲</button><input id="rngAltura" type="range" min="0.15" max="2.4" step="0.01" value="1.0"><button id="bAbajo" title="▼">▼</button><span id="t-height">altura</span></div>
 <script type="importmap">
-{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}
+{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/","app/modelos.js":"./modelos.js?v=<?= $V ?>","app/motor.js":"./motor.js?v=<?= $V ?>"}}
 </script>
-<script type="module" src="app.js"></script>
+<script>window.__CUBE_V='<?= $V ?>';</script>
+<script type="module" src="app.js?v=<?= $V ?>"></script>
 </body>
 </html>
