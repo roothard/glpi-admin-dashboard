@@ -40,6 +40,7 @@ async function cargarIdioma() {
   set('t-ruteo-centro', 'ruteo_centro'); set('t-ruteo-costados', 'ruteo_costados');
   set('t-cables-sub', 'cables_sub');
   set('t-energia-show', 'energia_show'); set('t-energia', 'energia_title'); set('t-energia-sub', 'energia_sub');
+  actualizarBarraRacks();
   document.documentElement.lang = LANG;
 }
 
@@ -181,12 +182,120 @@ function pintarChips() {
     b.onclick = () => irARack(i); el.appendChild(b);
   });
   $('detRacks').style.display = racks.length > 1 ? '' : 'none';
+  actualizarBarraRacks();
+  if (modoRacks && $('rackLista')) pintarPicker($('rackLista'));
 }
 function pintarAvisos() {
   const el = $('listaAvisos'); el.replaceChildren();
   document.querySelector('#detAvisos summary').textContent = `${t('todo')} (${avisosEquipos.length})`;
   $('detAvisos').style.display = avisosEquipos.length ? '' : 'none';
   avisosEquipos.forEach(a => { const d = document.createElement('div'); d.className = 'fila'; d.append(a.equipo); const s = document.createElement('small'); s.textContent = a.texto; d.appendChild(s); el.appendChild(d); });
+}
+
+/* ============ Racks: barra, selector e info por rack ============
+   El botón "Racks" despliega los racks disponibles; al elegir uno se abre una
+   ventana con: lo conocido de ese rack, lo que falta identificar dónde está
+   (aparece en los datos pero sin ubicación física) y lo que pertenece a otro
+   rack que no se ve acá. Todo se calcula con lo que ya tiene el cliente. */
+const norm = s => String(s ?? '').trim().toLowerCase();
+let ventana = null, modoRacks = false, controlesOcultos = false;
+
+function actualizarBarraRacks() {
+  const b = $('bRacks'); if (b) b.textContent = `\u{1F5C4} ${t('racks_ver')} (${racks.length})`;
+  const c = $('bColapsar'); if (c) { c.textContent = controlesOcultos ? '▾' : '▴'; c.title = t(controlesOcultos ? 'ctrl_mostrar' : 'ctrl_ocultar'); }
+}
+function alternarControles() {
+  if (modoRacks) { modoRacks = false; $('rackLista').style.display = 'none'; }   // salir del modo racks
+  controlesOcultos = !controlesOcultos;
+  const el = $('controles'); if (el) el.style.display = controlesOcultos ? 'none' : '';
+  actualizarBarraRacks();
+}
+// equipo "incompleto": la vista tuvo que suponer algo (ficha genérica, sin modelo o sin alto del modelo)
+const esIncompleto = v => !v.glpi.modelo || v.glpi.alto_origen !== 'modelo' || (catalogo && v.ficha.id === catalogo.generica);
+// nombres que nombran los feeds (energía/red/alertas) y de qué capa vienen
+function referidos() {
+  const m = new Map();
+  const add = (n, o) => { const k = norm(n); if (!k) return; if (!m.has(k)) m.set(k, { nombre: String(n).trim(), orig: new Set() }); m.get(k).orig.add(o); };
+  energiaDatos.forEach(e => { add(e.equipo, t('energia_title')); add(e.destino, t('energia_title')); });
+  cablesDatos.forEach(c => { add(c.origen, t('cables_title')); add(c.equipo, t('cables_title')); });
+  ultimo.forEach(a => add(a.equipo ?? a.host, t('al_rack')));
+  return m;
+}
+function datosRack(i) {
+  const propios = [], otros = [];
+  equipos.forEach(v => (v.rack === i ? propios : otros).push(v));
+  const colocados = new Set([...equipos.keys()]);
+  const sinUbic = [];
+  referidos().forEach((v, k) => { if (!colocados.has(k)) sinUbic.push(v); });
+  propios.sort((a, b) => (b.glpi.u || 0) - (a.glpi.u || 0));
+  otros.sort((a, b) => (a.rack - b.rack) || String(a.glpi.nombre).localeCompare(b.glpi.nombre));
+  sinUbic.sort((a, b) => a.nombre.localeCompare(b.nombre));
+  return { propios, otros, sinUbic };
+}
+function alternarPicker() {
+  const lista = $('rackLista'); if (!lista) return;
+  modoRacks = lista.style.display === 'none';   // oculto -> abrir; visible -> cerrar
+  if (modoRacks) { pintarPicker(lista); lista.style.display = ''; if ($('controles')) $('controles').style.display = 'none'; }
+  else { lista.style.display = 'none'; if ($('controles')) $('controles').style.display = controlesOcultos ? 'none' : ''; }
+}
+function pintarPicker(cont) {
+  cont.replaceChildren();
+  if (!racks.length) { const p = document.createElement('div'); p.className = 'sub'; p.textContent = t('info_vacio'); cont.appendChild(p); return; }
+  racks.forEach((r, i) => {
+    const d = datosRack(i), inc = d.propios.filter(esIncompleto).length;
+    const row = document.createElement('div'); row.className = 'rk';
+    const left = document.createElement('div');
+    const n = document.createElement('div'); n.className = 'n'; n.textContent = r.nombre;
+    const s = document.createElement('small'); s.textContent = `${d.propios.length} ${t('rack_equipos')}${inc ? ` · ${inc} ${t('rack_completar')}` : ''}`;
+    left.append(n, s);
+    const chev = document.createElement('small'); chev.textContent = '→';
+    row.append(left, chev);
+    row.onclick = () => { if (racks[i]?.grupo.visible) irARack(i); abrirInfoRack(i); };
+    cont.appendChild(row);
+  });
+}
+function seccion(cont, clave, subclave, items, clase, render) {
+  const sec = document.createElement('div'); sec.className = 'sec';
+  const sh = document.createElement('div'); sh.className = 'sh';
+  const dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = { ok: '#35c27a', warn: '#e8a317', otro: '#5a6b9a' }[clase] || '#44527a';
+  sh.append(dot, `${t(clave)} (${items.length})`);
+  const ss = document.createElement('div'); ss.className = 'ss'; ss.textContent = t(subclave);
+  sec.append(sh, ss);
+  if (!items.length) { const v = document.createElement('div'); v.className = 'sub'; v.style.padding = '2px 0'; v.textContent = t('info_vacio'); sec.appendChild(v); }
+  else items.forEach(it => sec.appendChild(render(it)));
+  cont.appendChild(sec);
+}
+function abrirInfoRack(i) {
+  const r = racks[i]; if (!r) return;
+  if (!ventana) { ventana = document.createElement('div'); ventana.id = 'rackInfo'; ventana.className = 'ov'; document.body.appendChild(ventana); }
+  const d = datosRack(i);
+  ventana.replaceChildren();
+  const h = document.createElement('div'); h.className = 'ovh';
+  const b = document.createElement('b'); b.textContent = r.nombre;
+  const x = document.createElement('button'); x.className = 'xbtn'; x.textContent = t('cerrar'); x.onclick = () => ventana.style.display = 'none';
+  h.append(b, x); ventana.appendChild(h);
+  seccion(ventana, 'info_conocido', 'info_conocido_sub', d.propios, 'ok', v => {
+    const it = document.createElement('div'); it.className = 'it ' + (esIncompleto(v) ? 'warn' : 'ok');
+    it.append(v.glpi.nombre);
+    const partes = [v.glpi.tipo, `U${v.glpi.u}`];
+    if (v.glpi.alto_origen === 'modelo' && v.glpi.alto) partes.push(`${v.glpi.alto}U`);
+    partes.push(v.glpi.modelo || t('info_sinmodelo'));
+    const s = document.createElement('small'); s.textContent = partes.join(' · '); it.appendChild(s);
+    return it;
+  });
+  seccion(ventana, 'info_sinubic', 'info_sinubic_sub', d.sinUbic, 'warn', v => {
+    const it = document.createElement('div'); it.className = 'it warn';
+    it.append(v.nombre);
+    const s = document.createElement('small'); s.textContent = [...v.orig].join(' · '); it.appendChild(s);
+    return it;
+  });
+  seccion(ventana, 'info_otrorack', 'info_otrorack_sub', d.otros, 'otro', v => {
+    const it = document.createElement('div'); it.className = 'it otro';
+    it.append(v.glpi.nombre);
+    const s = document.createElement('small'); s.textContent = `${t('info_en')} ${racks[v.rack]?.nombre || '?'} · ${v.glpi.modelo || t('info_sinmodelo')}`; it.appendChild(s);
+    return it;
+  });
+  ventana.style.display = '';
 }
 
 /* ============ Navegación ============ */
@@ -556,6 +665,8 @@ function cablearUI() {
   $('bFrente').onclick = () => irARack(rackActual);
   $('bTrasera').onclick = () => irARack(rackActual, true);
   $('bRefrescar').onclick = () => { actualizar(); cargarCables(); cargarEnergia(); };
+  $('bRacks').onclick = () => alternarPicker();
+  $('bColapsar').onclick = () => alternarControles();
   $('selDisp').onchange = e => { disposicion = e.target.value; try { localStorage.setItem('cube3d-disp', disposicion); } catch {} aplicarDisposicion(); vistaSala(); };
   $('chkPuerta').onchange = e => racks.forEach(r => r.obj.setPuerta(e.target.checked));
   $('chkPaneles').onchange = e => racks.forEach(r => r.obj.setPaneles(e.target.checked));

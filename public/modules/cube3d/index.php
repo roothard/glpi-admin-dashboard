@@ -55,6 +55,28 @@ $V = $V ?: time();
   #nav{position:fixed;right:10px;top:50%;transform:translateY(-50%);z-index:6;background:#121a2ce6;border:1px solid #2a3556;border-radius:10px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:#8a96bd}
   #nav button{margin:0;padding:3px 9px;font-size:13px}
   #rngAltura{writing-mode:vertical-lr;direction:rtl;height:200px;margin:2px 0;accent-color:#7b93ff}
+  #barraRacks{margin:8px 0 2px;display:flex;gap:6px;flex-wrap:wrap}
+  #bRacks{background:#3a4a74;font-weight:600}
+  .ov{position:fixed;z-index:20;background:#121a2cf2;border:1px solid #2a3556;border-radius:10px;box-shadow:0 12px 44px #000b;font-size:12px;color:#e6e9f2}
+  #rackPicker{left:12px;top:150px;width:272px;max-height:62vh;overflow:auto;padding:8px}
+  #rackInfo{right:12px;top:12px;width:344px;max-height:calc(100% - 24px);overflow:auto;padding:12px}
+  .ovh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+  .ovh b{color:#7b93ff;font-size:13px}
+  .xbtn{background:#2a3556;border:0;color:#c3cdee;border-radius:6px;padding:2px 9px;cursor:pointer;font-size:12px}
+  .xbtn:hover{background:#3a4a74}
+  .rk{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:7px 9px;border-radius:7px;background:#0b0f1a99;margin-top:5px;cursor:pointer;border:1px solid #23304f}
+  .rk:hover{background:#1b2440;border-color:#3a4a74}
+  .rk small{color:#8a96bd}
+  .rk .n{font-weight:600}
+  .sec{margin-top:12px}
+  .sec .sh{font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;display:flex;align-items:center;gap:6px}
+  .sec .ss{color:#8a96bd;font-size:11px;line-height:1.3;margin:2px 0 5px}
+  .it{padding:5px 8px;border-left:3px solid #44527a;margin-top:3px;background:#0b0f1a99;line-height:1.3;border-radius:0 4px 4px 0}
+  .it small{display:block;color:#8a96bd}
+  .it.ok{border-left-color:#35c27a}
+  .it.warn{border-left-color:#e8a317}
+  .it.otro{border-left-color:#5a6b9a}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:0 0 auto}
 </style>
 </head>
 <body>
@@ -63,6 +85,12 @@ $V = $V ?: time();
   <div class="sub" id="t-hint"></div>
   <div id="info"></div>
   <div id="selinfo" class="sub" style="color:#7b93ff;cursor:default"></div>
+  <div id="barraRacks">
+    <button id="bRacks"></button>
+    <button id="bColapsar" class="xbtn" title=""></button>
+  </div>
+  <div id="rackLista" style="display:none;margin-top:4px"></div>
+  <div id="controles">
   <div id="detRacks" style="display:none">
     <div class="grupo" id="t-racks">Racks</div><div id="chips"></div>
     <button id="bPrev"></button><button id="bNext"></button><button id="bSala"></button>
@@ -86,6 +114,7 @@ $V = $V ?: time();
   <div id="lista"></div>
   <button id="bFrente"></button><button id="bTrasera"></button><button id="bRefrescar"></button>
   <div id="estado"></div>
+  </div><!-- /#controles -->
 </div>
 <div id="capa"><svg id="lineas"></svg></div>
 <div id="nav"><button id="bArriba" title="▲">▲</button><input id="rngAltura" type="range" min="0.15" max="2.4" step="0.01" value="1.0"><button id="bAbajo" title="▼">▼</button><span id="t-height">altura</span></div>
