@@ -12,6 +12,8 @@
 require dirname(__DIR__, 3) . '/lib.php';
 panel_session();
 header('X-Content-Type-Options: nosniff');
+// La página del iframe NO se cachea: así cada deploy se ve al instante (los assets van versionados con ?v=).
+header('Cache-Control: no-cache, must-revalidate');
 if (empty($_SESSION['glpi_token'])) {
     header('Content-Type: text/html; charset=utf-8');
     echo '<!doctype html><meta charset="utf-8"><body style="margin:0;font-family:system-ui;background:#0b0f1a;color:#9fb0e8;display:grid;place-items:center;height:100vh">Iniciá sesión en el panel.</body>';
@@ -25,6 +27,11 @@ foreach (['app.js', 'motor.js', 'modelos.js', 'fichas/catalogo.json', 'i18n.json
     if (is_file($p)) { $V = max($V, (int) filemtime($p)); }
 }
 $V = $V ?: time();
+// Sello de build (lo escribe el deploy en config/version.json): versión + commit + entorno.
+$verInfo = @json_decode((string) @file_get_contents(dirname(__DIR__, 3) . '/config/version.json'), true) ?: [];
+$buildTxt = trim(($verInfo['version'] ?? 'dev')
+    . (!empty($verInfo['commit']) ? ' ·' . substr((string) $verInfo['commit'], 0, 7) : '')
+    . (!empty($verInfo['env']) ? ' · ' . $verInfo['env'] : ''));
 ?><!doctype html>
 <html lang="es">
 <head>
@@ -48,6 +55,7 @@ $V = $V ?: time();
   label.chk{display:block;margin-top:8px;font-size:12px;color:#c3cdee}
   select{background:#0b0f1a;color:#e6e9f2;border:1px solid #2a3556;border-radius:4px;padding:2px 4px;margin-left:6px}
   #estado{color:#6f7da8;font-size:11px;margin-top:8px}
+  #build{position:fixed;left:8px;bottom:6px;z-index:7;font-family:ui-monospace,monospace;font-size:10px;color:#5a6b9a;opacity:.72;pointer-events:none;letter-spacing:.02em}
   #capa{position:fixed;inset:0;pointer-events:none;z-index:4;overflow:hidden}
   #lineas{position:absolute;inset:0;width:100%;height:100%}
   .etiqueta{position:absolute;left:0;top:0;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;color:#fff;border:1px solid #fff5;white-space:nowrap;pointer-events:none;box-shadow:0 2px 8px #0008;max-width:300px}
@@ -118,6 +126,7 @@ $V = $V ?: time();
 </div>
 <div id="capa"><svg id="lineas"></svg></div>
 <div id="nav"><button id="bArriba" title="▲">▲</button><input id="rngAltura" type="range" min="0.15" max="2.4" step="0.01" value="1.0"><button id="bAbajo" title="▼">▼</button><span id="t-height">altura</span></div>
+<div id="build"><?= htmlspecialchars($buildTxt, ENT_QUOTES) ?></div>
 <script type="importmap">
 {"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/","app/modelos.js":"./modelos.js?v=<?= $V ?>","app/motor.js":"./motor.js?v=<?= $V ?>"}}
 </script>
