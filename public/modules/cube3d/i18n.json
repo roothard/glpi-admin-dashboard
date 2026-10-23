@@ -56,7 +56,8 @@
     "info_vacio": "Nada por acá.",
     "cerrar": "Cerrar",
     "ctrl_ocultar": "Ocultar controles",
-    "ctrl_mostrar": "Mostrar controles"
+    "ctrl_mostrar": "Mostrar controles",
+    "alertas_show": "Alertas de monitoreo"
   },
   "en": {
     "title": "3D Datacenter",
@@ -115,7 +116,8 @@
     "info_vacio": "Nothing here.",
     "cerrar": "Close",
     "ctrl_ocultar": "Hide controls",
-    "ctrl_mostrar": "Show controls"
+    "ctrl_mostrar": "Show controls",
+    "alertas_show": "Monitoring alerts"
   },
   "fr": {
     "title": "Datacenter 3D",
@@ -174,7 +176,8 @@
     "info_vacio": "Rien ici.",
     "cerrar": "Fermer",
     "ctrl_ocultar": "Masquer les contrôles",
-    "ctrl_mostrar": "Afficher les contrôles"
+    "ctrl_mostrar": "Afficher les contrôles",
+    "alertas_show": "Alertes de supervision"
   },
   "de": {
     "title": "3D-Rechenzentrum",
@@ -233,7 +236,8 @@
     "info_vacio": "Nichts hier.",
     "cerrar": "Schließen",
     "ctrl_ocultar": "Steuerung ausblenden",
-    "ctrl_mostrar": "Steuerung anzeigen"
+    "ctrl_mostrar": "Steuerung anzeigen",
+    "alertas_show": "Monitoring-Warnungen"
   },
   "pt": {
     "title": "Datacenter 3D",
@@ -292,6 +296,7 @@
     "info_vacio": "Nada aqui.",
     "cerrar": "Fechar",
     "ctrl_ocultar": "Ocultar controles",
-    "ctrl_mostrar": "Mostrar controles"
+    "ctrl_mostrar": "Mostrar controles",
+    "alertas_show": "Alertas de monitoramento"
   }
 }

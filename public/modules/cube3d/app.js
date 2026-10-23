@@ -36,7 +36,7 @@ async function cargarIdioma() {
   set('t-door', 'door'); set('t-panels', 'panels'); set('t-todo', 'todo'); set('t-todosub', 'todo_sub');
   set('t-height', 'height'); set('bPrev', 'prev'); set('bNext', 'next'); set('bSala', 'room');
   set('bFrente', 'front'); set('bTrasera', 'back'); set('bRefrescar', 'refresh');
-  set('t-info-hide', 'info_hide'); set('t-cables-show', 'cables_show'); set('t-ruteo', 'ruteo');
+  set('t-alertas-show', 'alertas_show'); set('t-info-hide', 'info_hide'); set('t-cables-show', 'cables_show'); set('t-ruteo', 'ruteo');
   set('t-ruteo-centro', 'ruteo_centro'); set('t-ruteo-costados', 'ruteo_costados');
   set('t-cables-sub', 'cables_sub');
   set('t-energia-show', 'energia_show'); set('t-energia', 'energia_title'); set('t-energia-sub', 'energia_sub');
@@ -388,6 +388,11 @@ function dibujarAlertas() {
   marcas.forEach(limpiarAnclaje); marcas = [];
   if (lineas) lineas.replaceChildren();
   if (capa) capa.querySelectorAll('.etiqueta').forEach(e => e.remove());
+  if ($('chkAlertas') && !$('chkAlertas').checked) {   // alertas de monitoreo ocultas: no se dibuja nada
+    if (capa) capa.style.display = 'none';
+    const el = $('lista'); if (el) el.innerHTML = '';
+    return;
+  }
   const ocultarInfo = $('chkInfo')?.checked;
   const visibles = ultimo.filter(p => !(ocultarInfo && (p.severidad ?? 0) <= 1));
   const grupos = new Map(), sinLugar = [], ocultas = [];
@@ -664,7 +669,8 @@ function cablearUI() {
   $('bSala').onclick = () => vistaSala();
   $('bFrente').onclick = () => irARack(rackActual);
   $('bTrasera').onclick = () => irARack(rackActual, true);
-  $('bRefrescar').onclick = () => { actualizar(); cargarCables(); cargarEnergia(); };
+  $('bRefrescar').onclick = () => refrescar();
+  if ($('chkAlertas')) $('chkAlertas').onchange = dibujarAlertas;
   $('bRacks').onclick = () => alternarPicker();
   $('bColapsar').onclick = () => alternarControles();
   $('selDisp').onchange = e => { disposicion = e.target.value; try { localStorage.setItem('cube3d-disp', disposicion); } catch {} aplicarDisposicion(); vistaSala(); };
@@ -723,6 +729,18 @@ async function actualizar() {
   ultimo = d.alertas || [];
   const est = $('estado'); if (est) est.textContent = t('al_status', { n: ultimo.length, h: new Date((d.actualizado || Date.now() / 1000) * 1000).toLocaleTimeString() });
   dibujarAlertas();
+}
+// "Actualizar": re-lee el rack de GLPI (data.php) y reconstruye, y refresca las capas
+// opcionales — así un cambio en GLPI (posición de un equipo, etc.) se ve sin recargar la página.
+// Mantiene la vista (cámara), el rack enfocado y el equipo seleccionado.
+async function refrescar() {
+  const cam = camera.position.clone(), tgt = controls.target.clone(), rk = rackActual, sel = equipoSel;
+  await cargar();
+  if (racks[rk]) rackActual = rk;
+  equipoSel = (sel && equipos.has(sel)) ? sel : null;
+  await Promise.all([cargarCables(), cargarEnergia(), actualizar()]);
+  actualizarSel();
+  anim = null; camera.position.copy(cam); controls.target.copy(tgt);
 }
 async function cargarCables() {
   const d = await pedirOpcional('cables.php'); if (!d) return;

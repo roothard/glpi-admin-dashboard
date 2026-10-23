@@ -106,6 +106,7 @@ $buildTxt = trim(($verInfo['version'] ?? 'dev')
     <label class="chk"><span id="t-disp">Disposición:</span>
       <select id="selDisp"><option value="linea" id="t-displine"></option><option value="real" id="t-dispreal"></option></select></label>
   </div>
+  <label class="chk"><input type="checkbox" id="chkAlertas" checked> <span id="t-alertas-show"></span></label>
   <label class="chk"><input type="checkbox" id="chkInfo" checked> <span id="t-info-hide"></span></label>
   <label class="chk"><input type="checkbox" id="chkCables" checked> <span id="t-cables-show"></span></label>
   <label class="chk"><input type="checkbox" id="chkEnergia" checked> <span id="t-energia-show"></span></label>
