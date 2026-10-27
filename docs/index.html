@@ -112,7 +112,7 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
   <span class="hdr-divider"></span>
   <span class="hdr-title">Centro de Administración GLPI · Documentación</span>
   <div class="hdr-right">
-    <span class="hdr-ver">v1.8.0</span>
+    <span class="hdr-ver">v1.10.0</span>
     <a class="hdr-gh" href="https://github.com/roothard/glpi-admin-dashboard" target="_blank" rel="noopener">GitHub</a>
   </div>
 </header>
@@ -421,7 +421,31 @@ pre.code{background:#0C0C12;border:1px solid rgba(255,255,255,0.08);border-radiu
       <h2 class="doc-h2" id="changelog">Registro de versiones</h2>
 
       <div class="ver">
-        <div class="ver-head"><span class="ver-tag cur">v1.8.0</span>
+        <div class="ver-head"><span class="ver-tag cur">v1.10.0</span>
+          <span class="ver-date">2026-10-27</span><span class="ver-name">Release unificada: Compliance por norma + Datacenter 3D</span></div>
+        <ul class="doc-ul">
+          <li>Reúne en una sola línea la vista <strong>Compliance por norma</strong> (v1.8.0) y el
+            módulo <strong>Datacenter 3D</strong> (v1.9.0), que habían salido en ramas divergentes.
+            Producción queda con las dos funciones juntas.</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="ver-head"><span class="ver-tag">v1.9.0</span>
+          <span class="ver-date">2026-10-22</span><span class="ver-name">Datacenter 3D (módulo cube3d)</span></div>
+        <ul class="doc-ul">
+          <li><strong>Nuevo módulo drop-in «Datacenter 3D» (<code>cube3d</code>)</strong>: dibuja el
+            rack en 3D desde el inventario de GLPI (Rack / Item_Rack), de solo lectura y con la sesión
+            del propio usuario. Cada equipo sale de un catálogo de modelos genérico, así que otro GLPI
+            funciona solo poblando sus datos. Capas opcionales (por archivo-feed) agregan el cableado de
+            red y energía y las alertas de monitoreo que apuntan al equipo afectado.</li>
+          <li><strong>Botón «Racks disponibles»</strong> con ventana de información por rack, y assets
+            versionados para que cada deploy sirva la build nueva. Traducido a los 5 idiomas.</li>
+        </ul>
+      </div>
+
+      <div class="ver">
+        <div class="ver-head"><span class="ver-tag">v1.8.0</span>
           <span class="ver-date">2026-10-18</span><span class="ver-name">Compliance por norma: ISO 27001 / 9001 / NIS2</span></div>
         <ul class="doc-ul">
           <li><strong>Resultado, no solo ejecución</strong>: el panel de Cumplimiento lee el

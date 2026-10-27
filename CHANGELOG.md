@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 A user-facing version of this changelog is published at [`docs/`](docs/index.html).
 
+## [1.10.0] — 2026-10-27 — Unified release: Compliance by standard + Datacenter 3D
+### Changed
+- Reconciliation release: brings together in a single line the
+  **compliance-by-standard** view (1.8.0) and the **Datacenter 3D** module
+  (1.9.0), which had shipped on divergent branches. No new features — production
+  now carries both.
+
 ## [1.9.0] — 2026-10-22 — Datacenter 3D
 ### Added
 - **New drop-in module "Datacenter 3D" (`cube3d`)**: renders the rack(s) in 3D
