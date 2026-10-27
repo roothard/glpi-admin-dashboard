@@ -1,0 +1,20 @@
+{
+ "version": 1,
+ "id": "ups-torre",
+ "nombre": "UPS de torre sobre bandeja (3U)",
+ "tipo": "ups",
+ "montaje": "rack",
+ "alto_u": 3,
+ "profundidad_mm": 380,
+ "medio_ancho": true,
+ "acabado": "negro",
+ "frente": {
+  "tipo": "ups",
+  "forma": "torre",
+  "pantalla": true,
+  "sin_cuerpo": true
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

@@ -4,6 +4,27 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 A user-facing version of this changelog is published at [`docs/`](docs/index.html).
 
+## [1.9.0] — 2026-10-22 — Datacenter 3D
+### Added
+- **New drop-in module "Datacenter 3D" (`cube3d`)**: renders the rack(s) in 3D
+  from the GLPI inventory (Rack / Item_Rack), read-only and per the user's own
+  session (GLPI keeps the entity isolation). Each equipment is drawn from a
+  generic model catalogue, so a different GLPI works by just populating its data
+  — no dashboard code changes. Optional layers, fed by file, add network and
+  power cabling and live monitoring alerts that point with arrows to the affected
+  equipment or port.
+- **Power cabling lands on the power supplies**: energy cables start at each
+  equipment's PSUs and run to the UPS / PDU, driven by the model geometry, so
+  the right landing point is automatic for any equipment.
+- **"Available racks" button with a per-rack info window**: the controls collapse
+  behind a button that lists the available racks; choosing one opens a window
+  with what is known about that rack, what appears in the data but still has no
+  physical location (to complete in GLPI) and what belongs to another rack that
+  is not shown. Translated in the five UI languages (ES/EN/FR/DE/PT).
+### Fixed
+- **Static assets are versioned** (JS modules and the fichas / i18n JSON): every
+  deploy serves the new build instead of a stale cached one.
+
 ## [1.8.0] — 2026-10-18 — Compliance by standard (ISO 27001 / 9001 / NIS2)
 ### Added
 - **Result, not just execution**: the Compliance panel reads the ticket's

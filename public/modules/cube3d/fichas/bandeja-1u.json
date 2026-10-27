@@ -1,0 +1,19 @@
+{
+ "version": 1,
+ "id": "bandeja-1u",
+ "nombre": "Bandeja fija 1U",
+ "tipo": "bandeja",
+ "montaje": "rack",
+ "alto_u": 1,
+ "profundidad_mm": 450,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "frente": {
+  "tipo": "panel",
+  "variante": "bandeja",
+  "sin_cuerpo": true
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

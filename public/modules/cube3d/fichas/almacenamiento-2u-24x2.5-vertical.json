@@ -1,0 +1,74 @@
+{
+ "version": 1,
+ "id": "almacenamiento-2u-24x2.5-vertical",
+ "nombre": "Almacenamiento 2U · 24 bahías 2,5\" verticales",
+ "tipo": "almacenamiento",
+ "montaje": "rack",
+ "alto_u": 2,
+ "profundidad_mm": 550,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "#2a2d33",
+ "cara_conectores": "trasera",
+ "frente": {
+  "tipo": "bahias",
+  "region": {
+   "x_mm": 26,
+   "y_mm": 5,
+   "ancho_mm": 432.4,
+   "alto_mm": 78
+  },
+  "bahias": {
+   "formato": "2.5",
+   "orientacion": "vertical",
+   "filas": 1,
+   "columnas": 24,
+   "grupo_columnas": 12,
+   "separacion_mm": 6,
+   "holgura_mm": 1.1,
+   "acento_superior": true,
+   "ocupadas": 24
+  },
+  "oreja_izq": {
+   "ancho_mm": 24,
+   "texto_vertical": true,
+   "leds": 3
+  },
+  "oreja_der": {
+   "ancho_mm": 24
+  }
+ },
+ "trasera": {
+  "estilo": "almacenamiento",
+  "fuentes": 2,
+  "controladoras": 2,
+  "puertos": [
+   {
+    "id": "a",
+    "tipo": "rj45",
+    "fx": 0.43,
+    "fy": 0.36
+   },
+   {
+    "id": "b",
+    "tipo": "rj45",
+    "fx": 0.74,
+    "fy": 0.36
+   }
+  ],
+  "defecto": "a",
+  "alias": [
+   {
+    "patron": "\\bb\\b",
+    "id": "b"
+   },
+   {
+    "patron": "\\ba\\b",
+    "id": "a"
+   }
+  ]
+ },
+ "supuestos": [
+  "No se sabe qué bahías tienen disco: se dibujan las primeras ocupadas."
+ ]
+}

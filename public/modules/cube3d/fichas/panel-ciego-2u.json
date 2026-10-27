@@ -1,0 +1,19 @@
+{
+ "version": 1,
+ "id": "panel-ciego-2u",
+ "nombre": "Panel ciego 2U",
+ "tipo": "panel-ciego",
+ "montaje": "rack",
+ "alto_u": 2,
+ "profundidad_mm": 20,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "#16181d",
+ "frente": {
+  "tipo": "panel",
+  "variante": "ciego"
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

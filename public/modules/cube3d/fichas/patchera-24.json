@@ -1,0 +1,34 @@
+{
+ "version": 1,
+ "id": "patchera-24",
+ "nombre": "Patchera 1U · 24 puertos",
+ "tipo": "patchera",
+ "montaje": "rack",
+ "alto_u": 1,
+ "profundidad_mm": 60,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "#16181d",
+ "cara_conectores": "frontal",
+ "frente": {
+  "tipo": "puertos",
+  "orejas_mm": 17.8,
+  "estilo": "patchera",
+  "puertos": {
+   "rj45": {
+    "cantidad": 24,
+    "filas": 1,
+    "numeracion": "secuencial",
+    "x_ini_mm": 40,
+    "paso_mm": 17.6,
+    "y_mm": [
+     26
+    ]
+   },
+   "leds": false
+  }
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

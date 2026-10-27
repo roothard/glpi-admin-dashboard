@@ -1,0 +1,35 @@
+{
+ "version": 1,
+ "id": "patchera-48",
+ "nombre": "Patchera 2U · 48 puertos",
+ "tipo": "patchera",
+ "montaje": "rack",
+ "alto_u": 2,
+ "profundidad_mm": 60,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "#16181d",
+ "cara_conectores": "frontal",
+ "frente": {
+  "tipo": "puertos",
+  "orejas_mm": 17.8,
+  "estilo": "patchera",
+  "puertos": {
+   "rj45": {
+    "cantidad": 48,
+    "filas": 2,
+    "numeracion": "secuencial",
+    "x_ini_mm": 40,
+    "paso_mm": 17.6,
+    "y_mm": [
+     30,
+     62
+    ]
+   },
+   "leds": false
+  }
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

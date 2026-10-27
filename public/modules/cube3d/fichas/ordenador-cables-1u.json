@@ -1,0 +1,20 @@
+{
+ "version": 1,
+ "id": "ordenador-cables-1u",
+ "nombre": "Ordenador de cables 1U",
+ "tipo": "ordenador-cables",
+ "montaje": "rack",
+ "alto_u": 1,
+ "profundidad_mm": 75,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "#16181d",
+ "frente": {
+  "tipo": "panel",
+  "variante": "organizador",
+  "ranuras": 6
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

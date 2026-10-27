@@ -1,0 +1,83 @@
+{
+ "version": 1,
+ "id": "servidor-2u-12x3.5",
+ "nombre": "Servidor 2U · 12 bahías 3,5\"",
+ "tipo": "servidor",
+ "montaje": "rack",
+ "alto_u": 2,
+ "profundidad_mm": 763,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "chapa",
+ "cara_conectores": "trasera",
+ "frente": {
+  "tipo": "bahias",
+  "region": {
+   "x_mm": 18,
+   "y_mm": 3.4,
+   "ancho_mm": 440.6,
+   "alto_mm": 83.4
+  },
+  "bahias": {
+   "formato": "3.5",
+   "orientacion": "horizontal",
+   "filas": 3,
+   "columnas": 4,
+   "acento_columnas": true
+  },
+  "oreja_izq": {
+   "ancho_mm": 18,
+   "vga": true,
+   "texto_vertical": true
+  },
+  "oreja_der": {
+   "ancho_mm": 24,
+   "panel": "control",
+   "usb": 2,
+   "etiqueta": true
+  }
+ },
+ "trasera": {
+  "estilo": "servidor",
+  "fuentes": 2,
+  "pcie": true,
+  "puertos": [
+   {
+    "id": "xcc",
+    "tipo": "rj45",
+    "fx": 0.25,
+    "fy": 0.6
+   },
+   {
+    "id": "gbe1",
+    "tipo": "rj45",
+    "fx": 0.308,
+    "fy": 0.6
+   },
+   {
+    "id": "gbe2",
+    "tipo": "rj45",
+    "fx": 0.359,
+    "fy": 0.6
+   }
+  ],
+  "defecto": "gbe1",
+  "alias": [
+   {
+    "patron": "port\\s*0?2|xcc|ipmi|bmc|idrac|ilo",
+    "id": "xcc"
+   },
+   {
+    "patron": "port\\s*0?1|gesti",
+    "id": "gbe2"
+   },
+   {
+    "patron": "port\\s*0?0|lan|corosync",
+    "id": "gbe1"
+   }
+  ]
+ },
+ "supuestos": [
+  "El inventario no indica cuántas bahías tiene este servidor (configuración a medida): se supuso 12 de 3,5\" y todas ocupadas."
+ ]
+}

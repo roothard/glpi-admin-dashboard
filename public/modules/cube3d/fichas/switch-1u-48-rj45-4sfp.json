@@ -1,0 +1,49 @@
+{
+ "version": 1,
+ "id": "switch-1u-48-rj45-4sfp",
+ "nombre": "Switch 1U · 48 RJ45 + 4 SFP+",
+ "tipo": "switch",
+ "montaje": "rack",
+ "alto_u": 1,
+ "profundidad_mm": 300,
+ "ancho_chasis_mm": 440,
+ "acabado": "grafito",
+ "cuerpo": "chapa",
+ "cara_conectores": "frontal",
+ "frente": {
+  "tipo": "puertos",
+  "orejas_mm": 21.3,
+  "puertos": {
+   "rj45": {
+    "cantidad": 48,
+    "filas": 2,
+    "numeracion": "alterna",
+    "x_ini_mm": 70,
+    "paso_mm": 12.9,
+    "y_mm": [
+     13.2,
+     28.2
+    ]
+   },
+   "extra": {
+    "tipo": "sfp",
+    "cantidad": 4,
+    "x_ini_mm": 395,
+    "paso_mm": 22,
+    "filas": 2,
+    "y_mm": [
+     13.2,
+     28.2
+    ]
+   },
+   "leds": true,
+   "area_izq": {
+    "x_mm": 28,
+    "barras": false
+   }
+  }
+ },
+ "trasera": {
+  "estilo": "plano"
+ }
+}

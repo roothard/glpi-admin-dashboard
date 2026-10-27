@@ -1,0 +1,68 @@
+{
+ "version": 1,
+ "id": "almacenamiento-2u-12x3.5",
+ "nombre": "Almacenamiento 2U · 12 bahías 3,5\"",
+ "tipo": "almacenamiento",
+ "montaje": "rack",
+ "alto_u": 2,
+ "profundidad_mm": 550,
+ "ancho_chasis_mm": 447,
+ "acabado": "negro",
+ "cuerpo": "#2a2d33",
+ "cara_conectores": "trasera",
+ "frente": {
+  "tipo": "bahias",
+  "region": {
+   "x_mm": 24,
+   "y_mm": 3.4,
+   "ancho_mm": 434,
+   "alto_mm": 83.4
+  },
+  "bahias": {
+   "formato": "3.5",
+   "orientacion": "horizontal",
+   "filas": 3,
+   "columnas": 4,
+   "acento_columnas": true,
+   "ocupadas": 12
+  },
+  "oreja_izq": {
+   "ancho_mm": 24,
+   "texto_vertical": true,
+   "leds": 3
+  },
+  "oreja_der": {
+   "ancho_mm": 24
+  }
+ },
+ "trasera": {
+  "estilo": "almacenamiento",
+  "fuentes": 2,
+  "controladoras": 2,
+  "puertos": [
+   {
+    "id": "a",
+    "tipo": "rj45",
+    "fx": 0.43,
+    "fy": 0.36
+   },
+   {
+    "id": "b",
+    "tipo": "rj45",
+    "fx": 0.74,
+    "fy": 0.36
+   }
+  ],
+  "defecto": "a",
+  "alias": [
+   {
+    "patron": "\\bb\\b",
+    "id": "b"
+   },
+   {
+    "patron": "\\ba\\b",
+    "id": "a"
+   }
+  ]
+ }
+}
